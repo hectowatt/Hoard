@@ -2,16 +2,16 @@ services:
   backend:
     build: 
       context: ./backend
-    container_name: Hoard_backend
+    container_name: hoard_backend
     restart: always
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=postgres://Hoard_user:Hoard_password@db:5432/Hoard_db
+      - DATABASE_URL=postgres://hoard_user:hoard_password@db:5432/hoard_db
     depends_on:
       - db
     networks:
-      - Hoard_network
+      - hoard_network
     volumes:
       - ./backend:/app
       - /app/node_modules
@@ -19,20 +19,20 @@ services:
 
   db:
     image: postgres:15
-    container_name: Hoard_db
+    container_name: hoard_db
     restart: always
     environment:
-      POSTGRES_USER: Hoard_user
-      POSTGRES_PASSWORD: Hoard_password
-      POSTGRES_DB: Hoard_db
+      POSTGRES_USER: hoard_user
+      POSTGRES_PASSWORD: hoard_password
+      POSTGRES_DB: hoard_db
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
-      - Hoard_network
+      - hoard_network
 
   nginx:
     image: nginx:latest
-    container_name: Hoard_nginx
+    container_name: hoard_nginx
     restart: always
     ports:
       - "80:80"
@@ -42,10 +42,26 @@ services:
     depends_on:
       - backend
     networks:
-      - Hoard_network
+      - hoard_network
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: hoard_frontend
+    restart: always
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - hoard_network
+    command: sh -c "npm install && npm run dev"
 
 networks:
-  Hoard_network:
+  hoard_network:
     driver: bridge
 
 volumes:
