@@ -21,6 +21,8 @@ services:
     image: postgres:15
     container_name: hoard_db
     restart: always
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_USER: hoard_user
       POSTGRES_PASSWORD: hoard_password
