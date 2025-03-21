@@ -1,0 +1,11 @@
+{
+    "name": "Hoard Dev Container",
+    "dockerComposeFile": "../docker-compose.yml",
+    "service": "app",
+    "workspaceFolder": "/app",
+    "postCreateCommand": "npm install",
+    "remoteEnv": {
+      "DATABASE_URL": "postgres://hoard_user:hoard_password@db:5432/hoard_db"
+    }
+  }
+  

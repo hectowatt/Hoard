@@ -1,11 +1,12 @@
 services:
-  backend:
+  app:
     build: 
-      context: ./backend
-    container_name: hoard_backend
+      context: .
+    container_name: hoard_app
     restart: always
     ports:
-      - "3000:3000"
+      - "3000:3000"  # frontend用
+      - "4000:4000"  # backend用
     environment:
       - DATABASE_URL=postgres://hoard_user:hoard_password@db:5432/hoard_db
     depends_on:
@@ -13,9 +14,10 @@ services:
     networks:
       - hoard_network
     volumes:
-      - ./backend:/app
-      - /app/node_modules
-    command: sh -c "npm install && npm run dev"
+      - ./src:/app
+      - /app/backend/node_modules
+      - /app/frontend/node_modules
+    command: /bin/sh -c "cd /app/frontend && npm run dev & cd /app/backend && npm run dev"
 
   db:
     image: postgres:15
@@ -42,25 +44,9 @@ services:
     volumes:
       - ./nginx:/etc/nginx/conf.d
     depends_on:
-      - backend
+      - app
     networks:
       - hoard_network
-
-  frontend:
-    build:
-      context: ./frontend
-    container_name: hoard_frontend
-    restart: always
-    ports:
-      - "4000:4000"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    depends_on:
-      - backend
-    networks:
-      - hoard_network
-    command: sh -c "npm install && npm run dev"
 
 networks:
   hoard_network:
