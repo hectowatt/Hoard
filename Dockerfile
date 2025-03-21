@@ -2,7 +2,7 @@
 FROM node:18
 
 # 作業ディレクトリを設定
-WORKDIR /
+WORKDIR /app
 
 # backendの依存関係をインストール
 COPY ./src/backend/package*.json ./src/backend/

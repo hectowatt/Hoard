@@ -14,10 +14,10 @@ services:
     networks:
       - hoard_network
     volumes:
-      - ./src:/app
-      - /app/backend/node_modules
-      - /app/frontend/node_modules
-    command: /bin/sh -c "cd /app/frontend && npm run dev & cd /app/backend && npm run dev"
+      - ./:/app
+      - /app/src/backend/node_modules
+      - /app/src/frontend/node_modules
+    command: /bin/sh -c "cd /app/src/frontend && npm run dev & cd /app/src/backend && npm run dev"
 
   db:
     image: postgres:15
