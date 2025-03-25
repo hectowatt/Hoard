@@ -11,6 +11,8 @@ services:
       - DATABASE_URL=postgres://hoard_user:hoard_password@db:5432/hoard_db
     depends_on:
       - db
+    env_file:
+      - .env
     networks:
       - hoard_network
     volumes:

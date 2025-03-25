@@ -17,8 +17,10 @@ export default function Note() {
             const newSocket = new WebSocket("ws://localhost:4000");
             newSocket.onopen = () => {
                 console.log("Connected to server");
+                console.log("inputValue: ", inputValue);
                 newSocket.send(inputValue);
             }
+            setSocket(newSocket);
             newSocket.onmessage = (event) => {
                 console.log("message from server: ", event.data);
             }
@@ -39,7 +41,7 @@ export default function Note() {
         <div>
             <form>
                 <p>入力：
-                    <input
+                    <input className="text-black"
                         type="text"
                         name="name"
                         value={inputValue}
