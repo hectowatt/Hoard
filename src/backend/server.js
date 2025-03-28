@@ -30,13 +30,7 @@ wss.on('connection', (ws) => {
     console.log(`Received: ${message}`);
     // PostgreSQLに接続してクエリを実行
     try{
-      console.log('クエリを組み立てる前');
-      console.log('PG_HOST:', process.env.PG_HOST);
-      console.log('PG_PORT:', process.env.PG_PORT);
-      console.log('PG_USER:', process.env.PG_USER);
-      console.log('PG_PASSWORD:', process.env.PG_PASSWORD);
-      console.log('PG_DATABASE:', process.env.PG_DATABASE);
-      const query = 'INSERT INTO hoard.MESSAGE(NAME) VALUES ($1) RETURNING ID';
+      const query = 'INSERT INTO hoard.note(notevalue) VALUES ($1) RETURNING notevalue';
       const values = [messageText];
       console.log('Query values:',values);
       const result = await pool.query(query, values);
