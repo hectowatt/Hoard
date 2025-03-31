@@ -8,8 +8,7 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "build": "echo 'No build step required'",
-    "migrate": "typeorm migration:run -d ./data-source.js",
-    "migrateshow": "typeorm migration:show -d ./data-source.js",
+    "migrate": "typeorm migration:run -- -d ./data-source.ts",
     "typeorm": "typeorm-ts-node-esm"
   },
   "keywords": [],
