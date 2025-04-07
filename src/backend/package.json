@@ -8,8 +8,11 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "build": "echo 'No build step required'",
-    "migrate": "typeorm migration:run -- -d ./data-source.ts",
-    "typeorm": "typeorm-ts-node-esm"
+    "migrate": "typeorm-ts-node-esm migration:run -d ./data-source.ts",
+    "typeorm": "typeorm-ts-node-esm",
+    "generate": "npm run typeorm migration:generate -- --dataSource ./data-source.ts --pretty ./migrations/InitialSchema"
+    
+    
   },
   "keywords": [],
   "author": "",
@@ -26,6 +29,7 @@
   "devDependencies": {
     "@types/node": "^22.13.14",
     "nodemon": "^3.1.9",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "typeorm-ts-node-esm": "^0.3.20"
   }
 }

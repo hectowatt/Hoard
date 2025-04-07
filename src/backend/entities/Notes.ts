@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from "typeorm";
 
-@Entity({schema: "hoard", name: "notes"})
+@Entity({name: "notes"})
 export default class Notes{
 
     // primary key

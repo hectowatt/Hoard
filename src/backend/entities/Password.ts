@@ -1,7 +1,7 @@
 import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn } from "typeorm";
 import Notes from "./Notes.js";
 
-@Entity({ schema: "hoard", name: "password" })
+@Entity({name: "password" })
 export class Password {
     // note_id (主キーかつ外部キー)
     @PrimaryColumn("uuid")

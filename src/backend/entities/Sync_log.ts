@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from "typeorm";
 import  Notes from "./Notes.js";
 
-@Entity({ schema: "hoard", name: "sync_log" })
+@Entity({name: "sync_log" })
 export class SyncLog {
     // id (主キー)
     @PrimaryGeneratedColumn()
