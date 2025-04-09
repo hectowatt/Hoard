@@ -53,10 +53,9 @@ export default function RootLayout({
           className={`fixed top-0 left-0 h-full bg-gray-500 border-r border-gray-500 transition-transform duration-300 
             ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
             }`}
-          style={{ width: "250px" }}
+          style={{ width: "250px", top: "48px" }}
         >
           <div className="p-4">
-            <h2 className="text-lg font-bold">メニュー</h2>
 
             <ul className="mt-4 space-y-2">
               <li>
@@ -73,20 +72,25 @@ export default function RootLayout({
           </div>
         </aside>
 
-        <div className="flex-1 ml-0 md:ml-[250px] transition-all duration-300">
-          <header className="flex items-center justify-between px-4 py-2 bg-gray-500 text-black border-b border-gray-300">
-            <h1 className="text-lg font-bold">Hoard</h1>
-            <button
-              className="px-2 py-1 bg-gray-300 rounded bg-black text-white hover:bg-gray-400"
-              onClick={toggleSidebar}
-            >
-              ☰
-            </button>
+        <div className="flex-1 ml-0 transition-all duration-300">
+          <header className="flex justify-between px-4 py-2 bg-gray-500 text-black border-b border-gray-300">
+            <div className="flex items-center" style={{ width: "230px" }}>
+              <button
+                className="flex flex-col justify-between h-6 w-8 bg-transparent border-none cursor-pointer"
+                onClick={toggleSidebar}
+                aria-label="Toggle Sidebar"
+              >
+                <span className="block h-1 w-full bg-white rounded"></span>
+                <span className="block h-1 w-full bg-white rounded"></span>
+                <span className="block h-1 w-full bg-white rounded"></span>
+              </button>
+              <h1 className="text-lg font-bold flex-1 ml-2">Hoard</h1>
+            </div>
             <input
               type="text"
               placeholder="検索"
-              className="px-3 py-1 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </input>
+              className="ml-4 px-3 py-1 border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </header>
           <main className="p-4">{children}</main>
         </div>
