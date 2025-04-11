@@ -3,7 +3,7 @@ services:
     build: 
       context: .
     container_name: hoard_app
-    restart: always
+    restart: unless-stopped
     ports:
       - "3000:3000"  # frontend用
       - "4000:4000"  # backend用
@@ -20,12 +20,12 @@ services:
       - ./:/app
       - /app/src/backend/node_modules
       - /app/src/frontend/node_modules
-    command: /bin/sh -c "cd /app/src/frontend && npm run dev & cd /app/src/backend && npm run dev"
+    command: sleep infinity
 
   db:
     image: postgres:15
     container_name: hoard_db
-    restart: always
+    restart: unless-stopped
     ports:
       - "5432:5432"
     environment:
@@ -41,7 +41,7 @@ services:
   nginx:
     image: nginx:latest
     container_name: hoard_nginx
-    restart: always
+    restart: unless-stopped
     ports:
       - "80:80"
     volumes:
