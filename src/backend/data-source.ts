@@ -1,6 +1,5 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
-import { fileURLToPath } from "url";
 
 export const AppDataSource: DataSource = new DataSource({
     type: "postgres",

@@ -76,7 +76,7 @@ export default function RootLayout({
           <header className="flex justify-between px-4 py-2 bg-gray-500 text-black border-b border-gray-300">
             <div className="flex items-center" style={{ width: "230px" }}>
               <button
-                className="flex flex-col justify-between h-6 w-8 bg-transparent border-none cursor-pointer"
+                className="flex flex-col justify-between h-5 w-7 bg-transparent border-none cursor-pointer"
                 onClick={toggleSidebar}
                 aria-label="Toggle Sidebar"
               >
