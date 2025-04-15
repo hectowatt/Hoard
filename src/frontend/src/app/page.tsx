@@ -1,14 +1,31 @@
-import Note from "../components/note"
+import styles from "./page.module.css";
+import {
+  Button,
+  Checkbox,
+  Container,
+  FormControlLabel,
+  FormGroup,
+  Paper,
+} from "@mui/material";
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Note></Note>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-
-      </footer>
-    </div>
+    <Container>
+      <Paper elevation={3} sx={{ p: 5 }}>
+        <h1>Welcome to Material UI!</h1>
+        <FormGroup>
+          <FormControlLabel
+            control={<Checkbox defaultChecked />}
+            label="Label"
+          />
+          <FormControlLabel required control={<Checkbox />} label="Required" />
+          <FormControlLabel disabled control={<Checkbox />} label="Disabled" />
+        </FormGroup>
+        <hr />
+        <Button variant="contained" color="primary">
+          ボタン
+        </Button>
+      </Paper>
+    </Container>
   );
 }

@@ -1,6 +1,6 @@
 <div align="center">
 
-**🖊️ Notes app with table and password lock! 🔐**
+**🖊️ A Notes app with table and password lock! 🔐**
 
 ---
 
