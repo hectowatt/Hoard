@@ -19,10 +19,32 @@ import {
   ListItemText,
   Divider
 } from "@mui/material";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
+import TextSnippetIcon from '@mui/icons-material/TextSnippet';
+import LabelImportantOutlineRoundedIcon from '@mui/icons-material/LabelImportantOutlineRounded';
+import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
+import SettingsIcon from '@mui/icons-material/Settings';
+import TextField from "@mui/material/TextField";
+import IconButton from "@mui/material/IconButton";
+import SearchIcon from "@mui/icons-material/Search";
 
 const inter = Inter({ subsets: ["latin"] });
+
+const aboveIcons = [<TextSnippetIcon />, <LabelImportantOutlineRoundedIcon />];
+const belowIcons = [<DeleteOutlineRoundedIcon />, <SettingsIcon />];
+
+const searchBar = (
+  <form>
+    <TextField
+      id="outlined-basic"
+      variant="outlined"
+      size="medium"
+      placeholder="検索"
+    />
+    <IconButton type="submit" aria-label="search">
+      <SearchIcon style={{ fill: "blue" }} />
+    </IconButton>
+  </form>
+)
 
 const metadata: Metadata = {
   title: "Hoard",
@@ -48,8 +70,9 @@ export default function RootLayout({
             >
               <Toolbar>
                 <Typography variant="h6" noWrap component="div">
-                  Clipped drawer
+                  Hoard
                 </Typography>
+                {searchBar}
               </Toolbar>
             </AppBar>
             <Drawer
@@ -66,12 +89,12 @@ export default function RootLayout({
               <Toolbar />
               <Box sx={{ overflow: "auto" }}>
                 <List>
-                  {["Inbox", "Starred", "Send email", "Drafts"].map(
+                  {["メモ", "ラベル"].map(
                     (text, index) => (
                       <ListItem key={text} disablePadding>
                         <ListItemButton>
                           <ListItemIcon>
-                            {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                            {aboveIcons[index]}
                           </ListItemIcon>
                           <ListItemText primary={text} />
                         </ListItemButton>
@@ -81,11 +104,11 @@ export default function RootLayout({
                 </List>
                 <Divider />
                 <List>
-                  {["All mail", "Trash", "Spam"].map((text, index) => (
+                  {["ごみ箱", "設定"].map((text, index) => (
                     <ListItem key={text} disablePadding>
                       <ListItemButton>
                         <ListItemIcon>
-                          {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                          {belowIcons[index]}
                         </ListItemIcon>
                         <ListItemText primary={text} />
                       </ListItemButton>
