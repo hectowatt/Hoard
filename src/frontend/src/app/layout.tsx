@@ -26,25 +26,38 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
+import InputAdornment from "@mui/material/InputAdornment";
 
 const inter = Inter({ subsets: ["latin"] });
 
 const aboveIcons = [<TextSnippetIcon />, <LabelImportantOutlineRoundedIcon />];
 const belowIcons = [<DeleteOutlineRoundedIcon />, <SettingsIcon />];
 
+// 検索バー
 const searchBar = (
   <form>
     <TextField
-      id="outlined-basic"
+      id="outlined-search-bar"
       variant="outlined"
       size="medium"
       placeholder="検索"
+      sx={{
+        width: "500px",
+        backgroundColor: "#ffffff",
+        borderRadius: "5px"
+      }}
+      InputProps={{
+        endAdornment: (
+          <InputAdornment position="end">
+            <IconButton type="submit" aria-label="search">
+              <SearchIcon style={{ fill: "blue" }} />
+            </IconButton>
+          </InputAdornment>
+        )
+      }}
     />
-    <IconButton type="submit" aria-label="search">
-      <SearchIcon style={{ fill: "blue" }} />
-    </IconButton>
   </form>
-)
+);
 
 const metadata: Metadata = {
   title: "Hoard",
@@ -68,11 +81,16 @@ export default function RootLayout({
               position="fixed"
               sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
             >
-              <Toolbar>
-                <Typography variant="h6" noWrap component="div">
-                  Hoard
-                </Typography>
-                {searchBar}
+              <Toolbar sx={{ display: "flex", justifyContent: "center" }}>
+                <Box sx={{ flexGrow: 1 }}>
+                  <Typography variant="h6" noWrap component="div">
+                    Hoard
+                  </Typography>
+                </Box>
+                <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>
+                  {searchBar}
+                </Box>
+                <Box sx={{ flexGrow: 1 }} />
               </Toolbar>
             </AppBar>
             <Drawer
