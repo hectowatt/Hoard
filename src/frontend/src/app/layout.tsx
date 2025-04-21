@@ -19,10 +19,10 @@ import {
   ListItemText,
   Divider
 } from "@mui/material";
-import TextSnippetIcon from '@mui/icons-material/TextSnippet';
+import TextSnippetOutlinedIcon from '@mui/icons-material/TextSnippetOutlined';
 import LabelImportantOutlineRoundedIcon from '@mui/icons-material/LabelImportantOutlineRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
-import SettingsIcon from '@mui/icons-material/Settings';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
@@ -30,8 +30,10 @@ import InputAdornment from "@mui/material/InputAdornment";
 
 const inter = Inter({ subsets: ["latin"] });
 
-const aboveIcons = [<TextSnippetIcon />, <LabelImportantOutlineRoundedIcon />];
-const belowIcons = [<DeleteOutlineRoundedIcon />, <SettingsIcon />];
+// サイドバー上部のアイコン
+const aboveIcons = [<TextSnippetOutlinedIcon />, <LabelImportantOutlineRoundedIcon />];
+// サイドバー下部のアイコン
+const belowIcons = [<DeleteOutlineRoundedIcon />, <SettingsOutlinedIcon />];
 
 // 検索バー
 const searchBar = (
