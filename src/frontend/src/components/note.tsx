@@ -11,10 +11,11 @@ import {
     Grid,
     Typography,
 } from '@mui/material';
+import { Content } from "next/font/google";
 
 export default function Note() {
 
-    const [expanded, setExpanded] = useState(false);
+    const [expanded, setExpand] = useState(false);
     const [title, setTitle] = useState("");
     const [inputContent, setContent] = useState("");
     const [isEditing, setIsEditing] = useState(false);
@@ -22,9 +23,9 @@ export default function Note() {
 
     const [socket, setSocket] = useState<WebSocket | null>(null);
 
-    const handleExpanded = () => { setExpanded(true) };
+    const handleExpand = () => { setExpand(true) };
     const handleCollapse = () => {
-        setExpanded(false);
+        setExpand(false);
         setTitle("");
         setContent("");
     }
@@ -61,8 +62,43 @@ export default function Note() {
     }
 
 
+
     return (
-        <div className="border border-gray-400 rounded-md p-4 hover:shadow-md transition-shadow duration-200">
-        </div>
+        <Paper elevation={3}
+            sx={{
+                p: 2,
+                width: '100%',
+                maxWidth: 600,
+                margin: 'auto',
+                mt: 4,
+                cursor: 'text',
+            }}
+            onClick={handleExpand}>
+            <Collapse in={expanded}>
+                <TextField
+                    placeholder="タイトル"
+                    fullWidth
+                    variant="standard"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    sx={{ mb: 1 }}
+                />
+            </Collapse>
+            <TextField
+                placeholder="メモを入力..."
+                fullWidth
+                multiline
+                minRows={expanded ? 5 : 1}
+                variant="standard"
+                value={inputContent}
+                onChange={(e) => setContent(e.target.value)}
+            />
+            <Collapse in={expanded}>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+                    <Button onClick={handleButtonClick}>保存</Button>
+                    <Button onClick={handleCollapse}>キャンセル</Button>
+                </Box>
+            </Collapse>
+        </Paper>
     )
 }
