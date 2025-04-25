@@ -34,6 +34,7 @@ export default function Note() {
         setIsEditing(true); // フォームがクリックされたときに編集モードにする 
     }
 
+    // 保存ボタン押下処理
     const handleButtonClick = () => {
         if (!socket) {
             // WebSocketサーバに接続
@@ -64,41 +65,57 @@ export default function Note() {
 
 
     return (
-        <Paper elevation={3}
-            sx={{
-                p: 2,
-                width: '100%',
-                maxWidth: 600,
-                margin: 'auto',
-                mt: 4,
-                cursor: 'text',
-            }}
-            onClick={handleExpand}>
-            <Collapse in={expanded}>
+        <Box sx={{ maxWidth: 800, mx: 'auto', mt: 4, p: 2 }}>
+            {/* 入力フォーム */}
+            <Paper
+                elevation={3}
+                sx={{ p: 2, cursor: 'text', mb: 4 }}
+                onClick={handleExpand}
+            >
+                <Collapse in={expanded}>
+                    <TextField
+                        placeholder="タイトル"
+                        fullWidth
+                        variant="standard"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        sx={{ mb: 1 }}
+                    />
+                </Collapse>
                 <TextField
-                    placeholder="タイトル"
+                    placeholder="メモを入力..."
                     fullWidth
+                    multiline
+                    minRows={expanded ? 3 : 1}
                     variant="standard"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    sx={{ mb: 1 }}
+                    value={inputContent}
+                    onChange={(e) => setContent(e.target.value)}
                 />
-            </Collapse>
-            <TextField
-                placeholder="メモを入力..."
-                fullWidth
-                multiline
-                minRows={expanded ? 5 : 1}
-                variant="standard"
-                value={inputContent}
-                onChange={(e) => setContent(e.target.value)}
-            />
-            <Collapse in={expanded}>
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
-                    <Button onClick={handleButtonClick}>保存</Button>
-                    <Button onClick={handleCollapse}>キャンセル</Button>
-                </Box>
-            </Collapse>
-        </Paper>
-    )
-}
+                <Collapse in={expanded}>
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+                        <Button onClick={handleButtonClick}>保存</Button>
+                        <Button onClick={handleCollapse}>キャンセル</Button>
+                    </Box>
+                </Collapse>
+            </Paper>
+
+            {/* メモ一覧表示 */}
+            <Grid container spacing={2}>
+                {notes.map((note, index) => (
+                    <Grid>
+                        <Paper elevation={2} sx={{ p: 2, height: '100%' }}>
+                            {note.title && (
+                                <Typography variant="h6" sx={{ mb: 1 }}>
+                                    {note.title}
+                                </Typography>
+                            )}
+                            <Typography variant="body1" whiteSpace="pre-line">
+                                {note.content}
+                            </Typography>
+                        </Paper>
+                    </Grid>
+                ))}
+            </Grid>
+        </Box>
+    );
+};
