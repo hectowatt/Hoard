@@ -33,15 +33,17 @@ const wss = new WebSocketServer({ server });
 wss.on('connection', (ws) => {
   console.log('Client connected');
   
-  ws.on('message', async (message) => {
-    const messageText:string = message.toString();
-    console.log(`Received: ${message}`);
+  ws.on('message', async (receiveValue) => {
+    const data = JSON.parse(receiveValue);
+    const {title, content} = data;
+    console.log(`title: ${title}`);
+    console.log(`inputContent: ${content}`);
     // PostgreSQLに接続してクエリを実行
     try{
       const noteRepository = AppDataSource.getRepository(Notes);
       const newNote = noteRepository.create({ 
-        title: messageText,
-        content: messageText,
+        title: title,
+        content: content,
         createdate: new Date(),
         updatedate: new Date()});
       const savedNote = await noteRepository.save(newNote);
@@ -53,7 +55,7 @@ wss.on('connection', (ws) => {
       ws.send("Error saving message to database");
     }
 
-    ws.send(`Echo: ${message}`);
+    ws.send(`Echo: ${receiveValue}`);
   });
 
   ws.on('close', () => {

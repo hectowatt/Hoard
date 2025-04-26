@@ -17,7 +17,7 @@ export default function Note() {
 
     const [expanded, setExpand] = useState(false);
     const [title, setTitle] = useState("");
-    const [inputContent, setContent] = useState("");
+    const [content, setContent] = useState("");
     const [isEditing, setIsEditing] = useState(false);
     const [notes, setNotes] = useState<{ title: String, content: String }[]>([]);
 
@@ -41,8 +41,10 @@ export default function Note() {
             const newSocket = new WebSocket("ws://localhost:4000");
             newSocket.onopen = () => {
                 console.log("Connected to server");
-                //console.log("inputValue: ", inputValue);
-                //newSocket.send(inputValue);
+                console.log("title: ", title);
+                console.log("inputValue: ", content);
+                const data = JSON.stringify({ title: title, content: content });
+                newSocket.send(data);
             }
             setSocket(newSocket);
             newSocket.onmessage = (event) => {
@@ -56,7 +58,8 @@ export default function Note() {
             }
         } else {
             // 既存の接続を使用してデータ送信
-            //socket.send(inputValue);
+            const data = JSON.stringify({ title: title, content: content });
+            socket.send(data);
         }
 
         setIsEditing(false); // 送信後に編集モードを解除
@@ -88,7 +91,7 @@ export default function Note() {
                     multiline
                     minRows={expanded ? 3 : 1}
                     variant="standard"
-                    value={inputContent}
+                    value={content}
                     onChange={(e) => setContent(e.target.value)}
                 />
                 <Collapse in={expanded}>
