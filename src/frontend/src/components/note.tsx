@@ -96,8 +96,8 @@ export default function Note() {
                 />
                 <Collapse in={expanded}>
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
-                        <Button onClick={handleButtonClick}>保存</Button>
-                        <Button onClick={handleCollapse}>キャンセル</Button>
+                        <Button onClick={handleButtonClick} sx={{ color: "#696969" }}>保存</Button>
+                        <Button onClick={handleCollapse} sx={{ color: "#696969" }}>キャンセル</Button>
                     </Box>
                 </Collapse>
             </Paper>
