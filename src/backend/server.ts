@@ -66,3 +66,15 @@ wss.on('connection', (ws) => {
 app.get('/', (req, res) => {
   res.send('WebSocket Server is running');
 });
+
+app.get('/api/notes', async (req, res) => {
+  try{
+    const noteRepository = AppDataSource.getRepository(Notes);
+    // Notesを全件取得する
+    const notes = await noteRepository.find();
+    res.status(200).json(notes);
+  }catch(error){
+    console.error("Error fetching notes:", error);
+    res.status(500).json({ error: 'Failed to fetch notes'});
+  }
+})
