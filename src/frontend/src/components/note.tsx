@@ -34,37 +34,64 @@ export default function Note() {
         setIsEditing(true); // フォームがクリックされたときに編集モードにする 
     }
 
-    // 保存ボタン押下処理
-    const handleButtonClick = () => {
-        if (!socket) {
-            // WebSocketサーバに接続
-            const newSocket = new WebSocket("ws://localhost:4000");
-            newSocket.onopen = () => {
-                console.log("Connected to server");
-                console.log("title: ", title);
-                console.log("inputValue: ", content);
-                const data = JSON.stringify({ title: title, content: content });
-                newSocket.send(data);
-            }
-            setSocket(newSocket);
-            newSocket.onmessage = (event) => {
-                console.log("message from server: ", event.data);
-            }
-            newSocket.onerror = (error) => {
-                console.error("WebSocket Error: ", error);
-            }
-            newSocket.onclose = () => {
-                console.log("WebSocket closed");
-            }
-        } else {
-            // 既存の接続を使用してデータ送信
-            const data = JSON.stringify({ title: title, content: content });
-            socket.send(data);
+    // 画面表示時や保存ボタン押下時にメモを取得
+    const fetchNotes = () => {
+        // WebSocketサーバに接続
+        const newSocket = new WebSocket("ws://localhost:4000");
+        newSocket.onopen = () => {
+            console.log("Connected to server");
+            newSocket.send("fetchNotes");
         }
-
-        setIsEditing(false); // 送信後に編集モードを解除
+        setSocket(newSocket);
+        newSocket.onmessage = (event) => {
+            console.log("message from server: ", event.data);
+            const notesData = JSON.parse(event.data);
+            setNotes(notesData);
+        }
+        newSocket.onerror = (error) => {
+            console.error("WebSocket Error: ", error);
+        }
+        newSocket.onclose = () => {
+            console.log("WebSocket closed");
+        }
     }
 
+    // 保存ボタン押下処理
+    const saveButtonClick = async () => {
+        if (!title.trim() || !content.trim()) {
+            console.log("タイトルと内容は必須です");
+            return
+        }
+
+        try {
+            const response = await fetch("http://localhost:4000/api/notes", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    title: title,
+                    content: content,
+                }),
+            })
+
+            if (!response.ok) {
+                throw new Error("Failed to save note");
+            }
+
+            const result = await response.json();
+            console.log("Save success!", result);
+
+            setNotes((prevNotes) => [...prevNotes, result.note]);
+            setTitle("");
+            setContent("");
+            setExpand(false);
+        } catch (error) {
+            console.error("Error saving note:", error);
+        }
+
+        setIsEditing(false);
+    }
 
 
     return (
@@ -96,7 +123,7 @@ export default function Note() {
                 />
                 <Collapse in={expanded}>
                     <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
-                        <Button onClick={handleButtonClick} sx={{ color: "#696969" }}>保存</Button>
+                        <Button onClick={saveButtonClick} sx={{ color: "#696969" }}>保存</Button>
                         <Button onClick={handleCollapse} sx={{ color: "#696969" }}>キャンセル</Button>
                     </Box>
                 </Collapse>

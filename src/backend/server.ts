@@ -24,49 +24,11 @@ AppDataSource.initialize().then(() => {
   console.error("Error during Data Source initialization", err);
 })
 
-const server = app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
-});
-
-const wss = new WebSocketServer({ server });
-
-wss.on('connection', (ws) => {
-  console.log('Client connected');
-  
-  ws.on('message', async (receiveValue) => {
-    const data = JSON.parse(receiveValue);
-    const {title, content} = data;
-    console.log(`title: ${title}`);
-    console.log(`inputContent: ${content}`);
-    // PostgreSQLに接続してクエリを実行
-    try{
-      const noteRepository = AppDataSource.getRepository(Notes);
-      const newNote = noteRepository.create({ 
-        title: title,
-        content: content,
-        createdate: new Date(),
-        updatedate: new Date()});
-      const savedNote = await noteRepository.save(newNote);
-      
-      console.log('Message inserted with ID: ', savedNote.id);
-      ws.send('Message inserted successfully. ID: ${savedNote.id}');
-    }catch(error){
-      console.error("Error executing query:", error);
-      ws.send("Error saving message to database");
-    }
-
-    ws.send(`Echo: ${receiveValue}`);
-  });
-
-  ws.on('close', () => {
-    console.log('Client disconnected');
-  });
-});
-
 app.get('/', (req, res) => {
   res.send('WebSocket Server is running');
 });
 
+// Notes全件取得API
 app.get('/api/notes', async (req, res) => {
   try{
     const noteRepository = AppDataSource.getRepository(Notes);
@@ -76,5 +38,31 @@ app.get('/api/notes', async (req, res) => {
   }catch(error){
     console.error("Error fetching notes:", error);
     res.status(500).json({ error: 'Failed to fetch notes'});
+  }
+})
+
+// Notes登録API
+app.post('/api/notes', async (req, res) => {
+  const { title, content } = req.body;
+
+  if (!title || !content) {
+    return res.status(400).json({ error: "タイトルと内容は必須です" });
+  }
+
+  try {
+    const noteRepository = AppDataSource.getRepository(Notes);
+    const newNote = noteRepository.create({
+      title: title,
+      content: content,
+      createdate: new Date(),
+      updatedate: new Date(),
+    });
+    const savedNote = await noteRepository.save(newNote);
+
+    console.log('Message inserted with ID: ', savedNote.id);
+    res.status(201).json({ message: "メモが保存されました", note: savedNote });
+  } catch (error) {
+    console.error("Error saving note:", error);
+    res.status(500).json({ error: "メモの保存に失敗しました" });
   }
 })
