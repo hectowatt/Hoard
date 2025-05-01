@@ -9,6 +9,9 @@ const { Pool } = pg;
 const app = express();
 const port = 4000;
 
+// JSONボディのパースを有効にする
+app.use(express.json());
+
 // PostgreSQL接続設定
 const pool = new Pool({
   host: process.env.PG_HOST || 'localhost',
@@ -18,12 +21,29 @@ const pool = new Pool({
   database: process.env.PG_DATABASE || 'mydatabase',
 })
 
+const server = app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
+});
+
+const wss = new WebSocketServer({ server });
+
+// WebSocket接続時の処理
+wss.on('connection', (ws) => {
+  console.log('Client connected');
+
+  ws.on('close', () => {
+    console.log('Client disconnected');
+  });
+});
+
+// TypeORMの初期化
 AppDataSource.initialize().then(() => {
   console.log("Data Source has been initialized!");
 }).catch((err) => {
   console.error("Error during Data Source initialization", err);
 })
 
+// ルートにアクセスされたときの処理
 app.get('/', (req, res) => {
   res.send('WebSocket Server is running');
 });

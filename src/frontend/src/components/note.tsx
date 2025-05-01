@@ -19,7 +19,7 @@ export default function Note() {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
     const [isEditing, setIsEditing] = useState(false);
-    const [notes, setNotes] = useState<{ title: String, content: String }[]>([]);
+    const [notes, setNotes] = useState<{ title: String, content: String, createDate: String, updateDate: String }[]>([]);
 
     const [socket, setSocket] = useState<WebSocket | null>(null);
 
@@ -35,25 +35,23 @@ export default function Note() {
     }
 
     // 画面表示時や保存ボタン押下時にメモを取得
-    const fetchNotes = () => {
-        // WebSocketサーバに接続
-        const newSocket = new WebSocket("ws://localhost:4000");
-        newSocket.onopen = () => {
-            console.log("Connected to server");
-            newSocket.send("fetchNotes");
+    const fetchNotes = async () => {
+        const response = await fetch("http://localhost:4000/api/notes",
+            {
+                method: "GET",
+                headers: {
+                    "content-type": "application/json",
+                }
+            }
+        );
+
+        if (!response.ok) {
+            console.error("Get notes failed");
+            return;
         }
-        setSocket(newSocket);
-        newSocket.onmessage = (event) => {
-            console.log("message from server: ", event.data);
-            const notesData = JSON.parse(event.data);
-            setNotes(notesData);
-        }
-        newSocket.onerror = (error) => {
-            console.error("WebSocket Error: ", error);
-        }
-        newSocket.onclose = () => {
-            console.log("WebSocket closed");
-        }
+
+        const data = await response.json();
+        setNotes(data);
     }
 
     // 保存ボタン押下処理
