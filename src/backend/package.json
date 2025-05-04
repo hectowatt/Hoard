@@ -11,14 +11,13 @@
     "migrate": "typeorm-ts-node-esm migration:run -d ./data-source.ts",
     "typeorm": "typeorm-ts-node-esm",
     "generate": "npm run typeorm migration:generate -- --dataSource ./data-source.ts --pretty ./migrations/InitialSchema"
-    
-    
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "pg": "^8.13.3",

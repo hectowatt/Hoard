@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import cors from 'cors';
 import { WebSocketServer} from 'ws';
 import pg from 'pg';
 import { AppDataSource } from './data-source.js';
@@ -11,6 +12,11 @@ const port = 4000;
 
 // JSONボディのパースを有効にする
 app.use(express.json());
+app.use(cors({
+  origin: '*',
+  methods: ['GET','POST'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // PostgreSQL接続設定
 const pool = new Pool({
