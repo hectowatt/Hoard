@@ -1,18 +1,26 @@
-import Note from "@/components/note";
-import styles from "./page.module.css";
-import {
-  Button,
-  Checkbox,
-  Container,
-  FormControlLabel,
-  FormGroup,
-  Paper,
-} from "@mui/material";
+"use client"
 
+import InputForm from "@/components/InputForm";
+import styles from "./page.module.css";
+import React, { useState } from "react";
+import { Container } from "@mui/material";
+
+// ルートページのコンテンツ
 export default function Home() {
+
+
   return (
     <Container>
-      <Note />
+      <InputForm />
+      {/* メモ一覧表示 */}
+
     </Container>
   );
+}
+
+// 画面描画時にDBからメモを全件取得して表示する
+function getAllNotes() {
+  // バックエンドAPIでメモを取得する
+
+  // Noteコンポーネントにセット
 }
