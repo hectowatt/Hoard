@@ -27,25 +27,6 @@ export default function InputForm() {
         setContent("");
     }
 
-    // 画面表示時や保存ボタン押下時にメモを取得
-    const fetchNotes = async () => {
-        const response = await fetch("http://localhost:4000/api/notes",
-            {
-                method: "GET",
-                headers: {
-                    "content-type": "application/json",
-                }
-            }
-        );
-
-        if (!response.ok) {
-            console.error("Get notes failed");
-            return;
-        }
-
-        const data = await response.json();
-    }
-
     // 保存ボタン押下処理
     const saveButtonClick = async () => {
         if (!title.trim() || !content.trim()) {
