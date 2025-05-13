@@ -8,7 +8,7 @@ import Note from "@/components/Note";
 
 // ルートページのコンテンツ
 export default function Home() {
-  const [notes, setNotes] = useState<{ title: string; content: string; createDate: string; updateDate: string }[]>([]);
+  const [notes, setNotes] = useState<{ title: string; content: string; createdate: string; updatedate: string }[]>([]);
 
   // 画面描画時にDBからメモを全件取得して表示する
   const fetchNotes = async () => {
@@ -27,7 +27,7 @@ export default function Home() {
       }
 
       const data = await response.json();
-      console.log("取得したデータ:", data);
+      console.log("取得したデータ:", JSON.stringify(data, null, 2));
       setNotes(data);
     } catch (error) {
       console.error("Error fetching notes", error);
@@ -46,7 +46,7 @@ export default function Home() {
         {notes.map((note, index) => (
           <Grid key={index}>
             {/* Noteコンポーネントを生成 */}
-            <Note title={note.title} content={note.content} createDate={note.createDate} updateDate={note.updateDate} />
+            <Note title={note.title} content={note.content} createdate={note.createdate} updatedate={note.updatedate} />
           </Grid>
         ))}
       </Grid>
