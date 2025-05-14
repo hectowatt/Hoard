@@ -34,7 +34,11 @@ export default function InputForm() {
             return
         }
 
+
         try {
+            console.log("title:", title);
+            console.log("content:", content);
+
             const response = await fetch("http://localhost:4000/api/notes", {
                 method: "POST",
                 headers: {
