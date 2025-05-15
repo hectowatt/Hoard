@@ -1,5 +1,5 @@
 import React from "react";
-import { Paper, Typography } from "@mui/material";
+import { Box, Paper, Typography, Dialog, DialogTitle, DialogContent, TextField, Button } from "@mui/material";
 
 interface NoteProps {
     title: string;
@@ -23,20 +23,86 @@ const formatDate = (exString: string) => {
 
 export default function Note({ title, content, createdate, updatedate }: NoteProps) {
 
+    const [open, setOpen] = React.useState(false);
+    const [editTitle, setEditTitle] = React.useState(title);
+    const [editContent, setEditContent] = React.useState(content);
+    const [isEditing, setIsEditing] = React.useState(false);
+
+    const handleOpen = () => {
+        setEditTitle(title);
+        setEditContent(content);
+        setOpen(true);
+        setIsEditing(false);
+    };
+    const handleClose = () => setOpen(false);
+
+    const handleEdit = () => setIsEditing(true);
+
+    const handleSave = () => {
+        // ここに保存処理を追加する
+        setIsEditing(false);
+        setOpen(false);
+    };
+
     return (
-        <Paper elevation={3} sx={{ p: 2, maxWidth: 400, wordWrap: "break-word" }}>
-            <Typography variant="h6" sx={{ mb: 1 }}>
-                {title}
-            </Typography>
-            <Typography variant="body1" sx={{ mb: 1, whiteSpace: "pre-line" }}>
-                {content}
-            </Typography>
-            <Typography variant="caption" color="textSecondary" sx={{ display: "block" }}>
-                作成日: {formatDate(createdate)}
-            </Typography>
-            <Typography variant="caption" color="textSecondary" sx={{ display: "block" }}>
-                更新日: {formatDate(updatedate)}
-            </Typography>
-        </Paper>
+        <>
+            <Paper elevation={3} sx={{ p: 2, maxWidth: 400, wordWrap: "break-word", cursor: "pointer" }} onClick={handleOpen}>
+                <Typography variant="h6" sx={{ mb: 1 }}>
+                    {title}
+                </Typography>
+                <Typography variant="body1" sx={{ mb: 1, whiteSpace: "pre-line" }}>
+                    {content}
+                </Typography>
+                <Typography variant="caption" color="textSecondary" sx={{ display: "block" }}>
+                    作成日: {formatDate(createdate)}
+                </Typography>
+                <Typography variant="caption" color="textSecondary" sx={{ display: "block" }}>
+                    更新日: {formatDate(updatedate)}
+                </Typography>
+            </Paper>
+            <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+                <DialogTitle>{isEditing ? (
+                    <TextField
+                        fullWidth
+                        value={editTitle}
+                        onChange={e => setEditTitle(e.target.value)}
+                        variant="standard" />
+                ) : (
+                    title
+                )}</DialogTitle>
+                <DialogContent>
+                    {isEditing ? (<TextField
+                        fullWidth
+                        multiline
+                        rows={4}
+                        value={editContent}
+                        onChange={e => setEditContent(e.target.value)}
+                        variant="standard"
+                        sx={{ mb: 2 }} />)
+                        : (
+                            <Typography variant="body1" sx={{ whiteSpace: "pre-line", mb: 2 }}>
+                                {content}
+                            </Typography>)
+                    }
+                    <Typography variant="caption" color="textSecondary" sx={{ display: "block" }}>
+                        作成日: {formatDate(createdate)}
+                    </Typography>
+                    <Typography variant="caption" color="textSecondary" sx={{ display: "block" }}>
+                        更新日: {formatDate(updatedate)}
+                    </Typography>
+                    <Box sx={{ mt: 2, textAlighn: "right" }}>
+                        {isEditing ? (
+                            <>
+                                <Button onClick={handleSave} variant="contained" sx={{ mr: 1 }}>保存</Button>
+                                <Button onClick={() => setIsEditing(false)}>キャンセル</Button>
+
+                            </>
+                        ) : (
+                            <Button onClick={handleEdit} variant="contained">編集</Button>
+                        )}
+                    </Box>
+                </DialogContent>
+            </Dialog>
+        </>
     );
 }
