@@ -14,7 +14,7 @@ const port = 4000;
 app.use(express.json());
 app.use(cors({
   origin: '*',
-  methods: ['GET','POST'],
+  methods: ['GET','POST','PUT','DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
@@ -72,7 +72,7 @@ app.post('/api/notes', async (req, res) => {
   const { title, content } = req.body;
 
   if (!title || !content) {
-    return res.status(400).json({ error: "タイトルと内容は必須です" });
+    return res.status(400).json({ error: "must set title and content" });
   }
 
   try {
@@ -86,9 +86,33 @@ app.post('/api/notes', async (req, res) => {
     const savedNote = await noteRepository.save(newNote);
 
     console.log('Message inserted with ID: ', savedNote.id);
-    res.status(201).json({ message: "メモが保存されました", note: savedNote });
+    res.status(201).json({ message: "save note success!", note: savedNote });
   } catch (error) {
     console.error("Error saving note:", error);
-    res.status(500).json({ error: "メモの保存に失敗しました" });
+    res.status(500).json({ error: "failed to save note" });
+  }
+})
+
+// Notes更新用API
+app.put('/api/notes', async (req, res) => {
+  const {title, content} = req.body;
+
+  if(!title || !content){
+    return res.status(400).json({error: "must set title and content"});
+  }
+
+  try{
+    const noteRepository = AppDataSource.getRepository(Notes);
+    const note = await noteRepository.findOneBy({title: title});
+    if(!note){
+      return res.status(404).json({error: "can't find note"});
+    }
+    note.content = content;
+    note.updatedate = new Date();
+    const updatedNote = await noteRepository.save(note);
+    res.status(200).json({message: "update note success!", note: updatedNote});
+  }catch(error){
+    console.error("Error updating note", error);
+    res.status(500).json({error: "failed to update notes"});
   }
 })

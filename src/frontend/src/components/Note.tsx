@@ -38,8 +38,36 @@ export default function Note({ title, content, createdate, updatedate }: NotePro
 
     const handleEdit = () => setIsEditing(true);
 
-    const handleSave = () => {
+    // 保存ボタン押下処理
+    const handleSave = async () => {
         // ここに保存処理を追加する
+        // 更新処理になるので、DBのidをもとにupdate
+            if (!title.trim() || !content.trim()) {
+            console.log("タイトルと内容は必須です");
+            return
+        }
+        try{
+            const response = await fetch("http://localhost:4000/api/notes", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    title: editTitle,
+                    content: editContent,
+                }),
+            })
+
+            if (!response.ok) {
+                throw new Error("Failed to save note");
+            }
+
+            const result = response.json();
+            console.log("Save success!", result);
+        }catch(error){
+            console.error("Error saving note", error);
+            return;
+        }
         setIsEditing(false);
         setOpen(false);
     };
