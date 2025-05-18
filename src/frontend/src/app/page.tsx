@@ -8,7 +8,7 @@ import Note from "@/components/Note";
 
 // ルートページのコンテンツ
 export default function Home() {
-  const [notes, setNotes] = useState<{ title: string; content: string; createdate: string; updatedate: string }[]>([]);
+  const [notes, setNotes] = useState<{ id: string, title: string; content: string; createdate: string; updatedate: string }[]>([]);
 
   // 画面描画時にDBからメモを全件取得して表示する
   const fetchNotes = async () => {
@@ -27,7 +27,7 @@ export default function Home() {
       }
 
       const data = await response.json();
-      console.log("取得したデータ:", JSON.stringify(data, null, 2));
+      console.log("selected data:", JSON.stringify(data, null, 2));
       setNotes(data);
     } catch (error) {
       console.error("Error fetching notes", error);
@@ -37,6 +37,21 @@ export default function Home() {
   useEffect(() => {
     fetchNotes();
   }, []);
+  
+  // メモ保存ボタン押下処理
+  const handleSave = (id: string, newTitle: string, newContent: string, newUpdateDate: string) => {
+    console.log("id: ", id);
+    console.log("newTitle: ", newTitle);
+    console.log("newContent: ", newContent);
+    console.log("newUpdateDate; ",newUpdateDate);
+    setNotes(prevNote => 
+      prevNote.map(
+        note => note.id === id ? {
+          ...note, title: newTitle, content: newContent, updatedate: newUpdateDate
+        }
+        : note)
+      );
+  };
 
   return (
     <Container>
@@ -46,7 +61,7 @@ export default function Home() {
         {notes.map((note, index) => (
           <Grid key={index}>
             {/* Noteコンポーネントを生成 */}
-            <Note title={note.title} content={note.content} createdate={note.createdate} updatedate={note.updatedate} />
+            <Note id={note.id} title={note.title} content={note.content} createdate={note.createdate} updatedate={note.updatedate} onSave={handleSave}/>
           </Grid>
         ))}
       </Grid>

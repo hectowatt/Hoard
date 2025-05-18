@@ -95,7 +95,7 @@ app.post('/api/notes', async (req, res) => {
 
 // Notes更新用API
 app.put('/api/notes', async (req, res) => {
-  const {title, content} = req.body;
+  const {id, title, content} = req.body;
 
   if(!title || !content){
     return res.status(400).json({error: "must set title and content"});
@@ -103,13 +103,15 @@ app.put('/api/notes', async (req, res) => {
 
   try{
     const noteRepository = AppDataSource.getRepository(Notes);
-    const note = await noteRepository.findOneBy({title: title});
+    // TODO: titleで検索じゃなくてidで検索じゃないといけない
+    const note = await noteRepository.findOneBy({id: id});
     if(!note){
       return res.status(404).json({error: "can't find note"});
     }
     note.content = content;
     note.updatedate = new Date();
     const updatedNote = await noteRepository.save(note);
+    console.log('updated: ', updatedNote.updatedate);
     res.status(200).json({message: "update note success!", note: updatedNote});
   }catch(error){
     console.error("Error updating note", error);

@@ -2,10 +2,12 @@ import React from "react";
 import { Box, Paper, Typography, Dialog, DialogTitle, DialogContent, TextField, Button } from "@mui/material";
 
 interface NoteProps {
+    id: string;
     title: string;
     content: string;
     createdate: string;
     updatedate: string;
+    onSave?: (id: string, newTitle: string, newContent:string, newUpdateDate: string) => void;
 }
 
 // 日付をフォーマットする
@@ -17,16 +19,16 @@ const formatDate = (exString: string) => {
     const hours = String(date.getHours()).padStart(2, "0");
     const minutes = String(date.getMinutes()).padStart(2, "0");
     const seconds = String(date.getSeconds()).padStart(2, "0");
-    //return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
     return `${year}/${month}/${day}`;
 }
 
-export default function Note({ title, content, createdate, updatedate }: NoteProps) {
+export default function Note({ id, title, content, createdate, updatedate, onSave }: NoteProps) {
 
     const [open, setOpen] = React.useState(false);
     const [editTitle, setEditTitle] = React.useState(title);
     const [editContent, setEditContent] = React.useState(content);
     const [isEditing, setIsEditing] = React.useState(false);
+    const [updateDateAfterSaving, setUpdateDateAfterSaving] = React.useState(updatedate);
 
     const handleOpen = () => {
         setEditTitle(title);
@@ -40,11 +42,9 @@ export default function Note({ title, content, createdate, updatedate }: NotePro
 
     // 保存ボタン押下処理
     const handleSave = async () => {
-        // ここに保存処理を追加する
-        // 更新処理になるので、DBのidをもとにupdate
-            if (!title.trim() || !content.trim()) {
-            console.log("タイトルと内容は必須です");
-            return
+        if (!editTitle.trim() || !editContent.trim()) {
+                console.log("must set title and content");
+                return;
         }
         try{
             const response = await fetch("http://localhost:4000/api/notes", {
@@ -62,13 +62,24 @@ export default function Note({ title, content, createdate, updatedate }: NotePro
                 throw new Error("Failed to save note");
             }
 
-            const result = response.json();
+            const result = await response.json();
             console.log("Save success!", result);
+
+            if(typeof onSave === "function"){
+                console.log("id: ", id);
+                console.log("新しいタイトル: ", editTitle);
+                console.log("新しい内容: ", editContent);
+                console.log("新しい更新日付: ", result.note.updatedate)
+                onSave(id, editTitle, editContent, result.note.updatedate);
+            }
         }catch(error){
             console.error("Error saving note", error);
             return;
         }
         setIsEditing(false);
+        setEditTitle(editTitle);
+        setEditContent(editContent);
+        setUpdateDateAfterSaving(new Date().toISOString());
         setOpen(false);
     };
 

@@ -80,6 +80,7 @@ export default function InputForm() {
         }
     }
 
+    // フォーカスが外れた場合、入力フォームを閉じる
     React.useEffect(() => {
         if (!isFocused) {
             setExpand(false);
