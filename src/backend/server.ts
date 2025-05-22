@@ -25,7 +25,7 @@ const pool = new Pool({
   user: process.env.PG_USER || 'postgres',
   password: process.env.PG_PASSWORD || 'password',
   database: process.env.PG_DATABASE || 'mydatabase',
-})
+});
 
 const server = app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
@@ -47,14 +47,14 @@ AppDataSource.initialize().then(() => {
   console.log("Data Source has been initialized!");
 }).catch((err) => {
   console.error("Error during Data Source initialization", err);
-})
+});
 
 // ルートにアクセスされたときの処理
 app.get('/', (req, res) => {
   res.send('WebSocket Server is running');
 });
 
-// Notes全件取得API
+// 【SELECT】Notes全件取得API
 app.get('/api/notes', async (req, res) => {
   try{
     const noteRepository = AppDataSource.getRepository(Notes);
@@ -65,9 +65,9 @@ app.get('/api/notes', async (req, res) => {
     console.error("Error fetching notes:", error);
     res.status(500).json({ error: 'Failed to fetch notes'});
   }
-})
+});
 
-// Notes登録API
+// 【INSERT】Notes登録API
 app.post('/api/notes', async (req, res) => {
   const { title, content } = req.body;
 
@@ -91,9 +91,9 @@ app.post('/api/notes', async (req, res) => {
     console.error("Error saving note:", error);
     res.status(500).json({ error: "failed to save note" });
   }
-})
+});
 
-// Notes更新用API
+// 【UPDATE】Notes更新用API
 app.put('/api/notes', async (req, res) => {
   const {id, title, content} = req.body;
 
@@ -117,4 +117,22 @@ app.put('/api/notes', async (req, res) => {
     console.error("Error updating note", error);
     res.status(500).json({error: "failed to update notes"});
   }
-})
+});
+
+// 【DELETE】Notes削除用API
+app.delete('/api/notes/:id', async (req, res) => {
+  const { id } = req.params;
+  console.log("delete id: ", id);
+  try {
+    const noteRepository = AppDataSource.getRepository(Notes);
+    const note = await noteRepository.findOneBy({ id: id });
+    if (!note) {
+      return res.status(404).json({ error: "Note not found" });
+    }
+    await noteRepository.remove(note);
+    res.status(200).json({ message: "Note deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting note:", error);
+    res.status(500).json({ error: "Failed to delete note" });
+  }
+});

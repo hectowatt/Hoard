@@ -7,7 +7,8 @@ interface NoteProps {
     content: string;
     createdate: string;
     updatedate: string;
-    onSave?: (id: string, newTitle: string, newContent:string, newUpdateDate: string) => void;
+    onSave?: (id: string, newTitle: string, newContent: string, newUpdateDate: string) => void;
+    onDelete?: (id: string) => void;
 }
 
 // 日付をフォーマットする
@@ -22,7 +23,7 @@ const formatDate = (exString: string) => {
     return `${year}/${month}/${day}`;
 }
 
-export default function Note({ id, title, content, createdate, updatedate, onSave }: NoteProps) {
+export default function Note({ id, title, content, createdate, updatedate, onSave, onDelete }: NoteProps) {
 
     const [open, setOpen] = React.useState(false);
     const [editTitle, setEditTitle] = React.useState(title);
@@ -36,17 +37,46 @@ export default function Note({ id, title, content, createdate, updatedate, onSav
         setOpen(true);
         setIsEditing(false);
     };
+
+    // フォーカスが外れた時の処理
     const handleClose = () => setOpen(false);
 
+    // 編集時
     const handleEdit = () => setIsEditing(true);
+
+    // 削除ボタン押下処理
+    const handleDelete = async () => {
+        try {
+            const response = await fetch(`http://localhost:4000/api/notes/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+            if (!response.ok) {
+                throw new Error("Failed to delete note");
+            }
+            const result = await response.json();
+            console.log("Delete success!", result);
+
+            if (typeof onDelete === "function") {
+                onDelete(id);
+            }
+
+        } catch (error) {
+            console.error("Error deleting note", error);
+            return;
+        }
+    }
+
 
     // 保存ボタン押下処理
     const handleSave = async () => {
         if (!editTitle.trim() || !editContent.trim()) {
-                console.log("must set title and content");
-                return;
+            console.log("must set title and content");
+            return;
         }
-        try{
+        try {
             const response = await fetch("http://localhost:4000/api/notes", {
                 method: "PUT",
                 headers: {
@@ -65,14 +95,10 @@ export default function Note({ id, title, content, createdate, updatedate, onSav
             const result = await response.json();
             console.log("Save success!", result);
 
-            if(typeof onSave === "function"){
-                console.log("id: ", id);
-                console.log("新しいタイトル: ", editTitle);
-                console.log("新しい内容: ", editContent);
-                console.log("新しい更新日付: ", result.note.updatedate)
+            if (typeof onSave === "function") {
                 onSave(id, editTitle, editContent, result.note.updatedate);
             }
-        }catch(error){
+        } catch (error) {
             console.error("Error saving note", error);
             return;
         }
@@ -133,11 +159,14 @@ export default function Note({ id, title, content, createdate, updatedate, onSav
                         {isEditing ? (
                             <>
                                 <Button onClick={handleSave} variant="contained" sx={{ mr: 1 }}>保存</Button>
-                                <Button onClick={() => setIsEditing(false)}>キャンセル</Button>
+                                <Button onClick={() => setIsEditing(false)} variant="contained">キャンセル</Button>
 
                             </>
                         ) : (
-                            <Button onClick={handleEdit} variant="contained">編集</Button>
+                            <>
+                                <Button onClick={handleEdit} variant="contained">編集</Button>
+                                <Button onClick={handleDelete} variant="contained" sx={{ ml: 1 }}>削除</Button>
+                            </>
                         )}
                     </Box>
                 </DialogContent>

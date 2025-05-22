@@ -37,20 +37,26 @@ export default function Home() {
   useEffect(() => {
     fetchNotes();
   }, []);
-  
-  // メモ保存ボタン押下処理
+
+  // メモ保存ボタン押下時のコールバック関数
   const handleSave = (id: string, newTitle: string, newContent: string, newUpdateDate: string) => {
     console.log("id: ", id);
     console.log("newTitle: ", newTitle);
     console.log("newContent: ", newContent);
-    console.log("newUpdateDate; ",newUpdateDate);
-    setNotes(prevNote => 
+    console.log("newUpdateDate; ", newUpdateDate);
+    setNotes(prevNote =>
       prevNote.map(
         note => note.id === id ? {
           ...note, title: newTitle, content: newContent, updatedate: newUpdateDate
         }
-        : note)
-      );
+          : note)
+    );
+  };
+
+  // メモ削除ボタン押下時のコールバック関数
+  const handleDelete = (id: string) => {
+    console.log("redraw after delete");
+    setNotes(prevNote => prevNote.filter(note => note.id !== id));
   };
 
   return (
@@ -61,7 +67,7 @@ export default function Home() {
         {notes.map((note, index) => (
           <Grid key={index}>
             {/* Noteコンポーネントを生成 */}
-            <Note id={note.id} title={note.title} content={note.content} createdate={note.createdate} updatedate={note.updatedate} onSave={handleSave}/>
+            <Note id={note.id} title={note.title} content={note.content} createdate={note.createdate} updatedate={note.updatedate} onSave={handleSave} onDelete={handleDelete} />
           </Grid>
         ))}
       </Grid>
