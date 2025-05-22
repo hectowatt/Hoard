@@ -10,7 +10,12 @@ import {
     Collapse,
 } from '@mui/material';
 
-export default function InputForm() {
+interface InputFormProps {
+    onInsert: (newTitle: string, newContent: string) => void;
+}
+
+
+export default function InputForm({ onInsert }: InputFormProps) {
 
     const [expanded, setExpand] = useState(false);
     const [title, setTitle] = useState("");
@@ -58,6 +63,11 @@ export default function InputForm() {
             setTitle("");
             setContent("");
             setExpand(false);
+
+            // メモ登録時のコールバック関数を呼び出す
+            if (typeof onInsert === "function") {
+                onInsert(title, content);
+            }
         } catch (error) {
             console.error("Error saving note:", error);
         }

@@ -38,6 +38,20 @@ export default function Home() {
     fetchNotes();
   }, []);
 
+  // メモ初期登録時のコールバック関数
+  const handleInsert = (newTitle: string, newContent: string) => {
+    setNotes(prevNote => [
+      ...prevNote,
+      {
+        id: new Date().toISOString(),
+        title: newTitle,
+        content: newContent,
+        createdate: new Date().toISOString(),
+        updatedate: new Date().toISOString(),
+      },
+    ]);
+  };
+
   // メモ保存ボタン押下時のコールバック関数
   const handleSave = (id: string, newTitle: string, newContent: string, newUpdateDate: string) => {
     console.log("id: ", id);
@@ -61,7 +75,7 @@ export default function Home() {
 
   return (
     <Container>
-      <InputForm />
+      <InputForm onInsert={handleInsert} />
       {/* メモ一覧表示 */}
       <Grid container spacing={2}>
         {notes.map((note, index) => (
