@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import React from "react";
 import { Inter } from "next/font/google";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v13-appRouter";
+import Link from "next/link";
 
 import {
 	Box,
@@ -123,10 +124,13 @@ export default function RootLayout({
 								<Toolbar />
 								<Box sx={{ overflow: "auto" }}>
 									<List>
-										{["メモ", "ラベル"].map((text, index) => (
+										{[
+											{ text: "メモ", icon: aboveIcons[0], href: "/" },
+											{ text: "ラベル", icon: aboveIcons[1], href: "/label" }
+										].map(({ text, icon, href }) => (
 											<ListItem key={text} disablePadding>
-												<ListItemButton>
-													<ListItemIcon>{aboveIcons[index]}</ListItemIcon>
+												<ListItemButton component={Link} href={href}>
+													<ListItemIcon>{icon}</ListItemIcon>
 													<ListItemText primary={text} />
 												</ListItemButton>
 											</ListItem>
@@ -134,13 +138,17 @@ export default function RootLayout({
 									</List>
 									<Divider />
 									<List>
-										{["ごみ箱", "設定"].map((text, index) => (
+										{[
+											{ text: "ゴミ箱", icon: belowIcons[0], href: "/trash" },
+											{ text: "設定", icon: belowIcons[1], href: "/settings" }
+										].map(({ text, icon, href }) => (
 											<ListItem key={text} disablePadding>
-												<ListItemButton>
-													<ListItemIcon>{belowIcons[index]}</ListItemIcon>
+												<ListItemButton component={Link} href={href}>
+													<ListItemIcon>{icon}</ListItemIcon>
 													<ListItemText primary={text} />
 												</ListItemButton>
 											</ListItem>
+
 										))}
 									</List>
 								</Box>
@@ -152,7 +160,7 @@ export default function RootLayout({
 						</Box>
 					</AppRouterCacheProvider>
 				</ThemeProvider>
-			</body>
-		</html>
+			</body >
+		</html >
 	);
 }
