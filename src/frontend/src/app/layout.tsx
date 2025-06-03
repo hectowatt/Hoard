@@ -18,7 +18,7 @@ import {
 	ListItemButton,
 	ListItemIcon,
 	ListItemText,
-	Divider
+	Divider,
 } from "@mui/material";
 import TextSnippetOutlinedIcon from "@mui/icons-material/TextSnippetOutlined";
 import LabelImportantOutlineRoundedIcon from "@mui/icons-material/LabelImportantOutlineRounded";
@@ -30,6 +30,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import InputAdornment from "@mui/material/InputAdornment";
 import { createTheme } from "@mui/material/styles";
 import { ThemeProvider } from "@mui/material/styles";
+import CreateLabelDialog from "@/components/CreateLabelDialog";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -37,6 +38,18 @@ const inter = Inter({ subsets: ["latin"] });
 const aboveIcons = [<TextSnippetOutlinedIcon />, <LabelImportantOutlineRoundedIcon />];
 // サイドバー下部のアイコン
 const belowIcons = [<DeleteOutlineRoundedIcon />, <SettingsOutlinedIcon />];
+
+// サイドバー上部
+const navAboveItems = [
+	{ text: "メモ", icon: aboveIcons[0], href: "/" },
+	{ text: "ラベル", icon: aboveIcons[1], dialog: true }
+];
+
+// サイドバー下部
+const navBelowItems = [
+	{ text: "ゴミ箱", icon: belowIcons[0], href: "/trash" },
+	{ text: "設定", icon: belowIcons[1], href: "/settings" }
+];
 
 // 検索バー
 const searchBar = (
@@ -64,6 +77,7 @@ const searchBar = (
 	</form>
 );
 
+// カスタムテーマの作成
 const theme = createTheme({
 	palette: {
 		primary: {
@@ -84,11 +98,14 @@ const metadata: Metadata = {
 
 const drawerWidth = 240;
 
+
 export default function RootLayout({
 	children
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	const [labelDialogOpen, setLabelDialogOpen] = React.useState(false);
+	const [lagels, setLabels] = React.useState<string[]>([])
 	return (
 		<html lang="en">
 			<body className={inter.className}>
@@ -124,24 +141,25 @@ export default function RootLayout({
 								<Toolbar />
 								<Box sx={{ overflow: "auto" }}>
 									<List>
-										{[
-											{ text: "メモ", icon: aboveIcons[0], href: "/" },
-											{ text: "ラベル", icon: aboveIcons[1], href: "/label" }
-										].map(({ text, icon, href }) => (
+										{navAboveItems.map(({ text, icon, href, dialog }) => (
 											<ListItem key={text} disablePadding>
-												<ListItemButton component={Link} href={href}>
-													<ListItemIcon>{icon}</ListItemIcon>
-													<ListItemText primary={text} />
-												</ListItemButton>
+												{dialog ? (
+													<ListItemButton onClick={() => setLabelDialogOpen(true)}>
+														<ListItemIcon>{icon}</ListItemIcon>
+														<ListItemText primary={text} />
+													</ListItemButton>
+												) : (
+													<ListItemButton component={Link} href={href!}>
+														<ListItemIcon>{icon}</ListItemIcon>
+														<ListItemText primary={text} />
+													</ListItemButton>
+												)}
 											</ListItem>
 										))}
 									</List>
 									<Divider />
 									<List>
-										{[
-											{ text: "ゴミ箱", icon: belowIcons[0], href: "/trash" },
-											{ text: "設定", icon: belowIcons[1], href: "/settings" }
-										].map(({ text, icon, href }) => (
+										{navBelowItems.map(({ text, icon, href }) => (
 											<ListItem key={text} disablePadding>
 												<ListItemButton component={Link} href={href}>
 													<ListItemIcon>{icon}</ListItemIcon>
@@ -158,6 +176,7 @@ export default function RootLayout({
 								{children}
 							</Box>
 						</Box>
+						<CreateLabelDialog open={labelDialogOpen} onClose={() => setLabelDialogOpen(false)} />
 					</AppRouterCacheProvider>
 				</ThemeProvider>
 			</body >

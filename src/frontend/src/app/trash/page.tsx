@@ -75,16 +75,6 @@ export default function Home() {
 
   return (
     <Container>
-      <InputForm onInsert={handleInsert} />
-      {/* メモ一覧表示 */}
-      <Grid container spacing={2}>
-        {notes.map((note, index) => (
-          <Grid key={index}>
-            {/* Noteコンポーネントを生成 */}
-            <Note id={note.id} title={note.title} content={note.content} createdate={note.createdate} updatedate={note.updatedate} onSave={handleSave} onDelete={handleDelete} />
-          </Grid>
-        ))}
-      </Grid>
     </Container>
   );
 }

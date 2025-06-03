@@ -54,10 +54,6 @@ export default function Home() {
 
   // メモ保存ボタン押下時のコールバック関数
   const handleSave = (id: string, newTitle: string, newContent: string, newUpdateDate: string) => {
-    console.log("id: ", id);
-    console.log("newTitle: ", newTitle);
-    console.log("newContent: ", newContent);
-    console.log("newUpdateDate; ", newUpdateDate);
     setNotes(prevNote =>
       prevNote.map(
         note => note.id === id ? {

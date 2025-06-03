@@ -23,6 +23,7 @@ const formatDate = (exString: string) => {
     return `${year}/${month}/${day}`;
 }
 
+// トップページに並ぶメモコンポーネント
 export default function Note({ id, title, content, createdate, updatedate, onSave, onDelete }: NoteProps) {
 
     const [open, setOpen] = React.useState(false);

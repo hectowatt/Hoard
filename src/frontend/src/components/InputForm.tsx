@@ -14,7 +14,7 @@ interface InputFormProps {
     onInsert: (newTitle: string, newContent: string) => void;
 }
 
-
+// トップページ上部の入力フォームコンポーネント
 export default function InputForm({ onInsert }: InputFormProps) {
 
     const [expanded, setExpand] = useState(false);

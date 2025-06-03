@@ -5,6 +5,7 @@ import { WebSocketServer} from 'ws';
 import pg from 'pg';
 import { AppDataSource } from './data-source.js';
 import Notes from './entities/Notes.js';
+import Label from './entities/Label.js';
 
 const { Pool } = pg;
 const app = express();
@@ -134,5 +135,30 @@ app.delete('/api/notes/:id', async (req, res) => {
   } catch (error) {
     console.error("Error deleting note:", error);
     res.status(500).json({ error: "Failed to delete note" });
+  }
+});
+
+// 【INSERT】ラベル登録API
+//TODO: ラベルの登録はNotesとは別のテーブルにする
+app.post('/api/labels', async (req, res) => {
+  const { labelName } = req.body;
+
+  if (!labelName) {
+    return res.status(400).json({ error: "must set labelname" });
+  }
+
+  try {
+    const labelRepository = AppDataSource.getRepository(Label);
+    const newLabel = labelRepository.create({
+      labelname: labelName,
+      createdate: new Date()
+    });
+    const savedLabel = await labelRepository.save(newLabel);
+
+    console.log('Label inserted with ID: ', savedLabel.id);
+    res.status(201).json({ message: "save label success!", label: savedLabel });
+  } catch (error) {
+    console.error("Error saving label:", error);
+    res.status(500).json({ error: "failed to save label" });
   }
 });
