@@ -104,7 +104,6 @@ app.put('/api/notes', async (req, res) => {
 
   try{
     const noteRepository = AppDataSource.getRepository(Notes);
-    // TODO: titleで検索じゃなくてidで検索じゃないといけない
     const note = await noteRepository.findOneBy({id: id});
     if(!note){
       return res.status(404).json({error: "can't find note"});
@@ -139,7 +138,6 @@ app.delete('/api/notes/:id', async (req, res) => {
 });
 
 // 【INSERT】ラベル登録API
-//TODO: ラベルの登録はNotesとは別のテーブルにする
 app.post('/api/labels', async (req, res) => {
   const { labelName } = req.body;
 
@@ -162,3 +160,35 @@ app.post('/api/labels', async (req, res) => {
     res.status(500).json({ error: "failed to save label" });
   }
 });
+
+// 【SELECT】label全件取得API
+app.get('/api/labels', async (req, res) => {
+  try{
+    const labelRepository = AppDataSource.getRepository(Label);
+    // Notesを全件取得する
+    const labels = await labelRepository.find();
+    res.status(200).json(labels);
+  }catch(error){
+    console.error("Error fetching labels:", error);
+    res.status(500).json({ error: 'Failed to fetch labels'});
+  }
+});
+
+// 【DELETE】ラベル削除API
+app.delete('/api/labels/:id', async (req, res) => {
+  const { id } = req.params;
+  console.log("delete label id: ", id);
+  try {
+    const labelRepository = AppDataSource.getRepository(Label);
+    const label = await labelRepository.findOneBy({ id: id });
+    if (!label) {
+      return res.status(404).json({ error: "Label not found" });
+    }
+    await labelRepository.remove(label);
+    res.status(200).json({ message: "Label deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting label:", error);
+    res.status(500).json({ error: "Failed to delete label" });
+  }
+}
+);
