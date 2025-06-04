@@ -4,7 +4,7 @@ import cors from 'cors';
 import { WebSocketServer} from 'ws';
 import pg from 'pg';
 import { AppDataSource } from './data-source.js';
-import Notes from './entities/Notes.js';
+import Notes from './entities/Note.js';
 import Label from './entities/Label.js';
 
 const { Pool } = pg;

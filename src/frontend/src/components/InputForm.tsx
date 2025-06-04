@@ -97,7 +97,7 @@ export default function InputForm({ onInsert }: InputFormProps) {
         }
     }, [isFocused]);
 
-
+    // TODO: テーブルノートの場合を追加する
     return (
         <Box sx={{ maxWidth: 800, mx: 'auto', mt: 4, p: 2 }}
             onBlur={handleBlur}

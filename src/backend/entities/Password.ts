@@ -1,5 +1,5 @@
 import { Entity, PrimaryColumn, Column, OneToOne, JoinColumn } from "typeorm";
-import Notes from "./Notes.js";
+import Notes from "./Note.js";
 
 @Entity({name: "password" })
 export class Password {

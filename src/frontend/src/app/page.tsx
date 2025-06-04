@@ -8,7 +8,7 @@ import Note from "@/components/Note";
 
 // ルートページのコンテンツ
 export default function Home() {
-  const [notes, setNotes] = useState<{ id: string, title: string; content: string; createdate: string; updatedate: string }[]>([]);
+  const [notes, setNotes] = useState<{ id: string, title: string; content: string; label: string; createdate: string; updatedate: string }[]>([]);
 
   // 画面描画時にDBからメモを全件取得して表示する
   const fetchNotes = async () => {
@@ -46,6 +46,8 @@ export default function Home() {
         id: new Date().toISOString(),
         title: newTitle,
         content: newContent,
+        // TODO: メモ初期登録時でもラベルを登録できるようにしたい
+        label: "",
         createdate: new Date().toISOString(),
         updatedate: new Date().toISOString(),
       },
@@ -53,11 +55,11 @@ export default function Home() {
   };
 
   // メモ保存ボタン押下時のコールバック関数
-  const handleSave = (id: string, newTitle: string, newContent: string, newUpdateDate: string) => {
+  const handleSave = (id: string, newTitle: string, newContent: string, newLabel: string, newUpdateDate: string) => {
     setNotes(prevNote =>
       prevNote.map(
         note => note.id === id ? {
-          ...note, title: newTitle, content: newContent, updatedate: newUpdateDate
+          ...note, title: newTitle, content: newContent, label: newLabel, updatedate: newUpdateDate
         }
           : note)
     );
@@ -77,7 +79,7 @@ export default function Home() {
         {notes.map((note, index) => (
           <Grid key={index}>
             {/* Noteコンポーネントを生成 */}
-            <Note id={note.id} title={note.title} content={note.content} createdate={note.createdate} updatedate={note.updatedate} onSave={handleSave} onDelete={handleDelete} />
+            <Note id={note.id} title={note.title} content={note.content} label={note.label} createdate={note.createdate} updatedate={note.updatedate} onSave={handleSave} onDelete={handleDelete} />
           </Grid>
         ))}
       </Grid>

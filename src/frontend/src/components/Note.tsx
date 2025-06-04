@@ -5,9 +5,10 @@ interface NoteProps {
     id: string;
     title: string;
     content: string;
+    label: string;
     createdate: string;
     updatedate: string;
-    onSave?: (id: string, newTitle: string, newContent: string, newUpdateDate: string) => void;
+    onSave?: (id: string, newTitle: string, newContent: string, newLabel: string, newUpdateDate: string) => void;
     onDelete?: (id: string) => void;
 }
 
@@ -24,7 +25,7 @@ const formatDate = (exString: string) => {
 }
 
 // トップページに並ぶメモコンポーネント
-export default function Note({ id, title, content, createdate, updatedate, onSave, onDelete }: NoteProps) {
+export default function Note({ id, title, content, label, createdate, updatedate, onSave, onDelete }: NoteProps) {
 
     const [open, setOpen] = React.useState(false);
     const [editTitle, setEditTitle] = React.useState(title);
@@ -97,7 +98,7 @@ export default function Note({ id, title, content, createdate, updatedate, onSav
             console.log("Save success!", result);
 
             if (typeof onSave === "function") {
-                onSave(id, editTitle, editContent, result.note.updatedate);
+                onSave(id, editTitle, editContent, label, result.note.updatedate);
             }
         } catch (error) {
             console.error("Error saving note", error);
@@ -125,6 +126,11 @@ export default function Note({ id, title, content, createdate, updatedate, onSav
                 <Typography variant="caption" color="textSecondary" sx={{ display: "block" }}>
                     更新日: {formatDate(updatedate)}
                 </Typography>
+                {label && label.trim() !== "" && (
+                    <Typography variant="caption" color="textSecondary" sx={{ mb: 1, border: "1px solid #ccc", p: 0.5, borderRadius: 1 }}>
+                        {label}
+                    </Typography>
+                )}
             </Paper>
             <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
                 <DialogTitle>{isEditing ? (

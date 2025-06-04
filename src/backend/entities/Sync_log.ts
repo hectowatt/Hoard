@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from "typeorm";
-import  Notes from "./Notes.js";
+import  Notes from "./Note.js";
 
 @Entity({name: "sync_log" })
 export class SyncLog {
