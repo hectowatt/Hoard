@@ -96,7 +96,7 @@ app.post('/api/notes', async (req, res) => {
 
 // 【UPDATE】Notes更新用API
 app.put('/api/notes', async (req, res) => {
-  const {id, title, content} = req.body;
+  const {id, title, content,label} = req.body;
 
   if(!title || !content){
     return res.status(400).json({error: "must set title and content"});
@@ -109,6 +109,9 @@ app.put('/api/notes', async (req, res) => {
       return res.status(404).json({error: "can't find note"});
     }
     note.content = content;
+    note.title = title;
+    console.log("update label:", label);
+    note.label = label;
     note.updatedate = new Date();
     const updatedNote = await noteRepository.save(note);
     console.log('updated: ', updatedNote.updatedate);

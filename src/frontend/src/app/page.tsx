@@ -1,10 +1,10 @@
 "use client";
 
-import InputForm from "@/components/InputForm";
+import InputForm from "../components/InputForm";
 import styles from "./page.module.css";
 import React, { useEffect, useState } from "react";
 import { Container, Grid } from "@mui/material";
-import Note from "@/components/Note";
+import Note from "../components/Note";
 
 // ルートページのコンテンツ
 export default function Home() {
@@ -27,7 +27,6 @@ export default function Home() {
       }
 
       const data = await response.json();
-      console.log("selected data:", JSON.stringify(data, null, 2));
       setNotes(data);
     } catch (error) {
       console.error("Error fetching notes", error);

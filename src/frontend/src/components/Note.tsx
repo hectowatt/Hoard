@@ -1,5 +1,5 @@
-import React from "react";
-import { Box, Paper, Typography, Dialog, DialogTitle, DialogContent, TextField, Button } from "@mui/material";
+import React, { useEffect } from "react";
+import { Box, Paper, Typography, Dialog, DialogTitle, DialogContent, TextField, Button, FormControl, Select, MenuItem, InputLabel } from "@mui/material";
 
 interface NoteProps {
     id: string;
@@ -32,6 +32,8 @@ export default function Note({ id, title, content, label, createdate, updatedate
     const [editContent, setEditContent] = React.useState(content);
     const [isEditing, setIsEditing] = React.useState(false);
     const [updateDateAfterSaving, setUpdateDateAfterSaving] = React.useState(updatedate);
+    const [labels, setLabels] = React.useState<string[]>([]);
+    const [editLabel, setEditLabel] = React.useState(label ?? "");
 
     const handleOpen = () => {
         setEditTitle(title);
@@ -87,6 +89,7 @@ export default function Note({ id, title, content, label, createdate, updatedate
                 body: JSON.stringify({
                     title: editTitle,
                     content: editContent,
+                    label: editLabel,
                 }),
             })
 
@@ -98,7 +101,7 @@ export default function Note({ id, title, content, label, createdate, updatedate
             console.log("Save success!", result);
 
             if (typeof onSave === "function") {
-                onSave(id, editTitle, editContent, label, result.note.updatedate);
+                onSave(id, editTitle, editContent, editLabel, result.note.updatedate);
             }
         } catch (error) {
             console.error("Error saving note", error);
@@ -110,6 +113,30 @@ export default function Note({ id, title, content, label, createdate, updatedate
         setUpdateDateAfterSaving(new Date().toISOString());
         setOpen(false);
     };
+
+    // ラベル付与できるようラベル一覧を取得
+    const fetchLabels = async () => {
+        try {
+            const response = await fetch("http://localhost:4000/api/labels", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to fetch labels");
+            }
+
+            const data = await response.json();
+            const labelNames = data.map((label: { labelname: string }) => label.labelname);
+            setLabels(labelNames); // ラベル名の配列に変換
+        } catch (error) { }
+    }
+
+    useEffect(() => {
+        fetchLabels();
+    }, []);
 
     return (
         <>
@@ -167,7 +194,19 @@ export default function Note({ id, title, content, label, createdate, updatedate
                             <>
                                 <Button onClick={handleSave} variant="contained" sx={{ mr: 1 }}>保存</Button>
                                 <Button onClick={() => setIsEditing(false)} variant="contained">キャンセル</Button>
-
+                                <FormControl size="small" sx={{ minWidth: 120, ml: 2 }}>
+                                    <InputLabel id="select-label">ラベル</InputLabel>
+                                    <Select
+                                        key={label}
+                                        labelId="select-label"
+                                        value={editLabel ?? ""}
+                                        onChange={e => setEditLabel(e.target.value)}
+                                        label="ラベル">
+                                        {labels.map(option => (
+                                            <MenuItem key={option} value={option}>{option}</MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
                             </>
                         ) : (
                             <>
