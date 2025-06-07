@@ -38,15 +38,14 @@ export default function Home() {
   }, []);
 
   // メモ初期登録時のコールバック関数
-  const handleInsert = (newTitle: string, newContent: string) => {
+  const handleInsert = (newId: string, newTitle: string, newContent: string, newLabel: string) => {
     setNotes(prevNote => [
       ...prevNote,
       {
-        id: new Date().toISOString(),
+        id: newId,
         title: newTitle,
         content: newContent,
-        // TODO: メモ初期登録時でもラベルを登録できるようにしたい
-        label: "",
+        label: newLabel,
         createdate: new Date().toISOString(),
         updatedate: new Date().toISOString(),
       },

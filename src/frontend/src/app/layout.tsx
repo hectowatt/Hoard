@@ -81,7 +81,7 @@ const searchBar = (
 const theme = createTheme({
 	palette: {
 		primary: {
-			main: "#ffee58"
+			main: "#6a5acd"
 		},
 		secondary: {
 			main: "#F39809",

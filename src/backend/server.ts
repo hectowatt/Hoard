@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import { WebSocketServer} from 'ws';
+import { WebSocketServer } from 'ws';
 import pg from 'pg';
 import { AppDataSource } from './data-source.js';
 import Notes from './entities/Note.js';
@@ -15,7 +15,7 @@ const port = 4000;
 app.use(express.json());
 app.use(cors({
   origin: '*',
-  methods: ['GET','POST','PUT','DELETE'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
@@ -57,21 +57,22 @@ app.get('/', (req, res) => {
 
 // 【SELECT】Notes全件取得API
 app.get('/api/notes', async (req, res) => {
-  try{
+  try {
     const noteRepository = AppDataSource.getRepository(Notes);
     // Notesを全件取得する
     const notes = await noteRepository.find();
     res.status(200).json(notes);
-  }catch(error){
+  } catch (error) {
     console.error("Error fetching notes:", error);
-    res.status(500).json({ error: 'Failed to fetch notes'});
+    res.status(500).json({ error: 'Failed to fetch notes' });
   }
 });
 
 // 【INSERT】Notes登録API
 app.post('/api/notes', async (req, res) => {
-  const { title, content } = req.body;
+  const { title, content, label } = req.body;
 
+  console.log("insert label:", label);
   if (!title || !content) {
     return res.status(400).json({ error: "must set title and content" });
   }
@@ -81,6 +82,7 @@ app.post('/api/notes', async (req, res) => {
     const newNote = noteRepository.create({
       title: title,
       content: content,
+      label: label || null, // ラベルがない場合はnullを設定
       createdate: new Date(),
       updatedate: new Date(),
     });
@@ -96,17 +98,17 @@ app.post('/api/notes', async (req, res) => {
 
 // 【UPDATE】Notes更新用API
 app.put('/api/notes', async (req, res) => {
-  const {id, title, content,label} = req.body;
+  const { id, title, content, label } = req.body;
 
-  if(!title || !content){
-    return res.status(400).json({error: "must set title and content"});
+  if (!title || !content) {
+    return res.status(400).json({ error: "must set title and content" });
   }
 
-  try{
+  try {
     const noteRepository = AppDataSource.getRepository(Notes);
-    const note = await noteRepository.findOneBy({id: id});
-    if(!note){
-      return res.status(404).json({error: "can't find note"});
+    const note = await noteRepository.findOneBy({ id: id });
+    if (!note) {
+      return res.status(404).json({ error: "can't find note" });
     }
     note.content = content;
     note.title = title;
@@ -115,10 +117,10 @@ app.put('/api/notes', async (req, res) => {
     note.updatedate = new Date();
     const updatedNote = await noteRepository.save(note);
     console.log('updated: ', updatedNote.updatedate);
-    res.status(200).json({message: "update note success!", note: updatedNote});
-  }catch(error){
+    res.status(200).json({ message: "update note success!", note: updatedNote });
+  } catch (error) {
     console.error("Error updating note", error);
-    res.status(500).json({error: "failed to update notes"});
+    res.status(500).json({ error: "failed to update notes" });
   }
 });
 
@@ -166,14 +168,14 @@ app.post('/api/labels', async (req, res) => {
 
 // 【SELECT】label全件取得API
 app.get('/api/labels', async (req, res) => {
-  try{
+  try {
     const labelRepository = AppDataSource.getRepository(Label);
     // Notesを全件取得する
     const labels = await labelRepository.find();
     res.status(200).json(labels);
-  }catch(error){
+  } catch (error) {
     console.error("Error fetching labels:", error);
-    res.status(500).json({ error: 'Failed to fetch labels'});
+    res.status(500).json({ error: 'Failed to fetch labels' });
   }
 });
 
