@@ -73,6 +73,8 @@ app.post('/api/notes', async (req, res) => {
   const { title, content, label } = req.body;
 
   console.log("insert label:", label);
+  console.log("insert title:", title);
+  console.log("insert content:", content);
   if (!title || !content) {
     return res.status(400).json({ error: "must set title and content" });
   }
@@ -112,7 +114,6 @@ app.put('/api/notes', async (req, res) => {
     }
     note.content = content;
     note.title = title;
-    console.log("update label:", label);
     note.label = label;
     note.updatedate = new Date();
     const updatedNote = await noteRepository.save(note);

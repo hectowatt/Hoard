@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, List, ListItem, ListItemText, IconButton } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { stringify } from "querystring";
+import { useLabelContext } from "@/app/context/LabelProvider";
 
 interface LabelDialogProps {
     open: boolean;
     onClose: () => void;
+    onLabelUpdate?: (labels: { id: string, labelname: string, createDate: string }[]) => void;
 }
 
 // ナビゲーションバー左のラベル編集用ダイアログコンポーネント
 export default function CreateLabelDialog({ open, onClose }: LabelDialogProps) {
     const [input, setInput] = useState("");
-    const [labels, setLabels] = useState<{ id: string, labelname: string, createDate: string }[]>([]);
+    const { labels, fetchLabels } = useLabelContext();
 
     // 保存ボタン押下処理
     const handleAdd = async () => {
@@ -46,26 +47,6 @@ export default function CreateLabelDialog({ open, onClose }: LabelDialogProps) {
         }
     }
 
-    // 画面表示時にラベル全件を取得する
-    const fetchLabels = async () => {
-        try {
-            const response = await fetch("http://localhost:4000/api/labels", {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error("Failed to fetch labels");
-            }
-
-            const data = await response.json();
-            console.log("Fetched labels:", JSON.stringify(data, null, 2));
-            setLabels(data); // ラベル名の配列に変換
-        } catch (error) { }
-    }
-
 
     // ラベル削除処理
     const onDeleteLabel = async (labelId: string) => {
@@ -84,17 +65,11 @@ export default function CreateLabelDialog({ open, onClose }: LabelDialogProps) {
             // ラベル削除後、状態を更新
 
             // ラベルの状態を更新
-            setLabels(prevLabels => prevLabels.filter(l => l.id !== labelId));
+            fetchLabels();
         } catch (error) {
 
         }
     }
-
-    useEffect(() => {
-        if (open) {
-            fetchLabels();
-        }
-    }, [open]);
 
     return (
         <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>

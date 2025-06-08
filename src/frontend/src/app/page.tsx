@@ -7,7 +7,12 @@ import { Container, Grid } from "@mui/material";
 import Note from "../components/Note";
 
 // ルートページのコンテンツ
-export default function Home() {
+type HomeProps = {
+  labels?: { id: string, labelName: string }[];
+  fetchLabels: () => void;
+};
+
+export default function Home({ labels = [], fetchLabels }: HomeProps) {
   const [notes, setNotes] = useState<{ id: string, title: string; content: string; label: string; createdate: string; updatedate: string }[]>([]);
 
   // 画面描画時にDBからメモを全件取得して表示する
@@ -38,14 +43,15 @@ export default function Home() {
   }, []);
 
   // メモ初期登録時のコールバック関数
-  const handleInsert = (newId: string, newTitle: string, newContent: string, newLabel: string) => {
+  const handleInsert = (newId: string, newTitle: string, newContent: string, LabelId: string) => {
+
     setNotes(prevNote => [
       ...prevNote,
       {
         id: newId,
         title: newTitle,
         content: newContent,
-        label: newLabel,
+        label: LabelId,
         createdate: new Date().toISOString(),
         updatedate: new Date().toISOString(),
       },
@@ -71,13 +77,13 @@ export default function Home() {
 
   return (
     <Container>
-      <InputForm onInsert={handleInsert} />
+      <InputForm labels={labels} onInsert={handleInsert} />
       {/* メモ一覧表示 */}
       <Grid container spacing={2}>
         {notes.map((note, index) => (
           <Grid key={index}>
             {/* Noteコンポーネントを生成 */}
-            <Note id={note.id} title={note.title} content={note.content} label={note.label} createdate={note.createdate} updatedate={note.updatedate} onSave={handleSave} onDelete={handleDelete} />
+            <Note id={note.id} title={note.title} content={note.content} label={note.label} createdate={note.createdate} updatedate={note.updatedate} onSave={handleSave} onDelete={handleDelete} labels={labels.map((label, idx) => ({ id: idx.toString(), labelName: label }))} />
           </Grid>
         ))}
       </Grid>

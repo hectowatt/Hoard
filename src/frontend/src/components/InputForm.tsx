@@ -13,6 +13,7 @@ import {
     Select,
     MenuItem,
 } from '@mui/material';
+import { useLabelContext } from "@/app/context/LabelProvider";
 
 interface InputFormProps {
     onInsert: (newId: string, newTitle: string, newContent: string, newLabel: string) => void;
@@ -26,9 +27,9 @@ export default function InputForm({ onInsert }: InputFormProps) {
     const [content, setContent] = useState("");
     const [isEditing, setIsEditing] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
-    const [labels, setLabels] = React.useState<string[]>([]);
-    const [editLabel, setEditLabel] = React.useState("");
+    const [editLabelId, setEditLabelId] = React.useState("");
 
+    const { labels } = useLabelContext();
 
     const blurTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
@@ -39,29 +40,6 @@ export default function InputForm({ onInsert }: InputFormProps) {
         setContent("");
     }
 
-    // ラベル付与できるようラベル一覧を取得
-    const fetchLabels = async () => {
-        try {
-            const response = await fetch("http://localhost:4000/api/labels", {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error("Failed to fetch labels");
-            }
-
-            const data = await response.json();
-            const labelNames = data.map((label: { labelname: string }) => label.labelname);
-            setLabels(labelNames); // ラベル名の配列に変換
-        } catch (error) { }
-    }
-
-    useEffect(() => {
-        fetchLabels();
-    }, []);
 
     // 保存ボタン押下処理
     const saveButtonClick = async () => {
@@ -81,7 +59,7 @@ export default function InputForm({ onInsert }: InputFormProps) {
                 body: JSON.stringify({
                     title: title,
                     content: content,
-                    label: editLabel || null, // ラベルが選択されていない場合はnullを送信
+                    label: editLabelId || null, // ラベルが選択されていない場合はnullを送信
                 }),
             })
 
@@ -100,7 +78,7 @@ export default function InputForm({ onInsert }: InputFormProps) {
 
             // メモ登録時のコールバック関数を呼び出す
             if (typeof onInsert === "function") {
-                onInsert(insertedNoteId, title, content, editLabel || "");
+                onInsert(insertedNoteId, title, content, editLabelId || "");
             }
         } catch (error) {
             console.error("Error saving note:", error);
@@ -171,11 +149,11 @@ export default function InputForm({ onInsert }: InputFormProps) {
                             <InputLabel id="select-label">ラベル</InputLabel>
                             <Select
                                 labelId="select-label"
-                                value={editLabel ?? ""}
-                                onChange={e => setEditLabel(e.target.value)}
+                                value={editLabelId ?? ""}
+                                onChange={e => setEditLabelId(e.target.value)}
                                 label="ラベル">
-                                {labels.map(option => (
-                                    <MenuItem key={option} value={option}>{option}</MenuItem>
+                                {(labels ?? []).map(option => (
+                                    <MenuItem key={option.id} value={option.id}>{option.labelname}</MenuItem>
                                 ))}
                             </Select>
                         </FormControl>

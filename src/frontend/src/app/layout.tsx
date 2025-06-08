@@ -31,6 +31,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import { createTheme } from "@mui/material/styles";
 import { ThemeProvider } from "@mui/material/styles";
 import CreateLabelDialog from "@/components/CreateLabelDialog";
+import { LabelProvider } from "./context/LabelProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -99,84 +100,109 @@ const metadata: Metadata = {
 const drawerWidth = 240;
 
 
+
+
 export default function RootLayout({
 	children
 }: Readonly<{
-	children: React.ReactNode;
+	children: (props: { labels: string[], fetchLabels: () => Promise<void> }) => React.ReactNode;
 }>) {
 	const [labelDialogOpen, setLabelDialogOpen] = React.useState(false);
-	const [lagels, setLabels] = React.useState<string[]>([])
+	const [labels, setLabels] = React.useState<string[]>([])
+
+	// ラベル一覧を取得する
+	const fetchLabels = async () => {
+		const response = await fetch("http://localhost:4000/api/labels", {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		});
+		if (!response.ok) {
+			throw new Error("Failed to fetch labels");
+		}
+		const data = await response.json();
+		setLabels(data);
+	};
+
+	React.useEffect(() => {
+		fetchLabels();
+	}
+		, []);
+
 	return (
 		<html lang="en">
 			<body className={inter.className}>
 				<ThemeProvider theme={theme}>
 					<AppRouterCacheProvider>
-						<Box sx={{ display: "flex" }}>
-							<CssBaseline />
-							<AppBar
-								position="fixed"
-								sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, backgroundColor: "lemon yellow" }}
-							>
-								<Toolbar sx={{ display: "flex", justifyContent: "center" }}>
-									<Box sx={{ flexGrow: 1 }}>
-										<Typography variant="h6" noWrap component="div">
-											Hoard
-										</Typography>
-									</Box>
-									<Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>{searchBar}</Box>
-									<Box sx={{ flexGrow: 1 }} />
-								</Toolbar>
-							</AppBar>
-							<Drawer
-								variant="permanent"
-								sx={{
-									width: drawerWidth,
-									flexShrink: 0,
-									[`& .MuiDrawer-paper`]: {
+						<LabelProvider>
+							<Box sx={{ display: "flex" }}>
+								<CssBaseline />
+								<AppBar
+									position="fixed"
+									sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, backgroundColor: "lemon yellow" }}
+								>
+									<Toolbar sx={{ display: "flex", justifyContent: "center" }}>
+										<Box sx={{ flexGrow: 1 }}>
+											<Typography variant="h6" noWrap component="div">
+												Hoard
+											</Typography>
+										</Box>
+										<Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>{searchBar}</Box>
+										<Box sx={{ flexGrow: 1 }} />
+									</Toolbar>
+								</AppBar>
+								<Drawer
+									variant="permanent"
+									sx={{
 										width: drawerWidth,
-										boxSizing: "border-box"
-									}
-								}}
-							>
-								<Toolbar />
-								<Box sx={{ overflow: "auto" }}>
-									<List>
-										{navAboveItems.map(({ text, icon, href, dialog }) => (
-											<ListItem key={text} disablePadding>
-												{dialog ? (
-													<ListItemButton onClick={() => setLabelDialogOpen(true)}>
+										flexShrink: 0,
+										[`& .MuiDrawer-paper`]: {
+											width: drawerWidth,
+											boxSizing: "border-box"
+										}
+									}}
+								>
+									<Toolbar />
+									<Box sx={{ overflow: "auto" }}>
+										<List>
+											{navAboveItems.map(({ text, icon, href, dialog }) => (
+												<ListItem key={text} disablePadding>
+													{dialog ? (
+														<ListItemButton onClick={() => setLabelDialogOpen(true)}>
+															<ListItemIcon>{icon}</ListItemIcon>
+															<ListItemText primary={text} />
+														</ListItemButton>
+													) : (
+														<ListItemButton component={Link} href={href!}>
+															<ListItemIcon>{icon}</ListItemIcon>
+															<ListItemText primary={text} />
+														</ListItemButton>
+													)}
+												</ListItem>
+											))}
+										</List>
+										<Divider />
+										<List>
+											{navBelowItems.map(({ text, icon, href }) => (
+												<ListItem key={text} disablePadding>
+													<ListItemButton component={Link} href={href}>
 														<ListItemIcon>{icon}</ListItemIcon>
 														<ListItemText primary={text} />
 													</ListItemButton>
-												) : (
-													<ListItemButton component={Link} href={href!}>
-														<ListItemIcon>{icon}</ListItemIcon>
-														<ListItemText primary={text} />
-													</ListItemButton>
-												)}
-											</ListItem>
-										))}
-									</List>
-									<Divider />
-									<List>
-										{navBelowItems.map(({ text, icon, href }) => (
-											<ListItem key={text} disablePadding>
-												<ListItemButton component={Link} href={href}>
-													<ListItemIcon>{icon}</ListItemIcon>
-													<ListItemText primary={text} />
-												</ListItemButton>
-											</ListItem>
+												</ListItem>
 
-										))}
-									</List>
+											))}
+										</List>
+									</Box>
+								</Drawer>
+								<Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+									<Toolbar />
+									{children}
 								</Box>
-							</Drawer>
-							<Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-								<Toolbar />
-								{children}
 							</Box>
-						</Box>
-						<CreateLabelDialog open={labelDialogOpen} onClose={() => setLabelDialogOpen(false)} />
+							<CreateLabelDialog open={labelDialogOpen} onClose={() => setLabelDialogOpen(false)} onLabelUpdate={fetchLabels} />
+						</LabelProvider>
 					</AppRouterCacheProvider>
 				</ThemeProvider>
 			</body >

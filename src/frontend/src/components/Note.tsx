@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { Box, Paper, Typography, Dialog, DialogTitle, DialogContent, TextField, Button, FormControl, Select, MenuItem, InputLabel } from "@mui/material";
+import { useLabelContext } from "@/app/context/LabelProvider";
 
 interface NoteProps {
     id: string;
@@ -32,8 +33,10 @@ export default function Note({ id, title, content, label, createdate, updatedate
     const [editContent, setEditContent] = React.useState(content);
     const [isEditing, setIsEditing] = React.useState(false);
     const [updateDateAfterSaving, setUpdateDateAfterSaving] = React.useState(updatedate);
-    const [labels, setLabels] = React.useState<string[]>([]);
+    const { fetchLabels } = useLabelContext();
     const [editLabel, setEditLabel] = React.useState(label ?? "");
+
+    const { labels } = useLabelContext();
 
     const handleOpen = () => {
         setEditTitle(title);
@@ -87,6 +90,7 @@ export default function Note({ id, title, content, label, createdate, updatedate
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
+                    id: id,
                     title: editTitle,
                     content: editContent,
                     label: editLabel,
@@ -114,29 +118,16 @@ export default function Note({ id, title, content, label, createdate, updatedate
         setOpen(false);
     };
 
-    // ラベル付与できるようラベル一覧を取得
-    const fetchLabels = async () => {
-        try {
-            const response = await fetch("http://localhost:4000/api/labels", {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error("Failed to fetch labels");
-            }
-
-            const data = await response.json();
-            const labelNames = data.map((label: { labelname: string }) => label.labelname);
-            setLabels(labelNames); // ラベル名の配列に変換
-        } catch (error) { }
-    }
-
     useEffect(() => {
         fetchLabels();
     }, []);
+
+    // ラベル名を取得する関数
+    const getLabelName = (id: string) => {
+        if (!labels) return "";
+        const found = labels.find(l => l.id === id);
+        return found ? found.labelname : "";
+    };
 
     return (
         <>
@@ -155,7 +146,7 @@ export default function Note({ id, title, content, label, createdate, updatedate
                 </Typography>
                 {label && label.trim() !== "" && (
                     <Typography variant="caption" color="textSecondary" sx={{ mb: 1, border: "1px solid #ccc", p: 0.5, borderRadius: 1 }}>
-                        {label}
+                        {getLabelName(label)}
                     </Typography>
                 )}
             </Paper>
@@ -197,13 +188,12 @@ export default function Note({ id, title, content, label, createdate, updatedate
                                 <FormControl size="small" sx={{ minWidth: 120, ml: 2 }}>
                                     <InputLabel id="select-label">ラベル</InputLabel>
                                     <Select
-                                        key={label}
                                         labelId="select-label"
                                         value={editLabel ?? ""}
                                         onChange={e => setEditLabel(e.target.value)}
                                         label="ラベル">
-                                        {labels.map(option => (
-                                            <MenuItem key={option} value={option}>{option}</MenuItem>
+                                        {labels && labels.map(option => (
+                                            <MenuItem key={option.id} value={option.id}>{option.labelname}</MenuItem>
                                         ))}
                                     </Select>
                                 </FormControl>
