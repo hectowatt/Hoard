@@ -15,6 +15,6 @@ export default class Label {
     @CreateDateColumn({ name: "createdate", type: "timestamp" })
     createdate: Date;
 
-    @OneToMany(() => Note, note => note.label)
+    @OneToMany(() => Note, note => note.label_id)
     notes: Note[];
 } 

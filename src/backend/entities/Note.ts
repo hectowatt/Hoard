@@ -16,7 +16,10 @@ export default class Note {
     @Column({ type: "text", nullable: false })
     content: string;
 
-    // content
+    // label_id
+    @Column({ type: "uuid", nullable: true })
+    label_id: string | null;
+
     // TODO: ラベルを複数追加できるようにしたい
     @ManyToOne(() => Label, label => label.notes, { nullable: true })
     @JoinColumn({ name: "label_id" })

@@ -61,6 +61,7 @@ app.get('/api/notes', async (req, res) => {
     const noteRepository = AppDataSource.getRepository(Notes);
     // Notesを全件取得する
     const notes = await noteRepository.find();
+    console.log("get notes:", notes);
     res.status(200).json(notes);
   } catch (error) {
     console.error("Error fetching notes:", error);
@@ -84,7 +85,7 @@ app.post('/api/notes', async (req, res) => {
     const newNote = noteRepository.create({
       title: title,
       content: content,
-      label: label || null, // ラベルがない場合はnullを設定
+      label_id: label || null, // ラベルがない場合はnullを設定
       createdate: new Date(),
       updatedate: new Date(),
     });
@@ -114,7 +115,7 @@ app.put('/api/notes', async (req, res) => {
     }
     note.content = content;
     note.title = title;
-    note.label = label;
+    note.label_id = label;
     note.updatedate = new Date();
     const updatedNote = await noteRepository.save(note);
     console.log('updated: ', updatedNote.updatedate);

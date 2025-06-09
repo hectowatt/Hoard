@@ -6,7 +6,7 @@ interface NoteProps {
     id: string;
     title: string;
     content: string;
-    label: string;
+    label_id: string;
     createdate: string;
     updatedate: string;
     onSave?: (id: string, newTitle: string, newContent: string, newLabel: string, newUpdateDate: string) => void;
@@ -26,16 +26,16 @@ const formatDate = (exString: string) => {
 }
 
 // トップページに並ぶメモコンポーネント
-export default function Note({ id, title, content, label, createdate, updatedate, onSave, onDelete }: NoteProps) {
+export default function Note({ id, title, content, label_id, createdate, updatedate, onSave, onDelete }: NoteProps) {
 
     const [open, setOpen] = React.useState(false);
     const [editTitle, setEditTitle] = React.useState(title);
     const [editContent, setEditContent] = React.useState(content);
     const [isEditing, setIsEditing] = React.useState(false);
     const [updateDateAfterSaving, setUpdateDateAfterSaving] = React.useState(updatedate);
-    const { fetchLabels } = useLabelContext();
-    const [editLabel, setEditLabel] = React.useState(label ?? "");
+    const [editLabel, setEditLabel] = React.useState(label_id ?? "");
 
+    const { fetchLabels } = useLabelContext();
     const { labels } = useLabelContext();
 
     const handleOpen = () => {
@@ -118,10 +118,6 @@ export default function Note({ id, title, content, label, createdate, updatedate
         setOpen(false);
     };
 
-    useEffect(() => {
-        fetchLabels();
-    }, []);
-
     // ラベル名を取得する関数
     const getLabelName = (id: string) => {
         if (!labels) return "";
@@ -144,9 +140,9 @@ export default function Note({ id, title, content, label, createdate, updatedate
                 <Typography variant="caption" color="textSecondary" sx={{ display: "block" }}>
                     更新日: {formatDate(updatedate)}
                 </Typography>
-                {label && label.trim() !== "" && (
+                {label_id && label_id.trim() !== "" && getLabelName(label_id) && (
                     <Typography variant="caption" color="textSecondary" sx={{ mb: 1, border: "1px solid #ccc", p: 0.5, borderRadius: 1 }}>
-                        {getLabelName(label)}
+                        {getLabelName(label_id)}
                     </Typography>
                 )}
             </Paper>
@@ -180,6 +176,11 @@ export default function Note({ id, title, content, label, createdate, updatedate
                     <Typography variant="caption" color="textSecondary" sx={{ display: "block" }}>
                         更新日: {formatDate(updatedate)}
                     </Typography>
+                    {label_id && label_id.trim() !== "" && getLabelName(label_id) && (
+                        <Typography variant="caption" color="textSecondary" sx={{ mb: 1, border: "1px solid #ccc", p: 0.5, borderRadius: 1 }}>
+                            {getLabelName(label_id)}
+                        </Typography>
+                    )}
                     <Box sx={{ mt: 2, textAlighn: "right" }}>
                         {isEditing ? (
                             <>

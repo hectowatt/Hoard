@@ -4,7 +4,6 @@ import InputForm from "@/components/InputForm";
 import styles from "./page.module.css";
 import React, { useEffect, useState } from "react";
 import { Container, Grid } from "@mui/material";
-import Note from "@/components/Note";
 
 // ルートページのコンテンツ
 export default function Home() {

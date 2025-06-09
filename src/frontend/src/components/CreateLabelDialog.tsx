@@ -84,7 +84,7 @@ export default function CreateLabelDialog({ open, onClose }: LabelDialogProps) {
                     margin="dense"
                 />
                 <List>
-                    {labels.map(label => (
+                    {labels && labels.map(label => (
                         <ListItem
                             key={label.id}
                             secondaryAction={

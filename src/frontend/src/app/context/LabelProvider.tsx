@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback } from "react";
 
+// ラベルをグローバルに保持するためのコンテキストプロバイダー
 type Label = { id: string; labelname: string };
 
 type LabelContextType = {
@@ -25,7 +26,7 @@ export const LabelProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         });
         if (!response.ok) throw new Error("Failed to fetch labels");
         const data = await response.json();
-        setLabels(data);
+        setLabels(Array.isArray(data) ? data : []);
     }, []);
 
     React.useEffect(() => { fetchLabels(); }, [fetchLabels]);
