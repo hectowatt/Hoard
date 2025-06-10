@@ -4,7 +4,7 @@ import InputForm from "../components/InputForm";
 import Note from "@/components/Note";
 import React, { use, useEffect, useState } from "react";
 import { Container, Grid } from "@mui/material";
-import { useLabelContext } from "./context/LabelProvider";
+import { useLabelContext } from "../context/LabelProvider";
 
 export default function Home() {
   const [notes, setNotes] = useState<{ id: string, title: string; content: string; label_id: string; createdate: string; updatedate: string }[]>([]);
@@ -59,7 +59,7 @@ export default function Home() {
     setNotes(prevNote =>
       prevNote.map(
         note => note.id === id ? {
-          ...note, title: newTitle, content: newContent, label: newLabel, updatedate: newUpdateDate
+          ...note, title: newTitle, content: newContent, label_id: newLabel, updatedate: newUpdateDate
         }
           : note)
     );

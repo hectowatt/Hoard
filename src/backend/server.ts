@@ -191,6 +191,14 @@ app.delete('/api/labels/:id', async (req, res) => {
     if (!label) {
       return res.status(404).json({ error: "Label not found" });
     }
+    // まず該当ノートのlabel_idをNULLにしてからラベルを削除
+    // await labelRepository
+    //   .createQueryBuilder()
+    //   .update()
+    //   .set({ id: null })
+    //   .where("label_id = :labelId", { id: label.id })
+    //   .execute();
+
     await labelRepository.remove(label);
     res.status(200).json({ message: "Label deleted successfully" });
   } catch (error) {

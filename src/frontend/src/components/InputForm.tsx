@@ -13,7 +13,7 @@ import {
     Select,
     MenuItem,
 } from '@mui/material';
-import { useLabelContext } from "@/app/context/LabelProvider";
+import { useLabelContext } from "@/context/LabelProvider";
 
 interface InputFormProps {
     onInsert: (newId: string, newTitle: string, newContent: string, newLabel: string) => void;

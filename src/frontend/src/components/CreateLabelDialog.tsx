@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, List, ListItem, ListItemText, IconButton } from "@mui/material";
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, List, ListItem, ListItemText, IconButton, DialogContentText } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useLabelContext } from "@/app/context/LabelProvider";
+import { useLabelContext } from "@/context/LabelProvider";
 
 interface LabelDialogProps {
     open: boolean;
@@ -13,6 +13,8 @@ interface LabelDialogProps {
 export default function CreateLabelDialog({ open, onClose }: LabelDialogProps) {
     const [input, setInput] = useState("");
     const { labels, fetchLabels } = useLabelContext();
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [targetLabelId, setTargetLabelId] = useState<string | null>(null);
 
     // 保存ボタン押下処理
     const handleAdd = async () => {
@@ -47,6 +49,20 @@ export default function CreateLabelDialog({ open, onClose }: LabelDialogProps) {
         }
     }
 
+    // 「はい」選択時
+    const handleConfirmDelete = async () => {
+        if (targetLabelId) {
+            await onDeleteLabel(targetLabelId);
+            setTargetLabelId(null);
+            setConfirmOpen(false);
+        }
+    };
+
+    // 「いいえ」選択時
+    const handleCancel = () => {
+        setTargetLabelId(null);
+        setConfirmOpen(false);
+    };
 
     // ラベル削除処理
     const onDeleteLabel = async (labelId: string) => {
@@ -71,37 +87,53 @@ export default function CreateLabelDialog({ open, onClose }: LabelDialogProps) {
         }
     }
 
+    // TODO: すでにノートに付与されているラベルを付与されたままの状態でも削除できるようにしたい
     return (
-        <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-            <DialogTitle>ラベルを編集</DialogTitle>
-            <DialogContent>
-                <TextField
-                    label="新しいラベルを作成"
-                    value={input}
-                    onChange={e => setInput(e.target.value)}
-                    onKeyDown={e => { if (e.key === "Enter") handleAdd(); }}
-                    fullWidth
-                    margin="dense"
-                />
-                <List>
-                    {labels && labels.map(label => (
-                        <ListItem
-                            key={label.id}
-                            secondaryAction={
-                                <IconButton edge="end" onClick={() => onDeleteLabel(label.id)}>
-                                    <DeleteIcon />
-                                </IconButton>
-                            }
-                        >
-                            <ListItemText primary={label.labelname} />
-                        </ListItem>
-                    ))}
-                </List>
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={onClose} variant="contained">閉じる</Button>
-                <Button onClick={handleAdd} variant="contained">追加</Button>
-            </DialogActions>
-        </Dialog>
+        <>
+            <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
+                <DialogTitle>ラベルを編集</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        label="新しいラベルを作成"
+                        value={input}
+                        onChange={e => setInput(e.target.value)}
+                        onKeyDown={e => { if (e.key === "Enter") handleAdd(); }}
+                        fullWidth
+                        margin="dense"
+                    />
+                    <List>
+                        {labels && labels.map(label => (
+                            <ListItem
+                                key={label.id}
+                                secondaryAction={
+                                    <IconButton edge="end" onClick={() => onDeleteLabel(label.id)}>
+                                        <DeleteIcon />
+                                    </IconButton>
+                                }
+                            >
+                                <ListItemText primary={label.labelname} />
+                            </ListItem>
+                        ))}
+                    </List>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={onClose} variant="contained">閉じる</Button>
+                    <Button onClick={handleAdd} variant="contained">追加</Button>
+                </DialogActions>
+            </Dialog>
+            {/* 確認ダイアログ */}
+            <Dialog open={confirmOpen} onClose={handleCancel}>
+                <DialogTitle>ラベル削除の確認</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        このラベルはノートに付与されています。本当に削除しますか？
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCancel}>いいえ</Button>
+                    <Button onClick={handleConfirmDelete} color="error" variant="contained">はい</Button>
+                </DialogActions>
+            </Dialog>
+        </>
     );
 }

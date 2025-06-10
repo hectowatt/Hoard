@@ -21,7 +21,7 @@ export default class Note {
     label_id: string | null;
 
     // TODO: ラベルを複数追加できるようにしたい
-    @ManyToOne(() => Label, label => label.notes, { nullable: true })
+    @ManyToOne(() => Label, label => label.notes, { nullable: true, onDelete: "SET NULL" })
     @JoinColumn({ name: "label_id" })
     label: Label | null;
 

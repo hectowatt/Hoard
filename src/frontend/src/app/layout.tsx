@@ -31,7 +31,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import { createTheme } from "@mui/material/styles";
 import { ThemeProvider } from "@mui/material/styles";
 import CreateLabelDialog from "@/components/CreateLabelDialog";
-import { LabelProvider } from "./context/LabelProvider";
+import { LabelProvider } from "../context/LabelProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 

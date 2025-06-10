@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Box, Paper, Typography, Dialog, DialogTitle, DialogContent, TextField, Button, FormControl, Select, MenuItem, InputLabel } from "@mui/material";
-import { useLabelContext } from "@/app/context/LabelProvider";
+import { useLabelContext } from "@/context/LabelProvider";
 
 interface NoteProps {
     id: string;
