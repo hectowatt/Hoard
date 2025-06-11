@@ -116,7 +116,6 @@ export default function CreateLabelDialog({ open, onClose }: LabelDialogProps) {
                                             setConfirmOpen(true);
                                         } else {
                                             console.log("islabelused", isLabelUsed(label.id));
-                                            console.log("ラベルがノートに付与されていない判定");
                                             onDeleteLabel(label.id);
                                         }
                                     }}>
