@@ -5,33 +5,11 @@ import Note from "@/components/Note";
 import React, { use, useEffect, useState } from "react";
 import { Container, Grid } from "@mui/material";
 import { useLabelContext } from "../context/LabelProvider";
+import { useNoteContext } from "@/context/NoteProvider";
 
 export default function Home() {
-  const [notes, setNotes] = useState<{ id: string, title: string; content: string; label_id: string; createdate: string; updatedate: string }[]>([]);
+  const { notes, setNotes, fetchNotes } = useNoteContext();
   const { labels, fetchLabels } = useLabelContext();
-
-  // 画面描画時にDBからメモを全件取得して表示する
-  const fetchNotes = async () => {
-    try {
-      // バックエンドAPIからメモ情報を取得
-      const response = await fetch("http://localhost:4000/api/notes", {
-        method: "GET",
-        headers: {
-          "content-type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        console.error("Get notes failed");
-        return;
-      }
-
-      const data = await response.json();
-      setNotes(data);
-    } catch (error) {
-      console.error("Error fetching notes", error);
-    }
-  };
 
   useEffect(() => {
     fetchNotes();
@@ -40,39 +18,50 @@ export default function Home() {
 
   // メモ初期登録時のコールバック関数
   const handleInsert = (newId: string, newTitle: string, newContent: string, LabelId: string) => {
-
-    setNotes(prevNote => [
-      ...prevNote,
-      {
-        id: newId,
-        title: newTitle,
-        content: newContent,
-        label_id: LabelId,
-        createdate: new Date().toISOString(),
-        updatedate: new Date().toISOString(),
-      },
-    ]);
-  };
+    if (setNotes !== undefined) {
+      setNotes(prevNote => [
+        ...prevNote,
+        {
+          id: newId,
+          title: newTitle,
+          content: newContent,
+          label_id: LabelId,
+          createdate: new Date().toISOString(),
+          updatedate: new Date().toISOString(),
+        },
+      ]);
+    } else {
+      console.error("setNotes is undefined");
+    };
+  }
 
   // メモ保存ボタン押下時のコールバック関数
   const handleSave = (id: string, newTitle: string, newContent: string, newLabel: string, newUpdateDate: string) => {
-    setNotes(prevNote =>
-      prevNote.map(
-        note => note.id === id ? {
-          ...note, title: newTitle, content: newContent, label_id: newLabel, updatedate: newUpdateDate
-        }
-          : note)
-    );
-  };
+    if (setNotes !== undefined) {
+      setNotes(prevNote =>
+        prevNote.map(
+          note => note.id === id ? {
+            ...note, title: newTitle, content: newContent, label_id: newLabel, updatedate: newUpdateDate
+          }
+            : note)
+      );
+    } else {
+      console.error("setNotes is undefined");
+    };
+  }
 
   // メモ削除ボタン押下時のコールバック関数
   const handleDelete = (id: string) => {
-    setNotes(prevNote => prevNote.filter(note => note.id !== id));
-  };
+    if (setNotes !== undefined) {
+      setNotes(prevNote => prevNote.filter(note => note.id !== id));
+    } else {
+      console.error("setNotes is undefined");
+    };
 
-  if (labels === undefined) {
-    return <div>Loading...</div>;
-  }
+    if (labels === undefined) {
+      return <div>Loading...</div>;
+    }
+  };
 
   return (
     <Container>

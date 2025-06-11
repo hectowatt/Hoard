@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, List, ListItem, ListItemText, IconButton, DialogContentText } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useLabelContext } from "@/context/LabelProvider";
+import { useNoteContext } from "@/context/NoteProvider";
 
 interface LabelDialogProps {
     open: boolean;
     onClose: () => void;
+    notes?: { id: string, title: string, content: string, label_id: string, createdate: string, updatedate: string }[];
     onLabelUpdate?: (labels: { id: string, labelname: string, createDate: string }[]) => void;
 }
 
@@ -15,6 +17,9 @@ export default function CreateLabelDialog({ open, onClose }: LabelDialogProps) {
     const { labels, fetchLabels } = useLabelContext();
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [targetLabelId, setTargetLabelId] = useState<string | null>(null);
+    const { notes } = useNoteContext();
+
+    const isLabelUsed = (labelId: string) => !!notes && notes.some(note => note.label_id === labelId);
 
     // 保存ボタン押下処理
     const handleAdd = async () => {
@@ -87,7 +92,6 @@ export default function CreateLabelDialog({ open, onClose }: LabelDialogProps) {
         }
     }
 
-    // TODO: すでにノートに付与されているラベルを付与されたままの状態でも削除できるようにしたい
     return (
         <>
             <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
@@ -106,7 +110,16 @@ export default function CreateLabelDialog({ open, onClose }: LabelDialogProps) {
                             <ListItem
                                 key={label.id}
                                 secondaryAction={
-                                    <IconButton edge="end" onClick={() => onDeleteLabel(label.id)}>
+                                    <IconButton edge="end" onClick={() => {
+                                        if (isLabelUsed(label.id)) {
+                                            setTargetLabelId(label.id);
+                                            setConfirmOpen(true);
+                                        } else {
+                                            console.log("islabelused", isLabelUsed(label.id));
+                                            console.log("ラベルがノートに付与されていない判定");
+                                            onDeleteLabel(label.id);
+                                        }
+                                    }}>
                                         <DeleteIcon />
                                     </IconButton>
                                 }
@@ -115,14 +128,14 @@ export default function CreateLabelDialog({ open, onClose }: LabelDialogProps) {
                             </ListItem>
                         ))}
                     </List>
-                </DialogContent>
+                </DialogContent >
                 <DialogActions>
-                    <Button onClick={onClose} variant="contained">閉じる</Button>
                     <Button onClick={handleAdd} variant="contained">追加</Button>
+                    <Button onClick={onClose} variant="contained">閉じる</Button>
                 </DialogActions>
-            </Dialog>
+            </Dialog >
             {/* 確認ダイアログ */}
-            <Dialog open={confirmOpen} onClose={handleCancel}>
+            < Dialog open={confirmOpen} onClose={handleCancel} >
                 <DialogTitle>ラベル削除の確認</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
@@ -130,10 +143,10 @@ export default function CreateLabelDialog({ open, onClose }: LabelDialogProps) {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCancel}>いいえ</Button>
                     <Button onClick={handleConfirmDelete} color="error" variant="contained">はい</Button>
+                    <Button onClick={handleCancel}>いいえ</Button>
                 </DialogActions>
-            </Dialog>
+            </Dialog >
         </>
     );
 }
