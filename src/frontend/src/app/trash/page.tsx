@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { Container, Grid } from "@mui/material";
-import Note from "@/components/Note";
 import { useLabelContext } from "@/context/LabelProvider";
+import TrashNote from "@/components/TrashNote";
 
 
 // 削除されたNoteを表示するページコンテンツ
@@ -39,6 +39,15 @@ export default function Home() {
     fetchTrashNotes();
   }, []);
 
+  // メモ復元ボタン押下時のコールバック関数
+  const handleSave = (id: string, newTitle: string, newContent: string, newLabel: string, newUpdateDate: string) => {
+    if (setTrashNotes !== undefined) {
+      setTrashNotes(prevNote => prevNote.filter(note => note.id !== id));
+    } else {
+      console.error("setNotes is undefined");
+    };
+  }
+
   // メモ削除ボタン押下時のコールバック関数
   const handleDelete = (id: string) => {
     if (setTrashNotes !== undefined) {
@@ -58,14 +67,15 @@ export default function Home() {
       <Grid container spacing={2}>
         {trashNotes.map(note => (
           <Grid key={note.id}>
-            <Note
+            <TrashNote
               id={note.id}
               title={note.title}
               content={note.content}
               label_id={note.label_id}
               createdate={note.createdate}
               updatedate={note.updatedate}
-            // ゴミ箱用なのでonSave/onDeleteは不要か、必要に応じてpropsを渡す
+              onRestore={handleSave}
+              onDelete={handleDelete}
             />
           </Grid>
         ))}

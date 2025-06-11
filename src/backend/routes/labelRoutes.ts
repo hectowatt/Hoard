@@ -9,7 +9,7 @@ router.post('/', async (req, res) => {
   const { labelName } = req.body;
 
   if (!labelName) {
-    return res.status(400).json({ error: "must set labelname" });
+    return res.status(400).json({ error: "Must set labelname" });
   }
 
   try {
@@ -21,10 +21,10 @@ router.post('/', async (req, res) => {
     const savedLabel = await labelRepository.save(newLabel);
 
     console.log('Label inserted with ID: ', savedLabel.id);
-    res.status(201).json({ message: "save label success!", label: savedLabel });
+    res.status(201).json({ message: "Save label success!", label: savedLabel });
   } catch (error) {
     console.error("Error saving label:", error);
-    res.status(500).json({ error: "failed to save label" });
+    res.status(500).json({ error: "Failed to save label" });
   }
 });
 
