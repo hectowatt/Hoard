@@ -35,7 +35,6 @@ export default function Note({ id, title, content, label_id, createdate, updated
     const [updateDateAfterSaving, setUpdateDateAfterSaving] = React.useState(updatedate);
     const [editLabel, setEditLabel] = React.useState(label_id ?? "");
 
-    const { fetchLabels } = useLabelContext();
     const { labels } = useLabelContext();
 
     const handleOpen = () => {

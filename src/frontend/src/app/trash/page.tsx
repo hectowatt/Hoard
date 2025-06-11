@@ -2,16 +2,20 @@
 
 import React, { useEffect, useState } from "react";
 import { Container, Grid } from "@mui/material";
+import Note from "@/components/Note";
+import { useLabelContext } from "@/context/LabelProvider";
 
-// ルートページのコンテンツ
+
+// 削除されたNoteを表示するページコンテンツ
 export default function Home() {
-  const [notes, setNotes] = useState<{ id: string, title: string; content: string; createdate: string; updatedate: string }[]>([]);
+  const [trashNotes, setTrashNotes] = useState<{ id: string, title: string; content: string; label_id: string, createdate: string; updatedate: string }[]>([]);
+  const { labels, fetchLabels } = useLabelContext();
 
   // 画面描画時にDBからメモを全件取得して表示する
-  const fetchNotes = async () => {
+  const fetchTrashNotes = async () => {
     try {
       // バックエンドAPIからメモ情報を取得
-      const response = await fetch("http://localhost:4000/api/notes", {
+      const response = await fetch("http://localhost:4000/api/notes/trash", {
         method: "GET",
         headers: {
           "content-type": "application/json",
@@ -24,54 +28,48 @@ export default function Home() {
       }
 
       const data = await response.json();
-      console.log("selected data:", JSON.stringify(data, null, 2));
-      setNotes(data);
+      console.log("selected trash data:", JSON.stringify(data, null, 2));
+      setTrashNotes(data);
     } catch (error) {
-      console.error("Error fetching notes", error);
+      console.error("Error fetching trash notes", error);
     }
   };
 
   useEffect(() => {
-    fetchNotes();
+    fetchTrashNotes();
   }, []);
-
-  // メモ初期登録時のコールバック関数
-  const handleInsert = (newTitle: string, newContent: string) => {
-    setNotes(prevNote => [
-      ...prevNote,
-      {
-        id: new Date().toISOString(),
-        title: newTitle,
-        content: newContent,
-        createdate: new Date().toISOString(),
-        updatedate: new Date().toISOString(),
-      },
-    ]);
-  };
-
-  // メモ保存ボタン押下時のコールバック関数
-  const handleSave = (id: string, newTitle: string, newContent: string, newUpdateDate: string) => {
-    console.log("id: ", id);
-    console.log("newTitle: ", newTitle);
-    console.log("newContent: ", newContent);
-    console.log("newUpdateDate; ", newUpdateDate);
-    setNotes(prevNote =>
-      prevNote.map(
-        note => note.id === id ? {
-          ...note, title: newTitle, content: newContent, updatedate: newUpdateDate
-        }
-          : note)
-    );
-  };
 
   // メモ削除ボタン押下時のコールバック関数
   const handleDelete = (id: string) => {
-    console.log("redraw after delete");
-    setNotes(prevNote => prevNote.filter(note => note.id !== id));
+    if (setTrashNotes !== undefined) {
+      setTrashNotes(prevNote => prevNote.filter(note => note.id !== id));
+    } else {
+      console.error("setNotes is undefined");
+    };
+
+    if (labels === undefined) {
+      return <div>Loading...</div>;
+    }
   };
 
   return (
     <Container>
+      <p>ゴミ箱内のメモは７日後に削除されます</p>
+      <Grid container spacing={2}>
+        {trashNotes.map(note => (
+          <Grid key={note.id}>
+            <Note
+              id={note.id}
+              title={note.title}
+              content={note.content}
+              label_id={note.label_id}
+              createdate={note.createdate}
+              updatedate={note.updatedate}
+            // ゴミ箱用なのでonSave/onDeleteは不要か、必要に応じてpropsを渡す
+            />
+          </Grid>
+        ))}
+      </Grid>
     </Container>
   );
 }

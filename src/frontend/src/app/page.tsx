@@ -4,7 +4,7 @@ import InputForm from "../components/InputForm";
 import Note from "@/components/Note";
 import React, { use, useEffect, useState } from "react";
 import { Container, Grid } from "@mui/material";
-import { useLabelContext } from "../context/LabelProvider";
+import { useLabelContext } from "@/context/LabelProvider";
 import { useNoteContext } from "@/context/NoteProvider";
 
 export default function Home() {

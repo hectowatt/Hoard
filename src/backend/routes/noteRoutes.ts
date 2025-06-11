@@ -9,7 +9,7 @@ router.get('/', async (req, res) => {
   try {
     const noteRepository = AppDataSource.getRepository(Notes);
     // Notesを全件取得する
-    const notes = await noteRepository.find();
+    const notes = await noteRepository.find({ where: { is_deleted: false }, order: { createdate: 'DESC' } });
     console.log("get notes:", notes);
     res.status(200).json(notes);
   } catch (error) {
@@ -85,11 +85,25 @@ router.delete('/:id', async (req, res) => {
     if (!note) {
       return res.status(404).json({ error: "Note not found" });
     }
-    await noteRepository.remove(note);
+    note.is_deleted = true; // 論理削除のためフラグを立てる
+    note.deletedate = new Date(); // 削除日時を設定
+    await noteRepository.save(note);
     res.status(200).json({ message: "Note deleted successfully" });
   } catch (error) {
     console.error("Error deleting note:", error);
     res.status(500).json({ error: "Failed to delete note" });
+  }
+});
+
+// 【TRASH】ゴミ箱ノート取得API
+router.get('/trash', async (req, res) => {
+  try {
+    const noteRepository = AppDataSource.getRepository(Notes);
+    const notes = await noteRepository.find({ where: { is_deleted: true }, order: { deletedate: 'DESC' } });
+    res.status(200).json(notes);
+  } catch (error) {
+    console.error("Error fetching trash notes:", error);
+    res.status(500).json({ error: 'Failed to fetch trash notes' });
   }
 });
 

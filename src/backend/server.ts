@@ -6,6 +6,8 @@ import pg from 'pg';
 import { AppDataSource } from './data-source.js';
 import noteRoutes  from './routes/noteRoutes.js';
 import labelRoutes from './routes/labelRoutes.js';
+import  { LessThan } from 'typeorm';
+import Note from './entities/Note.js';
 
 const { Pool } = pg;
 const app = express();
@@ -57,3 +59,17 @@ app.get('/', (req, res) => {
 
 app.use('/api/notes', noteRoutes);
 app.use('/api/labels', labelRoutes);
+
+
+// 定期的に古いノートを削除する関数（７日経過したら削除）
+async function deleteOldNotes() {
+    const noteRepository = AppDataSource.getRepository(Note);
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    await noteRepository.delete({
+        is_deleted: true,
+        deletedate: LessThan(sevenDaysAgo)
+    });
+}
+
+// サーバー起動時に定期実行（例: 1時間ごと）
+setInterval(deleteOldNotes, 60 * 60 * 1000);
