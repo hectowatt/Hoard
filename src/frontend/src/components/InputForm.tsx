@@ -27,7 +27,7 @@ export default function InputForm({ onInsert }: InputFormProps) {
     const [content, setContent] = useState("");
     const [isEditing, setIsEditing] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
-    const [editLabelId, setEditLabelId] = React.useState("");
+    const [editLabelId, setEditLabelId] = React.useState<string | null>(null);
 
     const { labels } = useLabelContext();
 
@@ -54,7 +54,7 @@ export default function InputForm({ onInsert }: InputFormProps) {
                 body: JSON.stringify({
                     title: title,
                     content: content,
-                    label: editLabelId || null, // ラベルが選択されていない場合はnullを送信
+                    label: editLabelId, // nullの場合はnullが送信される
                 }),
             })
 
@@ -145,8 +145,17 @@ export default function InputForm({ onInsert }: InputFormProps) {
                             <Select
                                 labelId="select-label"
                                 value={editLabelId ?? ""}
-                                onChange={e => setEditLabelId(e.target.value)}
-                                label="ラベル">
+                                onChange={e => setEditLabelId(e.target.value === "" ? null : e.target.value)}
+                                label="ラベル"
+                                renderValue={(selected: string) => {
+                                    if (!selected) return <em></em>;
+                                    const found = labels?.find(l => l.id === selected);
+                                    return found ? found.labelname : "";
+                                }}
+                            >
+                                <MenuItem value="">
+                                    <em>ラベルなし</em>
+                                </MenuItem>
                                 {(labels ?? []).map(option => (
                                     <MenuItem key={option.id} value={option.id}>{option.labelname}</MenuItem>
                                 ))}

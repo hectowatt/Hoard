@@ -44,10 +44,6 @@ router.post('/', async (req, res) => {
 router.put('/', async (req, res) => {
   const { id, title, content, label } = req.body;
 
-  if (!title || !content) {
-    return res.status(400).json({ error: "Must set title and content" });
-  }
-
   try {
     const noteRepository = AppDataSource.getRepository(Notes);
     const note = await noteRepository.findOneBy({ id: id });

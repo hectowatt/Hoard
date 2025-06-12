@@ -33,8 +33,7 @@ export default function Note({ id, title, content, label_id, createdate, updated
     const [editContent, setEditContent] = React.useState(content);
     const [isEditing, setIsEditing] = React.useState(false);
     const [updateDateAfterSaving, setUpdateDateAfterSaving] = React.useState(updatedate);
-    const [editLabel, setEditLabel] = React.useState(label_id ?? null);
-
+    const [editLabel, setEditLabel] = React.useState<string | null>(null);
     const { labels } = useLabelContext();
 
     const handleOpen = () => {
@@ -78,15 +77,8 @@ export default function Note({ id, title, content, label_id, createdate, updated
 
     // 保存ボタン押下処理
     const handleSave = async () => {
-        if (!editTitle.trim() || !editContent.trim()) {
-            console.log("must set title and content");
-            return;
-        }
+
         try {
-            console.log("id:", id);
-            console.log("title:", editTitle);
-            console.log("content:", editContent);
-            console.log("label:", editLabel);
             const response = await fetch("http://localhost:4000/api/notes", {
                 method: "PUT",
                 headers: {
@@ -108,7 +100,7 @@ export default function Note({ id, title, content, label_id, createdate, updated
             console.log("Save success!", result);
 
             if (typeof onSave === "function") {
-                onSave(id, editTitle, editContent, editLabel, result.note.updatedate);
+                onSave(id, editTitle, editContent, editLabel ?? "", result.note.updatedate);
             }
         } catch (error) {
             console.error("Error saving note", error);
@@ -194,8 +186,17 @@ export default function Note({ id, title, content, label_id, createdate, updated
                                     <Select
                                         labelId="select-label"
                                         value={editLabel ?? ""}
-                                        onChange={e => setEditLabel(e.target.value)}
-                                        label="ラベル">
+                                        onChange={e => setEditLabel(e.target.value === "" ? null : e.target.value)}
+                                        label="ラベル"
+                                        renderValue={(selected: string) => {
+                                            if (!selected) return <em>ラベルなし</em>;
+                                            const found = labels?.find(l => l.id === selected);
+                                            return found ? found.labelname : "";
+                                        }}
+                                    >
+                                        <MenuItem value="">
+                                            <em>ラベルなし</em>
+                                        </MenuItem>
                                         {labels && labels.map(option => (
                                             <MenuItem key={option.id} value={option.id}>{option.labelname}</MenuItem>
                                         ))}
