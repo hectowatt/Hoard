@@ -33,7 +33,7 @@ export default function Note({ id, title, content, label_id, createdate, updated
     const [editContent, setEditContent] = React.useState(content);
     const [isEditing, setIsEditing] = React.useState(false);
     const [updateDateAfterSaving, setUpdateDateAfterSaving] = React.useState(updatedate);
-    const [editLabel, setEditLabel] = React.useState(label_id ?? "");
+    const [editLabel, setEditLabel] = React.useState(label_id ?? null);
 
     const { labels } = useLabelContext();
 
@@ -83,6 +83,10 @@ export default function Note({ id, title, content, label_id, createdate, updated
             return;
         }
         try {
+            console.log("id:", id);
+            console.log("title:", editTitle);
+            console.log("content:", editContent);
+            console.log("label:", editLabel);
             const response = await fetch("http://localhost:4000/api/notes", {
                 method: "PUT",
                 headers: {
