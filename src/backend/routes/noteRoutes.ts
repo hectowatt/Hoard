@@ -21,10 +21,6 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   const { title, content, label } = req.body;
 
-  if (!title || !content) {
-    return res.status(400).json({ error: "Must set title and content" });
-  }
-
   try {
     const noteRepository = AppDataSource.getRepository(Notes);
     const newNote = noteRepository.create({
@@ -126,7 +122,7 @@ router.delete('/trash/:id', async (req, res) => {
 
 // 【UPDATE】Notes復元用API
 router.put('/trash', async (req, res) => {
-  const { id} = req.body;
+  const { id } = req.body;
 
   try {
     const noteRepository = AppDataSource.getRepository(Notes);

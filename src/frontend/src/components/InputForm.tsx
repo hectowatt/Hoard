@@ -43,11 +43,6 @@ export default function InputForm({ onInsert }: InputFormProps) {
 
     // 保存ボタン押下処理
     const saveButtonClick = async () => {
-        if (!title.trim() || !content.trim()) {
-            console.log("タイトルと内容は必須です");
-            return
-        }
-
 
         try {
 

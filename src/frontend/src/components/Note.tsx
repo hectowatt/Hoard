@@ -127,8 +127,8 @@ export default function Note({ id, title, content, label_id, createdate, updated
     return (
         <>
             <Paper elevation={3} sx={{ p: 2, maxWidth: 400, wordWrap: "break-word", cursor: "pointer" }} onClick={handleOpen}>
-                <Typography variant="h6" sx={{ mb: 1 }}>
-                    {title}
+                <Typography variant="h6" sx={title && title.trim() !== "" ? { mb: 1 } : { mb: 1, fontStyle: "italic", color: "#b0b0b0", fontWeight: "normal" }}>
+                    {title && title.trim() !== "" ? title : "タイトルなし"}
                 </Typography>
                 <Typography variant="body1" sx={{ mb: 1, whiteSpace: "pre-line" }}>
                     {content}
