@@ -107,7 +107,7 @@ const drawerWidth = 240;
 export default function RootLayout({
 	children
 }: Readonly<{
-	children: (props: { labels: string[], fetchLabels: () => Promise<void> }) => React.ReactNode;
+	children: React.ReactNode;
 }>) {
 	const [labelDialogOpen, setLabelDialogOpen] = React.useState(false);
 	const [labels, setLabels] = React.useState<string[]>([])
