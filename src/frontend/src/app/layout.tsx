@@ -112,7 +112,7 @@ export default function RootLayout({
 			createTheme({
 				palette: {
 					primary: {
-						main: "#47266e", // プライマリカラーを設定
+						main: "#e3a838", // プライマリカラーを設定
 					},
 					mode,
 					...(mode === "dark"
@@ -166,7 +166,7 @@ export default function RootLayout({
 										position="fixed"
 										sx={{
 											zIndex: (theme) => theme.zIndex.drawer + 1,
-											backgroundColor: "#47266e"
+											backgroundColor: "#e3a838"
 										}}
 										color="primary"
 									>
