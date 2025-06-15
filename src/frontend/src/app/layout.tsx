@@ -111,11 +111,14 @@ export default function RootLayout({
 		() =>
 			createTheme({
 				palette: {
+					primary: {
+						main: "#47266e", // プライマリカラーを設定
+					},
 					mode,
 					...(mode === "dark"
 						? {
 							background: {
-								default: "#2c2c2c", // ここをお好みのグレーに
+								default: "#2c2c2c",
 								paper: "#2c2c2c",   // ダイアログやカードの背景も調整
 							},
 						}
