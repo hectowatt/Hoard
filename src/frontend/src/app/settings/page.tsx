@@ -1,17 +1,26 @@
 "use client";
 
-import InputForm from "@/components/InputForm";
-import styles from "./page.module.css";
+
 import React, { useEffect, useState } from "react";
 import { Container, Grid } from "@mui/material";
 
-// ルートページのコンテンツ
+// 設定ページのコンテンツ
 export default function Home() {
-  const [notes, setNotes] = useState<{ id: string, title: string; content: string; createdate: string; updatedate: string }[]>([]);
+
 
   return (
+
     <Container>
-      {/* メモ一覧表示 */}
-    </Container>
+      <h1>設定</h1>
+
+      {/* ここに設定項目を追加 */}
+
+      <h3>テーマ設定</h3>
+      <p>アプリケーションのテーマを選択できます。</p>
+      {/* テーマ選択のUIをここに追加 */}
+
+
+    </Container >
+
   );
 }

@@ -12,8 +12,11 @@ import {
     InputLabel,
     Select,
     MenuItem,
+    IconButton,
 } from '@mui/material';
 import { useLabelContext } from "@/context/LabelProvider";
+import NoEncryptionGmailerrorredOutlinedIcon from '@mui/icons-material/NoEncryptionGmailerrorredOutlined';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 interface InputFormProps {
     onInsert: (newId: string, newTitle: string, newContent: string, newLabel: string) => void;
@@ -28,6 +31,7 @@ export default function InputForm({ onInsert }: InputFormProps) {
     const [isEditing, setIsEditing] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
     const [editLabelId, setEditLabelId] = React.useState<string | null>(null);
+    const [isLocked, setIsLocked] = React.useState(false);
 
     const { labels } = useLabelContext();
 
@@ -161,6 +165,11 @@ export default function InputForm({ onInsert }: InputFormProps) {
                                 ))}
                             </Select>
                         </FormControl>
+                        <IconButton
+                            onClick={() => setIsLocked(!isLocked)}
+                            sx={{ ml: 1 }}>
+                            {isLocked ? <LockOutlinedIcon /> : <NoEncryptionGmailerrorredOutlinedIcon />}
+                        </IconButton>
                     </Box>
                 </Collapse>
             </Paper >
