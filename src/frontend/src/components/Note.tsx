@@ -68,6 +68,9 @@ export default function Note({ id, title, content, label_id, createdate, updated
                 onDelete(id);
             }
 
+            setIsEditing(false);
+            setOpen(false);
+
         } catch (error) {
             console.error("Error deleting note", error);
             return;
