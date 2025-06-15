@@ -32,8 +32,9 @@ import { createTheme } from "@mui/material/styles";
 import { ThemeProvider } from "@mui/material/styles";
 import CreateLabelDialog from "@/components/CreateLabelDialog";
 import { LabelProvider } from "../context/LabelProvider";
-import Note from "@/components/Note";
 import { NoteProvider } from "@/context/NoteProvider";
+import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
+import Brightness2OutlinedIcon from '@mui/icons-material/Brightness2Outlined';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -54,45 +55,6 @@ const navBelowItems = [
 	{ text: "設定", icon: belowIcons[1], href: "/settings" }
 ];
 
-// 検索バー
-const searchBar = (
-	<form>
-		<TextField
-			id="outlined-search-bar"
-			variant="outlined"
-			size="medium"
-			placeholder="検索"
-			sx={{
-				width: "500px",
-				backgroundColor: "#ffffff",
-				borderRadius: "5px"
-			}}
-			InputProps={{
-				endAdornment: (
-					<InputAdornment position="end">
-						<IconButton type="submit" aria-label="search">
-							<SearchIcon style={{ fill: "gray" }} />
-						</IconButton>
-					</InputAdornment>
-				)
-			}}
-		/>
-	</form>
-);
-
-// カスタムテーマの作成
-const theme = createTheme({
-	palette: {
-		primary: {
-			main: "#6a5acd"
-		},
-		secondary: {
-			main: "#F39809",
-			light: "#f6ae54 ",
-			contrastText: "#FFFFFF"
-		}
-	}
-});
 
 const metadata: Metadata = {
 	title: "Hoard",
@@ -111,6 +73,57 @@ export default function RootLayout({
 }>) {
 	const [labelDialogOpen, setLabelDialogOpen] = React.useState(false);
 	const [labels, setLabels] = React.useState<string[]>([])
+	const [mode, setMode] = React.useState<"light" | "dark">("light");
+
+	// 検索バー
+	const searchBar = (
+		<form>
+			<TextField
+				id="outlined-search-bar"
+				variant="outlined"
+				size="medium"
+				placeholder="検索"
+				sx={{
+					width: "500px",
+					backgroundColor: mode === "dark" ? "#2c2c2c" : "#ffffff",
+					borderRadius: "5px"
+				}}
+				InputProps={{
+					endAdornment: (
+						<InputAdornment position="end">
+							<IconButton type="submit" aria-label="search">
+								<SearchIcon style={{ fill: "gray" }} />
+							</IconButton>
+						</InputAdornment>
+					),
+					sx: {
+						"&::placeholder": {
+							color: "#9e9e9e", // プレースホルダーの色を設定
+						}
+					},
+				}}
+			/>
+		</form>
+	);
+
+	// カスタムテーマの作成
+	const theme = React.useMemo(
+		() =>
+			createTheme({
+				palette: {
+					mode,
+					...(mode === "dark"
+						? {
+							background: {
+								default: "#2c2c2c", // ここをお好みのグレーに
+								paper: "#2c2c2c",   // ダイアログやカードの背景も調整
+							},
+						}
+						: {}),
+				},
+			}),
+		[mode]
+	);
 
 	// ラベル一覧を取得する
 	const fetchLabels = async () => {
@@ -132,6 +145,11 @@ export default function RootLayout({
 	}
 		, []);
 
+	const toggleColorMode = () => {
+		setMode((prev) => (prev === "light" ? "dark" : "light"));
+	};
+
+
 	return (
 		<html lang="en">
 			<body className={inter.className}>
@@ -143,7 +161,11 @@ export default function RootLayout({
 									<CssBaseline />
 									<AppBar
 										position="fixed"
-										sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, backgroundColor: "lemon yellow" }}
+										sx={{
+											zIndex: (theme) => theme.zIndex.drawer + 1,
+											backgroundColor: "#47266e"
+										}}
+										color="primary"
 									>
 										<Toolbar sx={{ display: "flex", justifyContent: "center" }}>
 											<Box sx={{ flexGrow: 1 }}>
@@ -153,6 +175,13 @@ export default function RootLayout({
 											</Box>
 											<Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>{searchBar}</Box>
 											<Box sx={{ flexGrow: 1 }} />
+											<IconButton
+												sx={{ position: "fixed", top: 16, right: 16, zIndex: 2000 }}
+												onClick={toggleColorMode}
+												color="inherit"
+											>
+												{mode === "dark" ? <Brightness2OutlinedIcon /> : <LightModeOutlinedIcon />}
+											</IconButton>
 										</Toolbar>
 									</AppBar>
 									<Drawer
