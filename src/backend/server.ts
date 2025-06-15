@@ -6,6 +6,7 @@ import pg from 'pg';
 import { AppDataSource } from './data-source.js';
 import noteRoutes from './routes/NoteRoutes.js';
 import labelRoutes from './routes/LabelRoutes.js';
+import passwordRoutes from './routes/PasswordRoutes.js';
 import { LessThan } from 'typeorm';
 import Note from './entities/Note.js';
 
@@ -59,6 +60,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/notes', noteRoutes);
 app.use('/api/labels', labelRoutes);
+app.use('/api/password', passwordRoutes);
 
 
 // 定期的に古いノートを削除する関数（７日経過したら削除）

@@ -9,15 +9,15 @@ export default class Note {
     id: string;
 
     // title
-    @Column({ type: "text", nullable: false })
+    @Column({ name: "title", type: "text", nullable: false })
     title: string;
 
     // content
-    @Column({ type: "text", nullable: false })
+    @Column({ name: "content", type: "text", nullable: false })
     content: string;
 
     // label_id
-    @Column({ type: "uuid", nullable: true })
+    @Column({ name: "label_id", type: "uuid", nullable: true })
     label_id: string | null;
 
     // TODO: ラベルを複数追加できるようにしたい
@@ -32,6 +32,10 @@ export default class Note {
     // deletedata
     @Column({ name: "deletedate", type: "timestamp", nullable: true })
     deletedate: Date | null;
+
+    // is_locked
+    @Column({ name: "is_locked", type: "boolean", default: false })
+    is_locked: boolean;
 
     // createdate
     @CreateDateColumn({ name: "createdate", type: "timestamp" })

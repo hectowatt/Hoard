@@ -8,7 +8,7 @@ export default class Label {
     id: string;
 
     // title
-    @Column({ type: "text", nullable: false, unique: true })
+    @Column({ name: "labelname", type: "text", nullable: false, unique: true })
     labelname: string;
 
     // createdate
