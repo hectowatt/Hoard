@@ -1,12 +1,12 @@
 services:
   app:
-    build: 
+    build:
       context: .
     container_name: hoard_app
     restart: unless-stopped
     ports:
-      - "3000:3000"  # frontend用
-      - "4000:4000"  # backend用
+      - "3500:3500" # frontend用
+      - "4000:4000" # backend用
     environment:
       - DATABASE_URL=postgres://hoard_user:hoard_password@db:5432/hoard_db
     depends_on:

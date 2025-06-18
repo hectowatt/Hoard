@@ -126,6 +126,80 @@ export default function Note({ id, title, content, label_id, createdate, updated
         return found ? found.labelname : "";
     };
 
+    // メモロック・アンロック処理
+    const handleUnlock = async () => {
+        if (isLocked) {
+            // ロック解除時の処理
+
+            // パスワードが存在するかチェック
+            try {
+                const responseSelect = await fetch("http://localhost:4000/api/password", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                if (responseSelect.ok) {
+                    const resultSelect = await responseSelect.json();
+                    console.log("パスワード取得成功", resultSelect);
+                    if (resultSelect.password_id != null && resultSelect.password_id !== "") {
+                        // TODO:すでにパスワードが登録されている場合はパスワード入力を求める
+                        console.log("パスワード登録済みのためパスワード入力を求める");
+                        // ここでパスワード入力を求めるUIを実装する必要があります
+                        // 例えば、promptを使ってパスワードを取得することもできますが、セキュリティ上の理由から
+                        // モーダルダイアログを使うことをお勧めします。
+                        // ここでは仮にpromptを使ってパスワードを取得する例を示します
+                        const passwordString = prompt("パスワードを入力してください");
+                        if (!passwordString) {
+                            console.error("パスワードが入力されませんでした");
+                            return;
+                        }
+                        const password_id = resultSelect.password_id;
+                        // 入力されたパスワードを取得
+
+                        const responseCompare = await fetch("http://localhost:4000/api/password/compare", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                password_id: password_id,
+                                passwordString: passwordString
+                            }),
+                        });
+
+                        if (responseCompare.ok) {
+                            const result = await responseCompare.json();
+                            const isMatch = result.isMatch;
+                        } else {
+                            console.error("failed to compare password");
+                        }
+                    } else {
+                        // パスワードが未登録の場合は新規登録
+                        // TODO:ここはエラーダイアログを出したい
+                        console.log("パスワード未登録のためロックできず");
+                    }
+
+                } else {
+                    console.error("failed to fetch password");
+                }
+                setEditTitle(title);
+                setEditContent(content);
+                setEditLabel(label_id);
+            } catch (error) {
+
+            }
+        } else {
+            // ロック時の処理
+            setEditTitle("");
+            setEditContent("");
+            setEditLabel(null);
+            setIsLocked(!isLocked);
+            setOpen(false);
+        }
+    };
+
     return (
         <>
             <Paper elevation={3} sx={{ p: 2, maxWidth: 300, maxHeight: 200, wordWrap: "break-word", cursor: "pointer" }} onClick={handleOpen}>
@@ -144,8 +218,7 @@ export default function Note({ id, title, content, label_id, createdate, updated
                         WebkitLineClamp: 4, // 表示したい最大行数
                         WebkitBoxOrient: "vertical",
                     }}
-                >
-                    {content}
+                >{isLocked ? "このメモはロックされています" : content}
                 </Typography>
                 <Typography variant="caption" color="textSecondary" sx={{ display: "block" }}>
                     作成日: {formatDate(createdate)}
@@ -221,7 +294,7 @@ export default function Note({ id, title, content, label_id, createdate, updated
                                     </Select>
                                 </FormControl>
                                 <IconButton
-                                    onClick={() => setIsLocked(!isLocked)}
+                                    onClick={() => handleUnlock()}
                                     sx={{ ml: 1, color: isLocked ? "primary.main" : "text.secondary" }}>
                                     {isLocked ? <LockOutlinedIcon /> : <NoEncryptionGmailerrorredOutlinedIcon />}
                                 </IconButton>
