@@ -19,7 +19,7 @@ import NoEncryptionGmailerrorredOutlinedIcon from '@mui/icons-material/NoEncrypt
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 interface InputFormProps {
-    onInsert: (newId: string, newTitle: string, newContent: string, newLabel: string) => void;
+    onInsert: (newId: string, newTitle: string, newContent: string, newLabel: string, isLocked: boolean) => void;
 }
 
 // トップページ上部の入力フォームコンポーネント
@@ -59,6 +59,7 @@ export default function InputForm({ onInsert }: InputFormProps) {
                     title: title,
                     content: content,
                     label: editLabelId, // nullの場合はnullが送信される
+                    isLocked: isLocked, // ロック状態を送信
                 }),
             })
 
@@ -77,7 +78,7 @@ export default function InputForm({ onInsert }: InputFormProps) {
 
             // メモ登録時のコールバック関数を呼び出す
             if (typeof onInsert === "function") {
-                onInsert(insertedNoteId, title, content, editLabelId || "");
+                onInsert(insertedNoteId, title, content, editLabelId || "", isLocked);
             }
         } catch (error) {
             console.error("Error saving note:", error);

@@ -11,6 +11,7 @@ interface NoteProps {
     label_id: string;
     createdate: string;
     updatedate: string;
+    is_locked: boolean;
     onSave?: (id: string, newTitle: string, newContent: string, newLabel: string, newUpdateDate: string) => void;
     onDelete?: (id: string) => void;
 }
@@ -28,7 +29,7 @@ const formatDate = (exString: string) => {
 }
 
 // ページに並ぶメモコンポーネント
-export default function Note({ id, title, content, label_id, createdate, updatedate, onSave, onDelete }: NoteProps) {
+export default function Note({ id, title, content, label_id, createdate, updatedate, is_locked, onSave, onDelete }: NoteProps) {
 
     const [open, setOpen] = React.useState(false);
     const [editTitle, setEditTitle] = React.useState(title);
@@ -42,6 +43,12 @@ export default function Note({ id, title, content, label_id, createdate, updated
     const [passwordDialogOpen, setPasswordDialogOpen] = React.useState(false);
     const [passwordId, setPasswordId] = React.useState<string | null>(null);
 
+    // 画面描画時にノートロック状態を設定
+    useEffect(() => {
+        setIsLocked(is_locked);
+    }, [is_locked]);
+
+
     const handleOpen = () => {
         setEditTitle(title);
         setEditContent(content);
@@ -50,7 +57,10 @@ export default function Note({ id, title, content, label_id, createdate, updated
     };
 
     // フォーカスが外れた時の処理
-    const handleClose = () => setOpen(false);
+    const handleClose = () => {
+        setIsEditing(false);
+        setOpen(false)
+    };
 
     // 編集時
     const handleEdit = () => setIsEditing(true);
@@ -98,6 +108,7 @@ export default function Note({ id, title, content, label_id, createdate, updated
                     title: editTitle,
                     content: editContent,
                     label: editLabel,
+                    isLocked: isLocked,
                 }),
             })
 
@@ -131,7 +142,7 @@ export default function Note({ id, title, content, label_id, createdate, updated
 
 
     // ロックボタン押下処理
-    const handleUnlock = async () => {
+    const handleLock = async () => {
         if (isLocked) {
             // ロック解除時の処理
 
@@ -148,13 +159,12 @@ export default function Note({ id, title, content, label_id, createdate, updated
                     const resultSelect = await responseSelect.json();
                     console.log("パスワード取得成功", resultSelect);
                     if (resultSelect.password_id != null && resultSelect.password_id !== "") {
-                        // TODO:すでにパスワードが登録されている場合はパスワード入力を求める
-                        console.log("パスワード登録済みのためパスワード入力を求める");
+                        // すでにパスワードが登録されている場合はパスワード入力を求める
                         setPasswordId(resultSelect.password_id);
                         // パスワード入力ダイアログを開く
                         setPasswordDialogOpen(true);
                     } else {
-                        // パスワードが未登録の場合は新規登録
+                        // パスワードが未登録の場合はロック解除できない
                         // TODO:ここはエラーダイアログを出したい
                         console.log("パスワード未登録のためロックできず");
                     }
@@ -162,20 +172,27 @@ export default function Note({ id, title, content, label_id, createdate, updated
                 } else {
                     console.error("failed to fetch password");
                 }
-                setEditTitle(title);
-                setEditContent(content);
-                setEditLabel(label_id);
             } catch (error) {
                 console.error("Error fetching password", error);
                 return;
             }
         } else {
             // ロック時の処理
-            setEditTitle("");
-            setEditContent("");
-            setEditLabel(null);
-            setIsLocked(!isLocked);
-            setOpen(false);
+            const responseLock = await fetch("http://localhost:4000/api/notes/lock", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    id: id,
+                    isLocked: true, // ロック状態にする
+                })
+            });
+            if (!responseLock.ok) {
+                console.error("Failed to lock note");
+                return;
+            }
+            setIsLocked(true);
         }
     };
 
@@ -201,12 +218,31 @@ export default function Note({ id, title, content, label_id, createdate, updated
         if (responseCompare.ok) {
             const result = await responseCompare.json();
             const isMatch = result.isMatch;
-            console.log("パスワード比較結果isMatch:", isMatch);
             if (isMatch) {
-                console.log("パスワードが一致しました");
-                setIsLocked(false);
-                setPasswordDialogOpen(false);
-                setInputPassword(""); // 入力フィールドをクリア
+                try {
+                    // パスワードが一致した場合、ロックを解除するAPIを呼び出す
+                    console.log("パスワードが一致しました。ロックを解除します。");
+                    const responseUnlock = await fetch("http://localhost:4000/api/notes/lock", {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            id: id,
+                            isLocked: false, // ロック解除
+                        })
+                    });
+                    if (!responseUnlock.ok) {
+                        throw new Error("Failed to unlock note");
+                    }
+
+                    setIsLocked(false);
+                    setPasswordDialogOpen(false);
+                    setInputPassword(""); // 入力フィールドをクリア
+                } catch (error) {
+                    console.error("Error unlocking note", error);
+                    return;
+                }
             }
         } else {
             console.error("failed to compare password");
@@ -257,14 +293,15 @@ export default function Note({ id, title, content, label_id, createdate, updated
                     title
                 )}</DialogTitle>
                 <DialogContent>
-                    {isEditing && !isLocked ? (<TextField
-                        fullWidth
-                        multiline
-                        rows={4}
-                        value={editContent}
-                        onChange={e => setEditContent(e.target.value)}
-                        variant="standard"
-                        sx={{ mb: 2 }} />)
+                    {isEditing && !isLocked ? (
+                        <TextField
+                            fullWidth
+                            multiline
+                            rows={4}
+                            value={editContent}
+                            onChange={e => setEditContent(e.target.value)}
+                            variant="standard"
+                            sx={{ mb: 2 }} />)
                         : (
                             <Typography variant="body1" sx={{ whiteSpace: "pre-line", mb: 2 }}>
                                 {isLocked ? "このメモはロックされています" : content}
@@ -307,27 +344,24 @@ export default function Note({ id, title, content, label_id, createdate, updated
                                         ))}
                                     </Select>
                                 </FormControl>
-                                <IconButton
-                                    onClick={handleUnlock}
-                                    sx={{ ml: 1, color: isLocked ? "primary.main" : "text.secondary" }}>
-                                    {isLocked ? <LockOutlinedIcon /> : <NoEncryptionGmailerrorredOutlinedIcon />}
-                                </IconButton>
+
                             </>
                         ) : !isLocked ? (
                             <>
                                 <Button onClick={handleEdit} variant="contained">編集</Button>
                                 <Button onClick={handleDelete} variant="contained" sx={{ ml: 1 }}>削除</Button>
                                 <IconButton
-                                    onClick={handleUnlock}
+                                    onClick={handleLock}
                                     sx={{ ml: 1, color: isLocked ? "primary.main" : "text.secondary" }}>
                                     {isLocked ? <LockOutlinedIcon /> : <NoEncryptionGmailerrorredOutlinedIcon />}
                                 </IconButton>
+
                             </>
                         ) : (
                             <>
                                 <Button onClick={handleDelete} variant="contained" sx={{ ml: 1 }}>削除</Button>
                                 <IconButton
-                                    onClick={handleUnlock}
+                                    onClick={handleLock}
                                     sx={{ ml: 1, color: isLocked ? "primary.main" : "text.secondary" }}>
                                     {isLocked ? <LockOutlinedIcon /> : <NoEncryptionGmailerrorredOutlinedIcon />}
                                 </IconButton>

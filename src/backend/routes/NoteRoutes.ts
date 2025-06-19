@@ -19,7 +19,7 @@ router.get('/', async (req, res) => {
 
 // 【INSERT】Notes登録API
 router.post('/', async (req, res) => {
-  const { title, content, label } = req.body;
+  const { title, content, label, isLocked } = req.body;
 
   try {
     const noteRepository = AppDataSource.getRepository(Notes);
@@ -29,6 +29,7 @@ router.post('/', async (req, res) => {
       label_id: label || null, // ラベルがない場合はnullを設定
       createdate: new Date(),
       updatedate: new Date(),
+      is_locked: isLocked // ロック状態を設定
     });
     const savedNote = await noteRepository.save(newNote);
 
@@ -42,7 +43,7 @@ router.post('/', async (req, res) => {
 
 // 【UPDATE】Notes更新用API
 router.put('/', async (req, res) => {
-  const { id, title, content, label } = req.body;
+  const { id, title, content, label, isLocked } = req.body;
 
   try {
     const noteRepository = AppDataSource.getRepository(Notes);
@@ -54,6 +55,7 @@ router.put('/', async (req, res) => {
     note.title = title;
     note.label_id = label;
     note.updatedate = new Date();
+    note.is_locked = isLocked;
     const updatedNote = await noteRepository.save(note);
     console.log('updated: ', updatedNote.updatedate);
     res.status(200).json({ message: "update note success!", note: updatedNote });
@@ -134,6 +136,26 @@ router.put('/trash', async (req, res) => {
   } catch (error) {
     console.error("Error restoring note", error);
     res.status(500).json({ error: "Failed to restore notes" });
+  }
+});
+
+
+// 【UPDATE】Notesロック状態更新用API
+router.put('/lock', async (req, res) => {
+  const { id, isLocked } = req.body;
+  try {
+    const noteRepository = AppDataSource.getRepository(Notes);
+    const note = await noteRepository.findOneBy({ id: id });
+    if (!note) {
+      return res.status(404).json({ error: "Can't find note" });
+    }
+    note.is_locked = isLocked; // ロック状態を更新
+    const updatedNote = await noteRepository.save(note);
+    console.log('Note lock state updated: ', updatedNote.is_locked);
+    res.status(200).json({ message: "Update lock state success!", note: updatedNote });
+  } catch (error) {
+    console.error("Error updating lock state", error);
+    res.status(500).json({ error: "Failed to update lock state" });
   }
 });
 
