@@ -130,7 +130,7 @@ export default function Note({ id, title, content, label_id, createdate, updated
     };
 
 
-    // メモロック・アンロックボタン押下処理
+    // ロックボタン押下処理
     const handleUnlock = async () => {
         if (isLocked) {
             // ロック解除時の処理
@@ -179,7 +179,7 @@ export default function Note({ id, title, content, label_id, createdate, updated
         }
     };
 
-    // パスワード検証
+    // ロック解除処理
     const hubdlePasswordSubmit = async () => {
         if (!inputPassword || inputPassword.trim() === "") {
             console.error("パスワードが入力されませんでした");
@@ -201,7 +201,7 @@ export default function Note({ id, title, content, label_id, createdate, updated
         if (responseCompare.ok) {
             const result = await responseCompare.json();
             const isMatch = result.isMatch;
-
+            console.log("パスワード比較結果isMatch:", isMatch);
             if (isMatch) {
                 console.log("パスワードが一致しました");
                 setIsLocked(false);
@@ -247,7 +247,7 @@ export default function Note({ id, title, content, label_id, createdate, updated
                 )}
             </Paper>
             <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-                <DialogTitle>{isEditing ? (
+                <DialogTitle>{isEditing && !isLocked ? (
                     <TextField
                         fullWidth
                         value={editTitle}
@@ -257,7 +257,7 @@ export default function Note({ id, title, content, label_id, createdate, updated
                     title
                 )}</DialogTitle>
                 <DialogContent>
-                    {isEditing ? (<TextField
+                    {isEditing && !isLocked ? (<TextField
                         fullWidth
                         multiline
                         rows={4}
@@ -281,8 +281,8 @@ export default function Note({ id, title, content, label_id, createdate, updated
                             {getLabelName(label_id)}
                         </Typography>
                     )}
-                    <Box sx={{ mt: 2, textAlighn: "right" }}>
-                        {isEditing ? (
+                    <Box sx={{ mt: 2, textAlignn: "right" }}>
+                        {isEditing && !isLocked ? (
                             <>
                                 <Button onClick={handleSave} variant="contained" sx={{ mr: 1 }}>保存</Button>
                                 <Button onClick={() => setIsEditing(false)} variant="contained">キャンセル</Button>
@@ -308,15 +308,29 @@ export default function Note({ id, title, content, label_id, createdate, updated
                                     </Select>
                                 </FormControl>
                                 <IconButton
-                                    onClick={() => handleUnlock()}
+                                    onClick={handleUnlock}
+                                    sx={{ ml: 1, color: isLocked ? "primary.main" : "text.secondary" }}>
+                                    {isLocked ? <LockOutlinedIcon /> : <NoEncryptionGmailerrorredOutlinedIcon />}
+                                </IconButton>
+                            </>
+                        ) : !isLocked ? (
+                            <>
+                                <Button onClick={handleEdit} variant="contained">編集</Button>
+                                <Button onClick={handleDelete} variant="contained" sx={{ ml: 1 }}>削除</Button>
+                                <IconButton
+                                    onClick={handleUnlock}
                                     sx={{ ml: 1, color: isLocked ? "primary.main" : "text.secondary" }}>
                                     {isLocked ? <LockOutlinedIcon /> : <NoEncryptionGmailerrorredOutlinedIcon />}
                                 </IconButton>
                             </>
                         ) : (
                             <>
-                                <Button onClick={handleEdit} variant="contained">編集</Button>
                                 <Button onClick={handleDelete} variant="contained" sx={{ ml: 1 }}>削除</Button>
+                                <IconButton
+                                    onClick={handleUnlock}
+                                    sx={{ ml: 1, color: isLocked ? "primary.main" : "text.secondary" }}>
+                                    {isLocked ? <LockOutlinedIcon /> : <NoEncryptionGmailerrorredOutlinedIcon />}
+                                </IconButton>
                             </>
                         )}
                     </Box>

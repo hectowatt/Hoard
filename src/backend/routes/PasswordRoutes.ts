@@ -70,15 +70,21 @@ router.put('/', async (req, res) => {
 // 【SELECT】パスワード取得API（リクエスト値とDBのハッシュ化されたパスワードが一致するかを返却）
 router.post('/compare', async (req, res) => {
     try {
-        const passwordString = req.body;
+        const password_id = req.body.password_id;
+        const passwordString = req.body.passwordString;
+
+        console.log("サーバに届いたパスワードid:", password_id);
+        console.log("サーバに届いたパスワード文字列:", passwordString);
         if (!passwordString) {
             return res.status(400).json({ error: "Must set password string" });
         }
         const passwordRepository = AppDataSource.getRepository(Password);
         // passwordを取得する
-        const password_hashed = await passwordRepository.find();
-        const isMatch = await bcrypt.compare(passwordString, password_hashed);
-        res.status(200).json(isMatch);
+        const password = await passwordRepository.findOneBy({ password_id: password_id });
+        console.log("取得したパスワード:", password);
+        const isMatch = await bcrypt.compare(passwordString, password.password_hashed);
+        console.log("パスワードの一致:", isMatch);
+        res.status(200).json({ isMatch: isMatch });
     } catch (error) {
         console.error("Error fetching password:", error);
         res.status(500).json({ error: 'Failed to fetch password' });
