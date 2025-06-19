@@ -22,7 +22,7 @@ router.post('/', async (req, res) => {
         });
         const savedPassword = await passwordRepository.save(newPassword);
 
-        console.log('Label inserted with ID: ', savedPassword.password_id);
+        console.log('Password inserted with ID: ', savedPassword.password_id);
         res.status(201).json({ message: "Save password success!" });
     } catch (error) {
         console.error("Error saving password:", error);

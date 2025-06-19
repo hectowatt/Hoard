@@ -27,7 +27,7 @@ const formatDate = (exString: string) => {
     return `${year}/${month}/${day}`;
 }
 
-// トップページに並ぶメモコンポーネント
+// ページに並ぶメモコンポーネント
 export default function Note({ id, title, content, label_id, createdate, updatedate, onSave, onDelete }: NoteProps) {
 
     const [open, setOpen] = React.useState(false);
@@ -38,6 +38,9 @@ export default function Note({ id, title, content, label_id, createdate, updated
     const [editLabel, setEditLabel] = React.useState<string | null>(null);
     const { labels } = useLabelContext();
     const [isLocked, setIsLocked] = React.useState(false);
+    const [inputPassword, setInputPassword] = React.useState("");
+    const [passwordDialogOpen, setPasswordDialogOpen] = React.useState(false);
+    const [passwordId, setPasswordId] = React.useState<string | null>(null);
 
     const handleOpen = () => {
         setEditTitle(title);
@@ -126,7 +129,8 @@ export default function Note({ id, title, content, label_id, createdate, updated
         return found ? found.labelname : "";
     };
 
-    // メモロック・アンロック処理
+
+    // メモロック・アンロックボタン押下処理
     const handleUnlock = async () => {
         if (isLocked) {
             // ロック解除時の処理
@@ -146,35 +150,9 @@ export default function Note({ id, title, content, label_id, createdate, updated
                     if (resultSelect.password_id != null && resultSelect.password_id !== "") {
                         // TODO:すでにパスワードが登録されている場合はパスワード入力を求める
                         console.log("パスワード登録済みのためパスワード入力を求める");
-                        // ここでパスワード入力を求めるUIを実装する必要があります
-                        // 例えば、promptを使ってパスワードを取得することもできますが、セキュリティ上の理由から
-                        // モーダルダイアログを使うことをお勧めします。
-                        // ここでは仮にpromptを使ってパスワードを取得する例を示します
-                        const passwordString = prompt("パスワードを入力してください");
-                        if (!passwordString) {
-                            console.error("パスワードが入力されませんでした");
-                            return;
-                        }
-                        const password_id = resultSelect.password_id;
-                        // 入力されたパスワードを取得
-
-                        const responseCompare = await fetch("http://localhost:4000/api/password/compare", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify({
-                                password_id: password_id,
-                                passwordString: passwordString
-                            }),
-                        });
-
-                        if (responseCompare.ok) {
-                            const result = await responseCompare.json();
-                            const isMatch = result.isMatch;
-                        } else {
-                            console.error("failed to compare password");
-                        }
+                        setPasswordId(resultSelect.password_id);
+                        // パスワード入力ダイアログを開く
+                        setPasswordDialogOpen(true);
                     } else {
                         // パスワードが未登録の場合は新規登録
                         // TODO:ここはエラーダイアログを出したい
@@ -188,7 +166,8 @@ export default function Note({ id, title, content, label_id, createdate, updated
                 setEditContent(content);
                 setEditLabel(label_id);
             } catch (error) {
-
+                console.error("Error fetching password", error);
+                return;
             }
         } else {
             // ロック時の処理
@@ -199,6 +178,41 @@ export default function Note({ id, title, content, label_id, createdate, updated
             setOpen(false);
         }
     };
+
+    // パスワード検証
+    const hubdlePasswordSubmit = async () => {
+        if (!inputPassword || inputPassword.trim() === "") {
+            console.error("パスワードが入力されませんでした");
+            return;
+        }
+
+        // 入力されたパスワードをもとに比較APIを呼び出す
+        const responseCompare = await fetch("http://localhost:4000/api/password/compare", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                password_id: passwordId,
+                passwordString: inputPassword
+            }),
+        });
+
+        if (responseCompare.ok) {
+            const result = await responseCompare.json();
+            const isMatch = result.isMatch;
+
+            if (isMatch) {
+                console.log("パスワードが一致しました");
+                setIsLocked(false);
+                setPasswordDialogOpen(false);
+                setInputPassword(""); // 入力フィールドをクリア
+            }
+        } else {
+            console.error("failed to compare password");
+            return;
+        }
+    }
 
     return (
         <>
@@ -253,7 +267,7 @@ export default function Note({ id, title, content, label_id, createdate, updated
                         sx={{ mb: 2 }} />)
                         : (
                             <Typography variant="body1" sx={{ whiteSpace: "pre-line", mb: 2 }}>
-                                {content}
+                                {isLocked ? "このメモはロックされています" : content}
                             </Typography>)
                     }
                     <Typography variant="caption" color="textSecondary" sx={{ display: "block" }}>
@@ -306,6 +320,29 @@ export default function Note({ id, title, content, label_id, createdate, updated
                             </>
                         )}
                     </Box>
+                </DialogContent>
+            </Dialog>
+            <Dialog open={passwordDialogOpen} onClose={() => setPasswordDialogOpen(false)}>
+                <DialogTitle>パスワード入力</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        type="password"
+                        label="パスワード"
+                        value={inputPassword}
+                        onChange={(e) => setInputPassword(e.target.value)}
+                        fullWidth
+                        variant="standard"
+                    />
+                    <Button
+                        onClick={hubdlePasswordSubmit}
+                        variant="contained"
+                        sx={{ mt: 2 }}
+                    >
+                        ロック解除
+                    </Button>
+                    <Button onClick={() => setPasswordDialogOpen(false)} variant="contained" sx={{ mt: 2, ml: 1 }}>
+                        キャンセル
+                    </Button>
                 </DialogContent>
             </Dialog>
         </>
