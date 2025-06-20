@@ -158,15 +158,14 @@ export default function Note({ id, title, content, label_id, createdate, updated
                 if (responseSelect.ok) {
                     const resultSelect = await responseSelect.json();
                     console.log("パスワード取得成功", resultSelect);
-                    if (resultSelect.password_id != null && resultSelect.password_id !== "") {
+                    if (resultSelect.password_id !== null && resultSelect.password_id !== "" && resultSelect.password_id !== undefined) {
                         // すでにパスワードが登録されている場合はパスワード入力を求める
                         setPasswordId(resultSelect.password_id);
                         // パスワード入力ダイアログを開く
                         setPasswordDialogOpen(true);
                     } else {
                         // パスワードが未登録の場合はロック解除できない
-                        // TODO:ここはエラーダイアログを出したい
-                        console.log("パスワード未登録のためロックできず");
+                        alert("パスワード未登録のためロックできません");
                     }
 
                 } else {
@@ -178,21 +177,46 @@ export default function Note({ id, title, content, label_id, createdate, updated
             }
         } else {
             // ロック時の処理
-            const responseLock = await fetch("http://localhost:4000/api/notes/lock", {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    id: id,
-                    isLocked: true, // ロック状態にする
-                })
-            });
-            if (!responseLock.ok) {
-                console.error("Failed to lock note");
+            try {
+                const responseSelect = await fetch("http://localhost:4000/api/password", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                if (responseSelect.ok) {
+                    const resultSelect = await responseSelect.json();
+                    console.log("パスワード取得成功", resultSelect);
+                    if (resultSelect.password_id !== null && resultSelect.password_id !== "" && resultSelect.password_id !== undefined) {
+                        // ロック時の処理
+                        const responseLock = await fetch("http://localhost:4000/api/notes/lock", {
+                            method: "PUT",
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify({
+                                id: id,
+                                isLocked: true, // ロック状態にする
+                            })
+                        });
+                        if (!responseLock.ok) {
+                            console.error("Failed to lock note");
+                            return;
+                        }
+                        setIsLocked(true);
+                    } else {
+                        // パスワードが未登録の場合はロックできない
+                        alert("パスワード未登録のためロックできません");
+                    }
+                } else {
+                    // パスワード取得に失敗した場合の処理
+                    alert("パスワード取得に失敗しました。");
+                }
+            } catch (error) {
+                console.error("Error locking note", error);
                 return;
             }
-            setIsLocked(true);
         }
     };
 
