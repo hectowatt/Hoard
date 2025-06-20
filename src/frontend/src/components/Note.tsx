@@ -376,6 +376,7 @@ export default function Note({ id, title, content, label_id, createdate, updated
                     <TextField
                         type="password"
                         label="パスワード"
+                        autoComplete="new-password"
                         value={inputPassword}
                         onChange={(e) => setInputPassword(e.target.value)}
                         fullWidth
