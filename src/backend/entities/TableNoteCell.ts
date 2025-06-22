@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
 import Note from "./Note.js";
 import TableNoteColumn from "./TableNoteColumn.js";
 
-@Entity()
+@Entity({ name: "table_note_cell" })
 export class NoteTableCell {
     @PrimaryGeneratedColumn("uuid")
     id: string;

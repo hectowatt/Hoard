@@ -5,23 +5,20 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-interface Note {
-    id: string;
-    title: string;
-    content: string;
-    createdate: string;
-    updatedate: string;
+interface Column {
+    id: number;
+    name: string;
 }
 
-interface NotesTableProps {
-    notes: Note[];
-    onEdit: (note: Note) => void;
-    onDelete: (id: string) => void;
+interface tableNoteProps {
+    columns: Column[];
+    setColumns: React.Dispatch<React.SetStateAction<Column[]>>;
+    rows: string[][];
+    setRows: React.Dispatch<React.SetStateAction<string[][]>>;
 }
 
-export default function TableNote({ notes, onEdit, onDelete }: NotesTableProps) {
-    const [columns, setColumns] = useState([{ id: 1, name: "カラム1" }]);
-    const [rows, setRows] = useState([[""]]);
+export default function TableNote({ columns, setColumns, rows, setRows }: tableNoteProps) {
+
 
     // カラム追加
     const handleAddColumn = () => {
@@ -55,7 +52,16 @@ export default function TableNote({ notes, onEdit, onDelete }: NotesTableProps) 
                     <TableRow>
                         {columns.map((col, idx) => (
                             <TableCell key={col.id}>
-                                {col.name}
+                                <TextField
+                                    value={col.name}
+                                    variant="standard"
+                                    onChange={e => {
+                                        const newColumns = [...columns];
+                                        newColumns[idx] = { ...newColumns[idx], name: e.target.value };
+                                        setColumns(newColumns);
+                                    }}
+                                    sx={{ width: 80 }}
+                                />
                                 <IconButton size="small" onClick={() => handleDeleteColumn(idx)} disabled={columns.length <= 1}>
                                     <DeleteIcon fontSize="small" />
                                 </IconButton>

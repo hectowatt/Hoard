@@ -13,6 +13,7 @@ import {
     Select,
     MenuItem,
     IconButton,
+    Dialog,
 } from '@mui/material';
 import { useLabelContext } from "@/context/LabelProvider";
 import NoEncryptionGmailerrorredOutlinedIcon from '@mui/icons-material/NoEncryptionGmailerrorredOutlined';
@@ -34,8 +35,16 @@ export default function InputForm({ onInsert }: InputFormProps) {
     const [isFocused, setIsFocused] = useState(false);
     const [editLabelId, setEditLabelId] = React.useState<string | null>(null);
     const [isLocked, setIsLocked] = React.useState(false);
+    const [tableNoteOpen, setTableNoteOpen] = useState(false);
 
     const { labels } = useLabelContext();
+
+    // テーブルノート用
+    const [tableColumns, setTableColumns] = useState([{ id: 1, name: "カラム1" }]);
+    const [tableRows, setTableRows] = useState([[""]]);
+
+    const handleTableNoteOpen = () => setTableNoteOpen(true);
+    const handleTableNoteClose = () => setTableNoteOpen(false);
 
     const blurTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
@@ -111,12 +120,10 @@ export default function InputForm({ onInsert }: InputFormProps) {
         }
     }, [isFocused]);
 
-    // テーブルノートボタン押下処理
-    const handleTableNoteClick = () => {
-        setIsEditing(true);
+    // テーブルノート保存処理
+    const handleSaveTableNote = () => {
+
     }
-
-
 
     return (
         <Box sx={{ maxWidth: 800, mx: 'auto', mt: 4, p: 2 }}
@@ -179,13 +186,24 @@ export default function InputForm({ onInsert }: InputFormProps) {
                             {isLocked ? <LockOutlinedIcon /> : <NoEncryptionGmailerrorredOutlinedIcon />}
                         </IconButton>
                         <IconButton
-                            onClick={() => setIsEditing(!isEditing)}
+                            onClick={() => setTableNoteOpen(true)}
                             sx={{ ml: 1 }}>
                             <TableChartOutlinedIcon />
                         </IconButton>
                     </Box>
                 </Collapse>
             </Paper >
+            <Dialog open={tableNoteOpen} onClose={() => setTableNoteOpen(false)} maxWidth="md" fullWidth>
+                <TableNote columns={tableColumns} setColumns={setTableColumns} rows={tableRows} setRows={setTableRows} />
+                <Box sx={{ textAlign: 'center', p: 2 }}>
+                    <Button onClick={handleSaveTableNote} variant="contained" sx={{ mr: 2 }}>
+                        保存
+                    </Button>
+                    <Button onClick={() => setTableNoteOpen(false)} variant="contained" >
+                        キャンセル
+                    </Button>
+                </Box>
+            </Dialog >
         </Box >
     );
 };
