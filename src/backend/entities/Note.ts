@@ -37,6 +37,10 @@ export default class Note {
     @Column({ name: "is_locked", type: "boolean", default: false })
     is_locked: boolean;
 
+    // is_table
+    @Column({ name: "is_table", type: "boolean", default: false })
+    is_table: boolean;
+
     // createdate
     @CreateDateColumn({ name: "createdate", type: "timestamp" })
     createdate: Date;

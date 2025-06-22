@@ -17,6 +17,8 @@ import {
 import { useLabelContext } from "@/context/LabelProvider";
 import NoEncryptionGmailerrorredOutlinedIcon from '@mui/icons-material/NoEncryptionGmailerrorredOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
+import TableNote from "@/components/TableNote";
 
 interface InputFormProps {
     onInsert: (newId: string, newTitle: string, newContent: string, newLabel: string, isLocked: boolean) => void;
@@ -109,8 +111,13 @@ export default function InputForm({ onInsert }: InputFormProps) {
         }
     }, [isFocused]);
 
+    // テーブルノートボタン押下処理
+    const handleTableNoteClick = () => {
+        setIsEditing(true);
+    }
 
-    // TODO: テーブルノートの場合を追加する
+
+
     return (
         <Box sx={{ maxWidth: 800, mx: 'auto', mt: 4, p: 2 }}
             onBlur={handleBlur}
@@ -170,6 +177,11 @@ export default function InputForm({ onInsert }: InputFormProps) {
                             onClick={() => setIsLocked(!isLocked)}
                             sx={{ ml: 1 }}>
                             {isLocked ? <LockOutlinedIcon /> : <NoEncryptionGmailerrorredOutlinedIcon />}
+                        </IconButton>
+                        <IconButton
+                            onClick={() => setIsEditing(!isEditing)}
+                            sx={{ ml: 1 }}>
+                            <TableChartOutlinedIcon />
                         </IconButton>
                     </Box>
                 </Collapse>

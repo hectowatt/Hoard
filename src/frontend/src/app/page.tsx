@@ -47,7 +47,7 @@ export default function Home() {
             : note)
       );
     } else {
-      console.error("setNotes is undefined");
+      console.error("error in handleSave: setNotes is undefined");
     };
   }
 
