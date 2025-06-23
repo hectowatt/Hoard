@@ -43,9 +43,6 @@ export default function InputForm({ onInsert }: InputFormProps) {
     const [tableColumns, setTableColumns] = useState([{ id: 1, name: "カラム1" }]);
     const [tableRows, setTableRows] = useState([[""]]);
 
-    const handleTableNoteOpen = () => setTableNoteOpen(true);
-    const handleTableNoteClose = () => setTableNoteOpen(false);
-
     const blurTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
     const handleExpand = () => { setExpand(true) };
@@ -121,8 +118,32 @@ export default function InputForm({ onInsert }: InputFormProps) {
     }, [isFocused]);
 
     // テーブルノート保存処理
-    const handleSaveTableNote = () => {
+    const handleSaveTableNote = async () => {
+        try {
+            const response = await fetch("http://localhost:4000/api/tableNote", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    columns: tableColumns,
+                    rows: tableRows,
+                    label: editLabelId, // nullの場合はnullが送信される
+                }),
+            })
 
+            if (!response.ok) {
+                throw new Error("Failed to save table note");
+            }
+
+            const result = await response.json();
+            console.log("Table note saved successfully!", result);
+            setTableNoteOpen(false);
+            setTableColumns([{ id: 1, name: "カラム1" }]);
+            setTableRows([[""]]);
+        } catch (error) {
+            console.error("Error saving table note:", error);
+        }
     }
 
     return (
@@ -202,6 +223,32 @@ export default function InputForm({ onInsert }: InputFormProps) {
                     <Button onClick={() => setTableNoteOpen(false)} variant="contained" >
                         キャンセル
                     </Button>
+                    <FormControl size="small" sx={{ minWidth: 120, ml: 2 }}>
+                        <InputLabel id="select-label">ラベル</InputLabel>
+                        <Select
+                            labelId="select-label"
+                            value={editLabelId ?? ""}
+                            onChange={e => setEditLabelId(e.target.value === "" ? null : e.target.value)}
+                            label="ラベル"
+                            renderValue={(selected: string) => {
+                                if (!selected) return <em></em>;
+                                const found = labels?.find(l => l.id === selected);
+                                return found ? found.labelname : "";
+                            }}
+                        >
+                            <MenuItem value="">
+                                <em>ラベルなし</em>
+                            </MenuItem>
+                            {(labels ?? []).map(option => (
+                                <MenuItem key={option.id} value={option.id}>{option.labelname}</MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                    <IconButton
+                        onClick={() => setIsLocked(!isLocked)}
+                        sx={{ ml: 1 }}>
+                        {isLocked ? <LockOutlinedIcon /> : <NoEncryptionGmailerrorredOutlinedIcon />}
+                    </IconButton>
                 </Box>
             </Dialog >
         </Box >

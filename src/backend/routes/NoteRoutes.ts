@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import { AppDataSource } from '../data-source.js';
-import Notes from '../entities/Note.js';
+import Note from '../entities/Note.js';
 
 const router = Router();
 
 // 【SELECT】Notes全件取得API
 router.get('/', async (req, res) => {
   try {
-    const noteRepository = AppDataSource.getRepository(Notes);
+    const noteRepository = AppDataSource.getRepository(Note);
     // Notesを全件取得する
     const notes = await noteRepository.find({ where: { is_deleted: false }, order: { createdate: 'DESC' } });
     res.status(200).json(notes);
@@ -22,7 +22,7 @@ router.post('/', async (req, res) => {
   const { title, content, label, isLocked } = req.body;
 
   try {
-    const noteRepository = AppDataSource.getRepository(Notes);
+    const noteRepository = AppDataSource.getRepository(Note);
     const newNote = noteRepository.create({
       title: title,
       content: content,
@@ -46,7 +46,7 @@ router.put('/', async (req, res) => {
   const { id, title, content, label, isLocked } = req.body;
 
   try {
-    const noteRepository = AppDataSource.getRepository(Notes);
+    const noteRepository = AppDataSource.getRepository(Note);
     const note = await noteRepository.findOneBy({ id: id });
     if (!note) {
       return res.status(404).json({ error: "Can't find note" });
@@ -70,7 +70,7 @@ router.delete('/:id', async (req, res) => {
   const { id } = req.params;
   console.log("delete id: ", id);
   try {
-    const noteRepository = AppDataSource.getRepository(Notes);
+    const noteRepository = AppDataSource.getRepository(Note);
     const note = await noteRepository.findOneBy({ id: id });
     if (!note) {
       return res.status(404).json({ error: "Note not found" });
@@ -91,7 +91,7 @@ router.delete('/:id', async (req, res) => {
 // 【SELECT】TrashNote取得API
 router.get('/trash', async (req, res) => {
   try {
-    const noteRepository = AppDataSource.getRepository(Notes);
+    const noteRepository = AppDataSource.getRepository(Note);
     const notes = await noteRepository.find({ where: { is_deleted: true }, order: { deletedate: 'DESC' } });
     res.status(200).json(notes);
   } catch (error) {
@@ -105,7 +105,7 @@ router.delete('/trash/:id', async (req, res) => {
   const { id } = req.params;
   console.log("delete id: ", id);
   try {
-    const noteRepository = AppDataSource.getRepository(Notes);
+    const noteRepository = AppDataSource.getRepository(Note);
     const note = await noteRepository.findOneBy({ id: id });
     if (!note) {
       return res.status(404).json({ error: "Note not found" });
@@ -123,7 +123,7 @@ router.put('/trash', async (req, res) => {
   const { id } = req.body;
 
   try {
-    const noteRepository = AppDataSource.getRepository(Notes);
+    const noteRepository = AppDataSource.getRepository(Note);
     const note = await noteRepository.findOneBy({ id: id });
     if (!note) {
       return res.status(404).json({ error: "Can't find note" });
@@ -144,7 +144,7 @@ router.put('/trash', async (req, res) => {
 router.put('/lock', async (req, res) => {
   const { id, isLocked } = req.body;
   try {
-    const noteRepository = AppDataSource.getRepository(Notes);
+    const noteRepository = AppDataSource.getRepository(Note);
     const note = await noteRepository.findOneBy({ id: id });
     if (!note) {
       return res.status(404).json({ error: "Can't find note" });

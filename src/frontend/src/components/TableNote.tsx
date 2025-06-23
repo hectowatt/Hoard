@@ -8,6 +8,13 @@ import DeleteIcon from "@mui/icons-material/Delete";
 interface Column {
     id: number;
     name: string;
+    order?: number;
+}
+
+interface Row {
+    id: number;
+    rowIndex: number;
+    value: string;
 }
 
 interface tableNoteProps {
@@ -47,6 +54,11 @@ export default function TableNote({ columns, setColumns, rows, setRows }: tableN
 
     return (
         <TableContainer component={Paper}>
+            <TextField
+                label="タイトル"
+                variant="outlined"
+                fullWidth
+                margin="normal" />
             <Table>
                 <TableHead>
                     <TableRow>
