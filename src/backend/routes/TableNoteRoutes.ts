@@ -30,6 +30,10 @@ router.post('/', async (req, res) => {
         const savedNote = await noteRepository.save(newNote);
 
         // TODO: columnsとcellの登録
+        const columnRepository = AppDataSource.getRepository(TableNoteColumn);
+        const newColumns = columnRepository.create(
+            
+        );
 
         console.log('Note inserted with ID: ', savedNote.id);
         res.status(201).json({ message: "Save password success!" });

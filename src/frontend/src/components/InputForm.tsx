@@ -25,6 +25,19 @@ interface InputFormProps {
     onInsert: (newId: string, newTitle: string, newContent: string, newLabel: string, isLocked: boolean) => void;
 }
 
+interface Column {
+    id: number;
+    name: string;
+    order?: number;
+}
+
+interface RowCell {
+    id: number;
+    rowIndex: number;
+    value: string;
+    columnId?: number;
+}
+
 // トップページ上部の入力フォームコンポーネント
 export default function InputForm({ onInsert }: InputFormProps) {
 
@@ -40,8 +53,16 @@ export default function InputForm({ onInsert }: InputFormProps) {
     const { labels } = useLabelContext();
 
     // テーブルノート用
-    const [tableColumns, setTableColumns] = useState([{ id: 1, name: "カラム1" }]);
-    const [tableRows, setTableRows] = useState([[""]]);
+    const [tableColumns, setTableColumns] = useState<Column[]>([
+        { id: 1, name: "カラム1", order: 1 }
+    ]);
+
+    const [tableRowCells, setTableRowCells] = useState<RowCell[][]>([[{
+        id: 1,
+        rowIndex: 0,
+        value: "",
+        columnId: 1
+    }]]);
 
     const blurTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
@@ -126,9 +147,11 @@ export default function InputForm({ onInsert }: InputFormProps) {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
+                    title: title,
                     columns: tableColumns,
-                    rows: tableRows,
-                    label: editLabelId, // nullの場合はnullが送信される
+                    rows: tableRowCells,
+                    label: editLabelId,
+                    is_locked: isLocked,
                 }),
             })
 
@@ -139,8 +162,8 @@ export default function InputForm({ onInsert }: InputFormProps) {
             const result = await response.json();
             console.log("Table note saved successfully!", result);
             setTableNoteOpen(false);
-            setTableColumns([{ id: 1, name: "カラム1" }]);
-            setTableRows([[""]]);
+            setTableColumns([{ id: 1, name: "カラム1", order: 1 }]);
+            setTableRowCells([[{ id: 1, rowIndex: 0, value: "", columnId: 1 }]]);
         } catch (error) {
             console.error("Error saving table note:", error);
         }
@@ -215,7 +238,7 @@ export default function InputForm({ onInsert }: InputFormProps) {
                 </Collapse>
             </Paper >
             <Dialog open={tableNoteOpen} onClose={() => setTableNoteOpen(false)} maxWidth="md" fullWidth>
-                <TableNote columns={tableColumns} setColumns={setTableColumns} rows={tableRows} setRows={setTableRows} />
+                <TableNote columns={tableColumns} setColumns={setTableColumns} rowCells={tableRowCells} setRowCells={setTableRowCells} />
                 <Box sx={{ textAlign: 'center', p: 2 }}>
                     <Button onClick={handleSaveTableNote} variant="contained" sx={{ mr: 2 }}>
                         保存
