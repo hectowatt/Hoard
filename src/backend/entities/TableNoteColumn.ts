@@ -6,10 +6,10 @@ export default class NoteTableColumn {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column()
+    @Column({ name: "name", type: "text" })
     name: string;
 
-    @Column()
+    @Column({ name: "order", type: "int", default: 0 })
     order: number;
 
     @ManyToOne(() => Note, note => note.id, { onDelete: "CASCADE" })

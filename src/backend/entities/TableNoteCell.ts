@@ -7,10 +7,10 @@ export default class NoteTableCell {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    @Column()
+    @Column({ name: "row_index", type: "int" })
     row_index: number;
 
-    @Column({ type: "text" })
+    @Column({ name: "value", type: "text" })
     value: string;
 
     @ManyToOne(() => Note, note => note.id, { onDelete: "CASCADE" })
