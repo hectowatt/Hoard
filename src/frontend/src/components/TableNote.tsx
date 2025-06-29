@@ -19,13 +19,15 @@ interface RowCell {
 }
 
 interface tableNoteProps {
+    title: string;
+    setTitle: React.Dispatch<React.SetStateAction<string>>;
     columns: Column[];
     setColumns: React.Dispatch<React.SetStateAction<Column[]>>;
     rowCells: RowCell[][];
     setRowCells: React.Dispatch<React.SetStateAction<RowCell[][]>>;
 }
 
-export default function TableNote({ columns, setColumns, rowCells, setRowCells }: tableNoteProps) {
+export default function TableNote({ title, setTitle, columns, setColumns, rowCells, setRowCells }: tableNoteProps) {
 
 
     // カラム追加
@@ -59,6 +61,8 @@ export default function TableNote({ columns, setColumns, rowCells, setRowCells }
             <TextField
                 label="タイトル"
                 variant="outlined"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
                 fullWidth
                 margin="normal" />
             <Table>

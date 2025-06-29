@@ -56,7 +56,6 @@ export default function InputForm({ onInsert }: InputFormProps) {
     const [tableColumns, setTableColumns] = useState<Column[]>([
         { id: 1, name: "カラム1", order: 1 }
     ]);
-
     const [tableRowCells, setTableRowCells] = useState<RowCell[][]>([[{
         id: 1,
         rowIndex: 0,
@@ -149,7 +148,7 @@ export default function InputForm({ onInsert }: InputFormProps) {
                 body: JSON.stringify({
                     title: title,
                     columns: tableColumns,
-                    rows: tableRowCells,
+                    rowCells: tableRowCells,
                     label: editLabelId,
                     is_locked: isLocked,
                 }),
@@ -238,7 +237,7 @@ export default function InputForm({ onInsert }: InputFormProps) {
                 </Collapse>
             </Paper >
             <Dialog open={tableNoteOpen} onClose={() => setTableNoteOpen(false)} maxWidth="md" fullWidth>
-                <TableNote columns={tableColumns} setColumns={setTableColumns} rowCells={tableRowCells} setRowCells={setTableRowCells} />
+                <TableNote title={title} setTitle={setTitle} columns={tableColumns} setColumns={setTableColumns} rowCells={tableRowCells} setRowCells={setTableRowCells} />
                 <Box sx={{ textAlign: 'center', p: 2 }}>
                     <Button onClick={handleSaveTableNote} variant="contained" sx={{ mr: 2 }}>
                         保存
