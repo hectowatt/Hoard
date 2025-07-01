@@ -18,6 +18,8 @@ router.post('/', async (req, res) => {
     }
 
     try {
+        var savedNote: Note = null;
+
         // TODO: noteテーブルと各TableNote用テーブルにすべてinsertができてからcommitにしたい
         await AppDataSource.transaction(async (transactionalEntityManager: EntityManager) => {
             // Noteテーブルにデータを登録
@@ -31,13 +33,12 @@ router.post('/', async (req, res) => {
                 createdate: new Date(),
                 updatedate: new Date()
             });
-            const savedNote = await noteRepository.save(newNote);
+            savedNote = await noteRepository.save(newNote);
 
             // columnの登録
             const columnRepository = transactionalEntityManager.getRepository(TableNoteColumn);
             const columnIdMap: { [key: string]: string } = {};
             for (const col of columns) {
-                const { id, ...colData } = col; // idを除外
                 const newColumn = columnRepository.create(
                     {
                         name: col.name,
@@ -56,7 +57,6 @@ router.post('/', async (req, res) => {
                 const row = rowCells[rowIndex];
                 for (let colIndex = 0; colIndex < row.length; colIndex++) {
                     const cell = row[colIndex];
-                    const { id, ...cellData } = cell; // idを除外
                     // クライアントのcolumnIdからDBのcolumnIdに変換
                     const dbColumnId = columnIdMap[cell.columnId];
                     const newCell = cellRepository.create({
@@ -71,7 +71,7 @@ router.post('/', async (req, res) => {
 
             console.log('TableNote inserted with ID: ', savedNote.id);
         });
-        res.status(201).json({ message: "Save TableNote success!" });
+        res.status(201).json({ message: "Save TableNote success!" , tableNote: savedNote});
     } catch (error) {
         console.error("Error saving TableNote:", error);
         res.status(500).json({ error: "Failed to save TableNote" });

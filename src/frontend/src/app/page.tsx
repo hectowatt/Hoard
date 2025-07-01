@@ -17,7 +17,7 @@ export default function Home() {
 
 
   // メモ初期登録時のコールバック関数
-  const handleInsert = (newId: string, newTitle: string, newContent: string, LabelId: string, is_locked: boolean) => {
+  const handleInsert = (newId: string, newTitle: string, newContent: string, LabelId: string, is_locked: boolean, is_table: boolean) => {
     if (setNotes !== undefined) {
       setNotes(prevNote => [
         ...prevNote,
@@ -29,6 +29,7 @@ export default function Home() {
           createdate: new Date().toISOString(),
           updatedate: new Date().toISOString(),
           is_locked: is_locked,
+          is_table: is_table
         },
       ]);
     } else {
@@ -72,7 +73,7 @@ export default function Home() {
         {notes.map((note, index) => (
           <Grid key={index}>
             {/* Noteコンポーネントを生成 */}
-            <Note id={note.id} title={note.title} content={note.content} label_id={note.label_id} createdate={note.createdate} updatedate={note.updatedate} is_locked={note.is_locked} onSave={handleSave} onDelete={handleDelete} />
+            <Note id={note.id} title={note.title} content={note.content} label_id={note.label_id} createdate={note.createdate} updatedate={note.updatedate} is_locked={note.is_locked} is_table={note.is_table} onSave={handleSave} onDelete={handleDelete} />
           </Grid>
         ))}
       </Grid>

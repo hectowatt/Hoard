@@ -22,7 +22,7 @@ import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
 import TableNote from "@/components/TableNote";
 
 interface InputFormProps {
-    onInsert: (newId: string, newTitle: string, newContent: string, newLabel: string, isLocked: boolean) => void;
+    onInsert: (newId: string, newTitle: string, newContent: string, newLabel: string, isLocked: boolean, is_table: boolean) => void;
 }
 
 interface Column {
@@ -106,7 +106,7 @@ export default function InputForm({ onInsert }: InputFormProps) {
 
             // メモ登録時のコールバック関数を呼び出す
             if (typeof onInsert === "function") {
-                onInsert(insertedNoteId, title, content, editLabelId || "", isLocked);
+                onInsert(insertedNoteId, title, content, editLabelId || "", isLocked, false); // is_tableはfalseで固定
             }
         } catch (error) {
             console.error("Error saving note:", error);
@@ -163,6 +163,10 @@ export default function InputForm({ onInsert }: InputFormProps) {
             setTableNoteOpen(false);
             setTableColumns([{ id: 1, name: "カラム1", order: 1 }]);
             setTableRowCells([[{ id: 1, rowIndex: 0, value: "", columnId: 1 }]]);
+            // メモ登録時のコールバック関数を呼び出す
+            if (typeof onInsert === "function") {
+                onInsert(result.tableNote.id, result.tableNote.title, result.tableNote.content, editLabelId || "", isLocked, false); // is_tableはfalseで固定
+            }
         } catch (error) {
             console.error("Error saving table note:", error);
         }

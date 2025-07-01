@@ -3,6 +3,7 @@ import { Box, Paper, Typography, Dialog, DialogTitle, DialogContent, TextField, 
 import { useLabelContext } from "@/context/LabelProvider";
 import NoEncryptionGmailerrorredOutlinedIcon from '@mui/icons-material/NoEncryptionGmailerrorredOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
 
 interface NoteProps {
     id: string;
@@ -12,6 +13,7 @@ interface NoteProps {
     createdate: string;
     updatedate: string;
     is_locked: boolean;
+    is_table: boolean;
     onSave?: (id: string, newTitle: string, newContent: string, newLabel: string, newUpdateDate: string) => void;
     onDelete?: (id: string) => void;
 }
@@ -29,7 +31,7 @@ const formatDate = (exString: string) => {
 }
 
 // ページに並ぶメモコンポーネント
-export default function Note({ id, title, content, label_id, createdate, updatedate, is_locked, onSave, onDelete }: NoteProps) {
+export default function Note({ id, title, content, label_id, createdate, updatedate, is_locked, is_table, onSave, onDelete }: NoteProps) {
 
     const [open, setOpen] = React.useState(false);
     const [editTitle, setEditTitle] = React.useState(title);
@@ -285,14 +287,14 @@ export default function Note({ id, title, content, label_id, createdate, updated
                     sx={{
                         mb: 1,
                         whiteSpace: "pre-line",
-                        maxHeight: 90, // お好みの高さ
+                        maxHeight: 90,
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                         display: "-webkit-box",
-                        WebkitLineClamp: 4, // 表示したい最大行数
+                        WebkitLineClamp: 4,
                         WebkitBoxOrient: "vertical",
                     }}
-                >{isLocked ? "このメモはロックされています" : content}
+                >{isLocked ? "このメモはロックされています" : (is_table ? <TableChartOutlinedIcon></TableChartOutlinedIcon> : content)}
                 </Typography>
                 <Typography variant="caption" color="textSecondary" sx={{ display: "block" }}>
                     作成日: {formatDate(createdate)}
