@@ -6,6 +6,7 @@
       "emitDecoratorMetadata": true,
       "useDefineForClassFields": false,
       "jsx": "react-jsx", 
-      "esModuleInterop": true
+      "esModuleInterop": true,
+      "sourceMap": true
     }
   }

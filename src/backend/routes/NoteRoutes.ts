@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { AppDataSource } from '../data-source.js';
+import { AppDataSource } from '../DataSource.js';
 import Note from '../entities/Note.js';
 
 const router = Router();
@@ -9,7 +9,7 @@ router.get('/', async (req, res) => {
   try {
     const noteRepository = AppDataSource.getRepository(Note);
     // Notesを全件取得する
-    const notes = await noteRepository.find({ where: { is_deleted: false }, order: { createdate: 'DESC' } });
+    const notes = await noteRepository.find({ where: { is_deleted: false}, order: { createdate: 'DESC' } });
     res.status(200).json(notes);
   } catch (error) {
     console.error("Error fetching notes:", error);

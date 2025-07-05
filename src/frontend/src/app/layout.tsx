@@ -19,6 +19,7 @@ import {
 	ListItemIcon,
 	ListItemText,
 	Divider,
+	Table,
 } from "@mui/material";
 import TextSnippetOutlinedIcon from "@mui/icons-material/TextSnippetOutlined";
 import LabelImportantOutlineRoundedIcon from "@mui/icons-material/LabelImportantOutlineRounded";
@@ -33,6 +34,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import CreateLabelDialog from "@/components/CreateLabelDialog";
 import { LabelProvider } from "../context/LabelProvider";
 import { NoteProvider } from "@/context/NoteProvider";
+import { TableNoteProvider } from "@/context/TableNoteProvider";
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import Brightness2OutlinedIcon from '@mui/icons-material/Brightness2Outlined';
 
@@ -45,7 +47,7 @@ const belowIcons = [<DeleteOutlineRoundedIcon />, <SettingsOutlinedIcon />];
 
 // サイドバー上部
 const navAboveItems = [
-	{ text: "メモ", icon: aboveIcons[0], href: "/" },
+	{ text: "ノート", icon: aboveIcons[0], href: "/" },
 	{ text: "ラベル", icon: aboveIcons[1], dialog: true }
 ];
 
@@ -159,85 +161,87 @@ export default function RootLayout({
 				<ThemeProvider theme={theme}>
 					<AppRouterCacheProvider>
 						<NoteProvider>
-							<LabelProvider>
-								<Box sx={{ display: "flex" }}>
-									<CssBaseline />
-									<AppBar
-										position="fixed"
-										sx={{
-											zIndex: (theme) => theme.zIndex.drawer + 1,
-											backgroundColor: "#e3a838"
-										}}
-										color="primary"
-									>
-										<Toolbar sx={{ display: "flex", justifyContent: "center" }}>
-											<Box sx={{ flexGrow: 1 }}>
-												<Typography variant="h6" noWrap component="div">
-													Hoard
-												</Typography>
-											</Box>
-											<Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>{searchBar}</Box>
-											<Box sx={{ flexGrow: 1 }} />
-											<IconButton
-												sx={{ position: "fixed", top: 16, right: 16, zIndex: 2000 }}
-												onClick={toggleColorMode}
-												color="inherit"
-											>
-												{mode === "dark" ? <Brightness2OutlinedIcon /> : <LightModeOutlinedIcon />}
-											</IconButton>
-										</Toolbar>
-									</AppBar>
-									<Drawer
-										variant="permanent"
-										sx={{
-											width: drawerWidth,
-											flexShrink: 0,
-											[`& .MuiDrawer-paper`]: {
+							<TableNoteProvider>
+								<LabelProvider>
+									<Box sx={{ display: "flex" }}>
+										<CssBaseline />
+										<AppBar
+											position="fixed"
+											sx={{
+												zIndex: (theme) => theme.zIndex.drawer + 1,
+												backgroundColor: "#e3a838"
+											}}
+											color="primary"
+										>
+											<Toolbar sx={{ display: "flex", justifyContent: "center" }}>
+												<Box sx={{ flexGrow: 1 }}>
+													<Typography variant="h6" noWrap component="div">
+														Hoard
+													</Typography>
+												</Box>
+												<Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>{searchBar}</Box>
+												<Box sx={{ flexGrow: 1 }} />
+												<IconButton
+													sx={{ position: "fixed", top: 16, right: 16, zIndex: 2000 }}
+													onClick={toggleColorMode}
+													color="inherit"
+												>
+													{mode === "dark" ? <Brightness2OutlinedIcon /> : <LightModeOutlinedIcon />}
+												</IconButton>
+											</Toolbar>
+										</AppBar>
+										<Drawer
+											variant="permanent"
+											sx={{
 												width: drawerWidth,
-												boxSizing: "border-box"
-											}
-										}}
-									>
-										<Toolbar />
-										<Box sx={{ overflow: "auto" }}>
-											<List>
-												{navAboveItems.map(({ text, icon, href, dialog }) => (
-													<ListItem key={text} disablePadding>
-														{dialog ? (
-															<ListItemButton onClick={() => setLabelDialogOpen(true)}>
+												flexShrink: 0,
+												[`& .MuiDrawer-paper`]: {
+													width: drawerWidth,
+													boxSizing: "border-box"
+												}
+											}}
+										>
+											<Toolbar />
+											<Box sx={{ overflow: "auto" }}>
+												<List>
+													{navAboveItems.map(({ text, icon, href, dialog }) => (
+														<ListItem key={text} disablePadding>
+															{dialog ? (
+																<ListItemButton onClick={() => setLabelDialogOpen(true)}>
+																	<ListItemIcon>{icon}</ListItemIcon>
+																	<ListItemText primary={text} />
+																</ListItemButton>
+															) : (
+																<ListItemButton component={Link} href={href!}>
+																	<ListItemIcon>{icon}</ListItemIcon>
+																	<ListItemText primary={text} />
+																</ListItemButton>
+															)}
+														</ListItem>
+													))}
+												</List>
+												<Divider />
+												<List>
+													{navBelowItems.map(({ text, icon, href }) => (
+														<ListItem key={text} disablePadding>
+															<ListItemButton component={Link} href={href}>
 																<ListItemIcon>{icon}</ListItemIcon>
 																<ListItemText primary={text} />
 															</ListItemButton>
-														) : (
-															<ListItemButton component={Link} href={href!}>
-																<ListItemIcon>{icon}</ListItemIcon>
-																<ListItemText primary={text} />
-															</ListItemButton>
-														)}
-													</ListItem>
-												))}
-											</List>
-											<Divider />
-											<List>
-												{navBelowItems.map(({ text, icon, href }) => (
-													<ListItem key={text} disablePadding>
-														<ListItemButton component={Link} href={href}>
-															<ListItemIcon>{icon}</ListItemIcon>
-															<ListItemText primary={text} />
-														</ListItemButton>
-													</ListItem>
+														</ListItem>
 
-												))}
-											</List>
+													))}
+												</List>
+											</Box>
+										</Drawer>
+										<Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+											<Toolbar />
+											{children}
 										</Box>
-									</Drawer>
-									<Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-										<Toolbar />
-										{children}
 									</Box>
-								</Box>
-								<CreateLabelDialog open={labelDialogOpen} onClose={() => setLabelDialogOpen(false)} onLabelUpdate={fetchLabels} />
-							</LabelProvider>
+									<CreateLabelDialog open={labelDialogOpen} onClose={() => setLabelDialogOpen(false)} onLabelUpdate={fetchLabels} />
+								</LabelProvider>
+							</TableNoteProvider>
 						</NoteProvider>
 					</AppRouterCacheProvider>
 				</ThemeProvider>

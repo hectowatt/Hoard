@@ -8,7 +8,6 @@ type note = {
     createdate: string;
     updatedate: string;
     is_locked: boolean;
-    is_table: boolean;
 };
 
 const NoteContext = createContext<noteContextType | undefined>(undefined);
@@ -20,7 +19,9 @@ type noteContextType = {
 }
 
 export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [notes, setNotes] = useState<{ id: string, title: string; content: string; label_id: string; createdate: string; updatedate: string; is_locked: boolean; is_table: boolean }[]>([]);
+    const [notes, setNotes] = useState<{ id: string, title: string; content: string; label_id: string; createdate: string; updatedate: string; is_locked: boolean; }[]>([]);
+
+    // Noteを取得
     const fetchNotes = async () => {
         const response = await fetch("http://localhost:4000/api/notes");
         if (!response.ok) throw new Error("Failed to fetch notes");
@@ -33,7 +34,7 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return (
         <NoteContext.Provider value={{ notes, setNotes, fetchNotes }}>
             {children}
-        </NoteContext.Provider>
+        </NoteContext.Provider >
     );
 };
 

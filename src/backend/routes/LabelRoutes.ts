@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { AppDataSource } from '../data-source.js';
+import { AppDataSource } from '../DataSource.js';
 import Label from '../entities/Label.js';
 
 const router = Router();

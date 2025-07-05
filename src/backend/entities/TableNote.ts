@@ -1,8 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from "typeorm";
 import Label from "./Label.js";
 
-@Entity({ name: "note" })
-export default class Note {
+@Entity({ name: "table_note" })
+export default class TableNote {
 
     // primary key
     @PrimaryGeneratedColumn("uuid")
@@ -11,10 +11,6 @@ export default class Note {
     // title
     @Column({ name: "title", type: "text", nullable: false })
     title: string;
-
-    // content
-    @Column({ name: "content", type: "text", nullable: false })
-    content: string;
 
     // label_id
     @Column({ name: "label_id", type: "uuid", nullable: true })
