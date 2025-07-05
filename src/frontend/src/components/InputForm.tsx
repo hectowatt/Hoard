@@ -14,24 +14,32 @@ import {
     MenuItem,
     IconButton,
     Dialog,
+    TableContainer,
+    TableBody,
+    Table,
+    TableCell,
+    TableRow,
+    TableHead,
 } from '@mui/material';
 import { useLabelContext } from "@/context/LabelProvider";
 import NoEncryptionGmailerrorredOutlinedIcon from '@mui/icons-material/NoEncryptionGmailerrorredOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
-import TableNote from "@/components/TableNote";
+import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 interface InputFormProps {
-    onInsert: (newId: string, newTitle: string, newContent: string, newLabel: string, isLocked: boolean, is_table: boolean) => void;
+    onInsert: (newId: string, newTitle: string, newContent: string, newLabel: string, isLocked: boolean) => void;
+    onInsertTableNote: (newId: string, newTitle: string, newLabel: string, isLocked: boolean, newColumns: Column[], newRowCells: RowCell[][]) => void;
 }
 
-interface Column {
+type Column = {
     id: number;
     name: string;
     order?: number;
 }
 
-interface RowCell {
+type RowCell = {
     id: number;
     rowIndex: number;
     value: string;
@@ -39,7 +47,7 @@ interface RowCell {
 }
 
 // トップページ上部の入力フォームコンポーネント
-export default function InputForm({ onInsert }: InputFormProps) {
+export default function InputForm({ onInsert, onInsertTableNote }: InputFormProps) {
 
     const [expanded, setExpand] = useState(false);
     const [title, setTitle] = useState("");
@@ -53,10 +61,10 @@ export default function InputForm({ onInsert }: InputFormProps) {
     const { labels } = useLabelContext();
 
     // テーブルノート用
-    const [tableColumns, setTableColumns] = useState<Column[]>([
+    const [editColumns, setEditColumns] = useState<Column[]>([
         { id: 1, name: "カラム1", order: 1 }
     ]);
-    const [tableRowCells, setTableRowCells] = useState<RowCell[][]>([[{
+    const [editRowCells, setEditRowCells] = useState<RowCell[][]>([[{
         id: 1,
         rowIndex: 0,
         value: "",
@@ -104,9 +112,9 @@ export default function InputForm({ onInsert }: InputFormProps) {
 
             const insertedNoteId = result.note.id;
 
-            // メモ登録時のコールバック関数を呼び出す
+            // ノート登録時のコールバック関数を呼び出す
             if (typeof onInsert === "function") {
-                onInsert(insertedNoteId, title, content, editLabelId || "", isLocked, false); // is_tableはfalseで固定
+                onInsert(insertedNoteId, title, content, editLabelId || "", isLocked);
             }
         } catch (error) {
             console.error("Error saving note:", error);
@@ -140,15 +148,15 @@ export default function InputForm({ onInsert }: InputFormProps) {
     // テーブルノート保存処理
     const handleSaveTableNote = async () => {
         try {
-            const response = await fetch("http://localhost:4000/api/tableNote", {
+            const response = await fetch("http://localhost:4000/api/tablenotes", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
                     title: title,
-                    columns: tableColumns,
-                    rowCells: tableRowCells,
+                    columns: editColumns,
+                    rowCells: editRowCells,
                     label: editLabelId,
                     is_locked: isLocked,
                 }),
@@ -161,16 +169,42 @@ export default function InputForm({ onInsert }: InputFormProps) {
             const result = await response.json();
             console.log("Table note saved successfully!", result);
             setTableNoteOpen(false);
-            setTableColumns([{ id: 1, name: "カラム1", order: 1 }]);
-            setTableRowCells([[{ id: 1, rowIndex: 0, value: "", columnId: 1 }]]);
-            // メモ登録時のコールバック関数を呼び出す
-            if (typeof onInsert === "function") {
-                onInsert(result.tableNote.id, result.tableNote.title, result.tableNote.content, editLabelId || "", isLocked, false); // is_tableはfalseで固定
+            setEditColumns([{ id: 1, name: "カラム1", order: 1 }]);
+            setEditRowCells([[{ id: 1, rowIndex: 0, value: "", columnId: 1 }]]);
+            // テーブルノート登録時のコールバック関数を呼び出す
+            if (typeof onInsertTableNote === "function") {
+                onInsertTableNote(result.tableNote.id, result.tableNote.title, editLabelId || "", isLocked, editColumns, editRowCells);
             }
         } catch (error) {
             console.error("Error saving table note:", error);
         }
     }
+
+    // カラム追加
+    const handleAddColumn = () => {
+        const addColumnId = Date.now();
+        if (editColumns.length >= 5) return;
+        setEditColumns([...editColumns, { id: addColumnId, name: `カラム${editColumns.length + 1}` }]);
+        setEditRowCells(editRowCells.map(editRowCell => [...editRowCell, { id: Date.now(), rowIndex: editRowCell.length, value: "", columnId: addColumnId }]));
+    };
+
+    // カラム削除
+    const handleDeleteColumn = (colIdx: number) => {
+        if (editColumns.length <= 1) return;
+        setEditColumns(editColumns.filter((_, idx) => idx !== colIdx));
+        setEditRowCells(editRowCells.map(row => row.filter((_, idx) => idx !== colIdx)));
+    };
+
+    // セル編集
+    const handleCellChange = (rowIdx: number, colIdx: number, value: string) => {
+        const updatedRows: RowCell[][] = editRowCells.map((row, index) =>
+            index === rowIdx ? row.map((cell, c) => (c === colIdx ? { ...cell, value } : cell)) : row
+        );
+        setEditRowCells(updatedRows);
+    };
+
+    // 行追加
+    const handleAddRow = () => setEditRowCells([...editRowCells, Array(editColumns.length).fill("")]);
 
     return (
         <Box sx={{ maxWidth: 800, mx: 'auto', mt: 4, p: 2 }}
@@ -194,7 +228,7 @@ export default function InputForm({ onInsert }: InputFormProps) {
                     />
                 </Collapse>
                 <TextField
-                    placeholder="メモを入力..."
+                    placeholder="ノートを入力..."
                     fullWidth
                     multiline
                     minRows={expanded ? 3 : 1}
@@ -241,7 +275,60 @@ export default function InputForm({ onInsert }: InputFormProps) {
                 </Collapse>
             </Paper >
             <Dialog open={tableNoteOpen} onClose={() => setTableNoteOpen(false)} maxWidth="md" fullWidth>
-                <TableNote title={title} setTitle={setTitle} columns={tableColumns} setColumns={setTableColumns} rowCells={tableRowCells} setRowCells={setTableRowCells} />
+                <TableContainer component={Paper}>
+                    <TextField
+                        label="タイトル"
+                        variant="outlined"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        fullWidth
+                        margin="normal" />
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                {editColumns.map((col, idx) => (
+                                    <TableCell key={col.id}>
+                                        <TextField
+                                            value={col.name}
+                                            variant="outlined"
+                                            onChange={e => {
+                                                const newColumns = [...editColumns];
+                                                newColumns[idx] = { ...newColumns[idx], name: e.target.value };
+                                                setEditColumns(newColumns);
+                                            }}
+                                            sx={{ width: 200 }}
+                                        />
+                                        <IconButton size="small" onClick={() => handleDeleteColumn(idx)} disabled={editColumns.length <= 1}>
+                                            <DeleteIcon fontSize="small" />
+                                        </IconButton>
+                                    </TableCell>
+                                ))}
+                                <TableCell>
+                                    <IconButton onClick={handleAddColumn} disabled={editColumns.length >= 5}>
+                                        <AddIcon />
+                                    </IconButton>
+                                </TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {editRowCells.map((row, rowIdx) => (
+                                <TableRow key={rowIdx}>
+                                    {row.map((cell, colIdx) => (
+                                        <TableCell key={colIdx}>
+                                            <TextField
+                                                value={cell.value}
+                                                onChange={e => handleCellChange(rowIdx, colIdx, e.target.value)}
+                                                variant="outlined"
+                                                sx={{ width: 200 }}
+                                            />
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                    <Button onClick={handleAddRow} sx={{ m: 2 }}><AddIcon /></Button>
+                </TableContainer>
                 <Box sx={{ textAlign: 'center', p: 2 }}>
                     <Button onClick={handleSaveTableNote} variant="contained" sx={{ mr: 2 }}>
                         保存

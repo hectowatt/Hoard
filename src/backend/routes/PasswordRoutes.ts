@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { AppDataSource } from '../data-source.js';
+import { AppDataSource } from '../DataSource.js';
 import Password from '../entities/Password.js';
 import bcrypt from "bcrypt";
 

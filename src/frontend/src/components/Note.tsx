@@ -3,7 +3,8 @@ import { Box, Paper, Typography, Dialog, DialogTitle, DialogContent, TextField, 
 import { useLabelContext } from "@/context/LabelProvider";
 import NoEncryptionGmailerrorredOutlinedIcon from '@mui/icons-material/NoEncryptionGmailerrorredOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
+import TableNote from "./TableNote";
+import { useNoteContext } from "@/context/NoteProvider";
 
 interface NoteProps {
     id: string;
@@ -13,9 +14,8 @@ interface NoteProps {
     createdate: string;
     updatedate: string;
     is_locked: boolean;
-    is_table: boolean;
-    onSave?: (id: string, newTitle: string, newContent: string, newLabel: string, newUpdateDate: string) => void;
-    onDelete?: (id: string) => void;
+    onSave: (id: string, newTitle: string, newContent: string, newLabel: string, newUpdateDate: string) => void;
+    onDelete: (id: string) => void;
 }
 
 // 日付をフォーマットする
@@ -30,8 +30,18 @@ const formatDate = (exString: string) => {
     return `${year}/${month}/${day}`;
 }
 
-// ページに並ぶメモコンポーネント
-export default function Note({ id, title, content, label_id, createdate, updatedate, is_locked, is_table, onSave, onDelete }: NoteProps) {
+// ページに並ぶノートコンポーネント
+export default function Note({
+    id,
+    title,
+    content,
+    label_id,
+    createdate,
+    updatedate,
+    is_locked,
+    onSave,
+    onDelete
+}: NoteProps) {
 
     const [open, setOpen] = React.useState(false);
     const [editTitle, setEditTitle] = React.useState(title);
@@ -93,7 +103,7 @@ export default function Note({ id, title, content, label_id, createdate, updated
             console.error("Error deleting note", error);
             return;
         }
-    }
+    };
 
 
     // 保存ボタン押下処理
@@ -294,7 +304,7 @@ export default function Note({ id, title, content, label_id, createdate, updated
                         WebkitLineClamp: 4,
                         WebkitBoxOrient: "vertical",
                     }}
-                >{isLocked ? "このメモはロックされています" : (is_table ? <TableChartOutlinedIcon></TableChartOutlinedIcon> : content)}
+                >{isLocked ? "このノートはロックされています" : content}
                 </Typography>
                 <Typography variant="caption" color="textSecondary" sx={{ display: "block" }}>
                     作成日: {formatDate(createdate)}
@@ -330,7 +340,7 @@ export default function Note({ id, title, content, label_id, createdate, updated
                             sx={{ mb: 2 }} />)
                         : (
                             <Typography variant="body1" sx={{ whiteSpace: "pre-line", mb: 2 }}>
-                                {isLocked ? "このメモはロックされています" : content}
+                                {isLocked ? "このノートはロックされています" : content}
                             </Typography>)
                     }
                     <Typography variant="caption" color="textSecondary" sx={{ display: "block" }}>
@@ -346,6 +356,7 @@ export default function Note({ id, title, content, label_id, createdate, updated
                     )}
                     <Box sx={{ mt: 2, textAlignn: "right" }}>
                         {isEditing && !isLocked ? (
+                            // 編集中でパスワードロックされておらず、通常ノートの場合
                             <>
                                 <Button onClick={handleSave} variant="contained" sx={{ mr: 1 }}>保存</Button>
                                 <Button onClick={() => setIsEditing(false)} variant="contained">キャンセル</Button>
@@ -373,6 +384,7 @@ export default function Note({ id, title, content, label_id, createdate, updated
 
                             </>
                         ) : !isLocked ? (
+                            // 編集中でなく、パスワードロックされていない場合
                             <>
                                 <Button onClick={handleEdit} variant="contained">編集</Button>
                                 <Button onClick={handleDelete} variant="contained" sx={{ ml: 1 }}>削除</Button>
@@ -384,6 +396,7 @@ export default function Note({ id, title, content, label_id, createdate, updated
 
                             </>
                         ) : (
+                            // パスワードロックされている場合
                             <>
                                 <Button onClick={handleDelete} variant="contained" sx={{ ml: 1 }}>削除</Button>
                                 <IconButton

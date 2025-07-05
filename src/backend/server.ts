@@ -3,7 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import { WebSocketServer } from 'ws';
 import pg from 'pg';
-import { AppDataSource } from './data-source.js';
+import { AppDataSource } from './DataSource.js';
 import noteRoutes from './routes/NoteRoutes.js';
 import labelRoutes from './routes/LabelRoutes.js';
 import passwordRoutes from './routes/PasswordRoutes.js';
@@ -62,7 +62,7 @@ app.get('/', (req, res) => {
 app.use('/api/notes', noteRoutes);
 app.use('/api/labels', labelRoutes);
 app.use('/api/password', passwordRoutes);
-app.use('/api/tableNote', tableNoteRoutes);
+app.use('/api/tableNotes', tableNoteRoutes);
 
 
 // 定期的に古いノートを削除する関数（７日経過したら削除）

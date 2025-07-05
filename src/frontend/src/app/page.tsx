@@ -6,18 +6,38 @@ import React, { use, useEffect, useState } from "react";
 import { Container, Grid } from "@mui/material";
 import { useLabelContext } from "@/context/LabelProvider";
 import { useNoteContext } from "@/context/NoteProvider";
+import { useTableNoteContext } from "@/context/TableNoteProvider";
+import TableNote from "@/components/TableNote";
+
+type Column = {
+  id: number;
+  name: string;
+  order?: number;
+}
+
+type RowCell = {
+  id: number;
+  rowIndex: number;
+  value: string;
+  columnId?: number;
+}
 
 export default function Home() {
   const { notes, setNotes, fetchNotes } = useNoteContext();
   const { labels, fetchLabels } = useLabelContext();
+  const { tableNotes, setTableNotes, fetchTableNotes } = useTableNoteContext();
 
   useEffect(() => {
     fetchNotes();
   }, []);
 
+  useEffect(() => {
+    fetchTableNotes();
+  }, []);
 
-  // メモ初期登録時のコールバック関数
-  const handleInsert = (newId: string, newTitle: string, newContent: string, LabelId: string, is_locked: boolean, is_table: boolean) => {
+
+  // ノート初期登録時のコールバック関数
+  const handleInsert = (newId: string, newTitle: string, newContent: string, LabelId: string, is_locked: boolean) => {
     if (setNotes !== undefined) {
       setNotes(prevNote => [
         ...prevNote,
@@ -28,8 +48,7 @@ export default function Home() {
           label_id: LabelId,
           createdate: new Date().toISOString(),
           updatedate: new Date().toISOString(),
-          is_locked: is_locked,
-          is_table: is_table
+          is_locked: is_locked
         },
       ]);
     } else {
@@ -37,7 +56,28 @@ export default function Home() {
     };
   }
 
-  // メモ保存ボタン押下時のコールバック関数
+  // テーブルノート初期登録時のコールバック関数
+  const handleInsertTableNote = (newId: string, newTitle: string, newLabel: string, is_locked: boolean, newColumn: Column[], newRowCells: RowCell[][]) => {
+    if (setTableNotes !== undefined) {
+      setTableNotes(prevTableNotes => [
+        ...prevTableNotes,
+        {
+          id: newId,
+          title: newTitle,
+          label_id: newLabel,
+          createdate: new Date().toISOString(),
+          updatedate: new Date().toISOString(),
+          is_locked: is_locked,
+          columns: newColumn,
+          rowCells: newRowCells
+        },
+      ]);
+    } else {
+      console.error("setNotes is undefined");
+    };
+  }
+
+  // ノート保存ボタン押下時のコールバック関数
   const handleSave = (id: string, newTitle: string, newContent: string, newLabel: string, newUpdateDate: string) => {
     if (setNotes !== undefined) {
       setNotes(prevNote =>
@@ -52,7 +92,8 @@ export default function Home() {
     };
   }
 
-  // メモ削除ボタン押下時のコールバック関数
+
+  // ノート削除ボタン押下時のコールバック関数
   const handleDelete = (id: string) => {
     if (setNotes !== undefined) {
       setNotes(prevNote => prevNote.filter(note => note.id !== id));
@@ -65,17 +106,52 @@ export default function Home() {
     }
   };
 
+  // テーブルノート保存ボタン押下時のコールバック関数
+  const handleSaveTableNote = (id: string, newTitle: string, newLabel: string, is_Locked: boolean, newUpdateDate: string, newColumn: Column[], newRowCells: RowCell[][]) => {
+    if (setTableNotes !== undefined) {
+      setTableNotes(prevTableNote =>
+        prevTableNote.map(
+          tableNote => tableNote.id === id ? {
+            ...tableNote, title: newTitle, label_id: newLabel, is_Locked: is_Locked, updatedate: newUpdateDate
+          }
+            : tableNote)
+      );
+    } else {
+      console.error("error in handleSave: setNotes is undefined");
+    };
+  }
+
+  // テーブルノート削除ボタン押下時のコールバック関数
+  const handleDeleteTableNote = (id: string) => {
+    if (setTableNotes !== undefined) {
+      setTableNotes(prevTableNote => prevTableNote.filter(tableNote => tableNote.id !== id));
+    } else {
+      console.error("setNotes is undefined");
+    };
+
+    if (labels === undefined) {
+      return <div>Loading...</div>;
+    }
+  };
+
   return (
     <Container>
-      <InputForm onInsert={handleInsert} />
-      {/* メモ一覧表示 */}
+      <InputForm onInsert={handleInsert} onInsertTableNote={handleInsertTableNote} />
+      {/* ノートとテーブルノート一覧表示 */}
       <Grid container spacing={2}>
         {notes.map((note, index) => (
           <Grid key={index}>
             {/* Noteコンポーネントを生成 */}
-            <Note id={note.id} title={note.title} content={note.content} label_id={note.label_id} createdate={note.createdate} updatedate={note.updatedate} is_locked={note.is_locked} is_table={note.is_table} onSave={handleSave} onDelete={handleDelete} />
+            <Note {...note} onSave={handleSave} onDelete={handleDelete} />
           </Grid>
         ))}
+        {tableNotes.map((tableNote, index) => (
+          <Grid key={index}>
+            {/* TableNoteコンポーネントを生成 */}
+            <TableNote {...tableNote} onSave={handleSaveTableNote} onDelete={handleDeleteTableNote} />
+          </Grid>
+        ))}
+
       </Grid>
     </Container>
   );

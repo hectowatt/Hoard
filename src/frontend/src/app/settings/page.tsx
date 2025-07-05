@@ -85,7 +85,7 @@ export default function Home() {
 
       {/* ここに設定項目を追加 */}
       <h3>パスワード設定</h3>
-      <p>メモにロックをかけるときのパスワードを設定できます</p>
+      <p>ノートにロックをかけるときのパスワードを設定できます</p>
       <form>
         <TextField
           id="password-setting"
