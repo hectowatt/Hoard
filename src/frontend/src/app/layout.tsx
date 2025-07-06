@@ -175,9 +175,11 @@ export default function RootLayout({
 										>
 											<Toolbar sx={{ display: "flex", justifyContent: "center" }}>
 												<Box sx={{ flexGrow: 1 }}>
-													<Typography variant="h6" noWrap component="div">
-														Hoard
-													</Typography>
+													<img
+														src="/Hoard_logo.png"
+														alt="Hoard Logo"
+														style={{ height: 35, objectFit: "contain" }}
+													/>
 												</Box>
 												<Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>{searchBar}</Box>
 												<Box sx={{ flexGrow: 1 }} />
