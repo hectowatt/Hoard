@@ -39,7 +39,7 @@ export const TableNoteProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
     // TableNoteを取得
     const fetchTableNotes = async () => {
-        const response = await fetch("http://localhost:4000/api/tablenotes");
+        const response = await fetch("/api/tablenotes");
         if (!response.ok) throw new Error("Failed to fetch table notes");
         const data = await response.json();
         setTableNotes(data);

@@ -140,7 +140,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
 
             // パスワードが存在するかチェック
             try {
-                const responseSelect = await fetch("http://localhost:4000/api/password", {
+                const responseSelect = await fetch("/api/password", {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"
@@ -170,7 +170,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
         } else {
             // ロック時の処理
             try {
-                const responseSelect = await fetch("http://localhost:4000/api/password", {
+                const responseSelect = await fetch("/api/password", {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"
@@ -182,7 +182,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                     console.log("パスワード取得成功", resultSelect);
                     if (resultSelect.password_id !== null && resultSelect.password_id !== "" && resultSelect.password_id !== undefined) {
                         // ロック時の処理
-                        const responseLock = await fetch("http://localhost:4000/api/notes/lock", {
+                        const responseLock = await fetch("/api/notes/lock", {
                             method: "PUT",
                             headers: {
                                 "Content-Type": "application/json",
@@ -220,7 +220,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
         }
 
         // 入力されたパスワードをもとに比較APIを呼び出す
-        const responseCompare = await fetch("http://localhost:4000/api/password/compare", {
+        const responseCompare = await fetch("/api/password/compare", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -238,7 +238,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                 try {
                     // パスワードが一致した場合、ロックを解除するAPIを呼び出す
                     console.log("パスワードが一致しました。ロックを解除します。");
-                    const responseUnlock = await fetch("http://localhost:4000/api/tablenotes/lock", {
+                    const responseUnlock = await fetch("/api/tablenotes/lock", {
                         method: "PUT",
                         headers: {
                             "Content-Type": "application/json",
@@ -269,7 +269,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
     // テーブルノート保存処理
     const handleSaveTableNote = async () => {
         try {
-            const response = await fetch("http://localhost:4000/api/tablenotes", {
+            const response = await fetch("/api/tablenotes", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -304,7 +304,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
     // 削除ボタン押下処理
     const handleDelete = async () => {
         try {
-            const response = await fetch(`http://localhost:4000/api/tablenotes/${id}`, {
+            const response = await fetch(`http://localhost/api/tablenotes/${id}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",

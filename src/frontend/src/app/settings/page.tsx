@@ -16,7 +16,7 @@ export default function Home() {
       return;
     }
 
-    const responseSelect = await fetch("http://localhost:4000/api/password", {
+    const responseSelect = await fetch("/api/password", {
       method: "GET",
       headers: {
         "Content-Type": "application/json"
@@ -35,7 +35,7 @@ export default function Home() {
         console.log("password_id:", password_id);
         console.log("passwordString:", passwordString);
 
-        const response = await fetch("http://localhost:4000/api/password", {
+        const response = await fetch("/api/password", {
           method: "PUT",
           headers: {
             "Content-Type": "application/json"
@@ -55,7 +55,7 @@ export default function Home() {
       } else {
         // パスワードが未登録の場合は新規登録
         console.log("パスワード未登録のため新規登録");
-        const response = await fetch("http://localhost:4000/api/password", {
+        const response = await fetch("/api/password", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"

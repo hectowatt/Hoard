@@ -52,7 +52,7 @@ export default function TrashNote({ id, title, content, label_id, is_locked, cre
     // 削除ボタン押下処理
     const handleDelete = async () => {
         try {
-            const response = await fetch(`http://localhost:4000/api/notes/trash/${id}`, {
+            const response = await fetch(`http://localhost/api/notes/trash/${id}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
@@ -78,7 +78,7 @@ export default function TrashNote({ id, title, content, label_id, is_locked, cre
     // 復元ボタン押下処理
     const handleSave = async () => {
         try {
-            const response = await fetch("http://localhost:4000/api/notes/trash", {
+            const response = await fetch("/api/notes/trash", {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",

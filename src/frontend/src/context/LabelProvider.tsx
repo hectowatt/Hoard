@@ -20,7 +20,7 @@ export const LabelProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const [labels, setLabels] = useState<Label[]>([]);
 
     const fetchLabels = useCallback(async () => {
-        const response = await fetch("http://localhost:4000/api/labels", {
+        const response = await fetch("/api/labels", {
             method: "GET",
             headers: { "Content-Type": "application/json" },
         });

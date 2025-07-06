@@ -86,7 +86,7 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
 
         try {
 
-            const response = await fetch("http://localhost:4000/api/notes", {
+            const response = await fetch("/api/notes", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -148,7 +148,7 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
     // テーブルノート保存処理
     const handleSaveTableNote = async () => {
         try {
-            const response = await fetch("http://localhost:4000/api/tablenotes", {
+            const response = await fetch("/api/tablenotes", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
