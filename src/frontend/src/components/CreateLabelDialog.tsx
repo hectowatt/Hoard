@@ -29,7 +29,7 @@ export default function CreateLabelDialog({ open, onClose }: LabelDialogProps) {
         }
         try {
 
-            const response = await fetch("http://localhost:4000/api/labels", {
+            const response = await fetch("/api/labels", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -72,7 +72,7 @@ export default function CreateLabelDialog({ open, onClose }: LabelDialogProps) {
     // ラベル削除処理
     const onDeleteLabel = async (labelId: string) => {
         try {
-            const response = await fetch('http://localhost:4000/api/labels/' + labelId, {
+            const response = await fetch('http://localhost/api/labels/' + labelId, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",

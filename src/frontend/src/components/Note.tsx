@@ -80,7 +80,7 @@ export default function Note({
     // 削除ボタン押下処理
     const handleDelete = async () => {
         try {
-            const response = await fetch(`http://localhost:4000/api/notes/${id}`, {
+            const response = await fetch(`http://localhost/api/notes/${id}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
@@ -110,7 +110,7 @@ export default function Note({
     const handleSave = async () => {
 
         try {
-            const response = await fetch("http://localhost:4000/api/notes", {
+            const response = await fetch("/api/notes", {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -160,7 +160,7 @@ export default function Note({
 
             // パスワードが存在するかチェック
             try {
-                const responseSelect = await fetch("http://localhost:4000/api/password", {
+                const responseSelect = await fetch("/api/password", {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"
@@ -190,7 +190,7 @@ export default function Note({
         } else {
             // ロック時の処理
             try {
-                const responseSelect = await fetch("http://localhost:4000/api/password", {
+                const responseSelect = await fetch("/api/password", {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"
@@ -202,7 +202,7 @@ export default function Note({
                     console.log("パスワード取得成功", resultSelect);
                     if (resultSelect.password_id !== null && resultSelect.password_id !== "" && resultSelect.password_id !== undefined) {
                         // ロック時の処理
-                        const responseLock = await fetch("http://localhost:4000/api/notes/lock", {
+                        const responseLock = await fetch("/api/notes/lock", {
                             method: "PUT",
                             headers: {
                                 "Content-Type": "application/json",
@@ -240,7 +240,7 @@ export default function Note({
         }
 
         // 入力されたパスワードをもとに比較APIを呼び出す
-        const responseCompare = await fetch("http://localhost:4000/api/password/compare", {
+        const responseCompare = await fetch("/api/password/compare", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -258,7 +258,7 @@ export default function Note({
                 try {
                     // パスワードが一致した場合、ロックを解除するAPIを呼び出す
                     console.log("パスワードが一致しました。ロックを解除します。");
-                    const responseUnlock = await fetch("http://localhost:4000/api/notes/lock", {
+                    const responseUnlock = await fetch("/api/notes/lock", {
                         method: "PUT",
                         headers: {
                             "Content-Type": "application/json",

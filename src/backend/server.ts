@@ -18,7 +18,9 @@ const port = 4000;
 // JSONボディのパースを有効にする
 app.use(express.json());
 app.use(cors({
-  origin: 'http://localhost:3500',
+  origin: [
+    'http://192.168.1.100:3500',
+  ],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));

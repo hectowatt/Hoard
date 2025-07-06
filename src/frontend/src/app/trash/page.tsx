@@ -17,7 +17,7 @@ export default function Home() {
   const fetchTrashNotes = async () => {
     try {
       // バックエンドAPIからノート情報を取得
-      const response = await fetch("http://localhost:4000/api/notes/trash", {
+      const response = await fetch("/api/notes/trash", {
         method: "GET",
         headers: {
           "content-type": "application/json",
@@ -45,7 +45,7 @@ export default function Home() {
   const fetchTrashTableNotes = async () => {
     try {
       // バックエンドAPIからノート情報を取得
-      const response = await fetch("http://localhost:4000/api/tablenotes/trash", {
+      const response = await fetch("/api/tablenotes/trash", {
         method: "GET",
         headers: {
           "content-type": "application/json",

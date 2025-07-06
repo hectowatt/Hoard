@@ -132,7 +132,7 @@ export default function RootLayout({
 
 	// ラベル一覧を取得する
 	const fetchLabels = async () => {
-		const response = await fetch("http://localhost:4000/api/labels", {
+		const response = await fetch("/api/labels", {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
