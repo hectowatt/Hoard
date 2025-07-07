@@ -1,5 +1,7 @@
 <div align="center">
 
+![Hoard logo](./assets/Hoard_logo_colored.png)
+
 **🖊️ A Notes app with table and password lock! 🔐**
 
 ---
