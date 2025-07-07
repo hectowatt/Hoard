@@ -1,0 +1,65 @@
+services:
+  app:
+    build:
+      context: .
+    container_name: hoard_app
+    restart: unless-stopped
+    ports:
+      - "3500:3500" # frontend用
+      - "4000:4000" # backend用
+    environment:
+      - DATABASE_URL=postgres://hoard_user:hoard_password@db:5432/hoard_db
+    depends_on:
+      - db
+    env_file:
+      - .env
+    networks:
+      hoard_network:
+        ipv4_address: 192.168.1.100
+    volumes:
+      - ./:/app
+      - /app/src/backend/node_modules
+      - /app/src/frontend/node_modules
+    command: sleep infinity
+
+  db:
+    image: postgres:15
+    container_name: hoard_db
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: hoard_user
+      POSTGRES_PASSWORD: hoard_password
+      POSTGRES_DB: hoard_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      hoard_network:
+        ipv4_address: 192.168.1.101
+
+  nginx:
+    image: nginx:latest
+    container_name: hoard_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - app
+    networks:
+      hoard_network:
+        ipv4_address: 192.168.1.102
+
+networks:
+  hoard_network:
+    name: hoard_network
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.1.0/24
+
+volumes:
+  pgdata:
