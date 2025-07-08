@@ -70,7 +70,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
     const [editRowCells, setEditRowCells] = useState<RowCell[][]>(rowCells);
 
 
-    // columnsやrowCellsが変わったら内部状態も更新
+    // propsを変更用のstateに格納
     useEffect(() => {
         setEditColumns(columns);
     }, [columns]);
@@ -79,31 +79,32 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
         setEditRowCells(rowCells);
     }, [rowCells]);
 
+
     // カラム追加
     const handleAddColumn = () => {
         const addColumnId = Date.now();
-        if (columns.length >= 5) return;
-        setEditColumns([...columns, { id: addColumnId, name: `カラム${columns.length + 1}` }]);
-        setEditRowCells(rowCells.map(rowCell => [...rowCell, { id: Date.now(), rowIndex: rowCell.length, value: "", columnId: addColumnId }]));
+        if (editColumns.length >= 5) return;
+        setEditColumns([...editColumns, { id: addColumnId, name: `カラム${editColumns.length + 1}` }]);
+        setEditRowCells(editRowCells.map(rowCell => [...rowCell, { id: Date.now(), rowIndex: rowCell.length, value: "", columnId: addColumnId }]));
     };
 
     // カラム削除
     const handleDeleteColumn = (colIdx: number) => {
-        if (columns.length <= 1) return;
-        setEditColumns(columns.filter((_, idx) => idx !== colIdx));
-        setEditRowCells(rowCells.map(row => row.filter((_, idx) => idx !== colIdx)));
+        if (editColumns.length <= 1) return;
+        setEditColumns(editColumns.filter((_, idx) => idx !== colIdx));
+        setEditRowCells(editRowCells.map(row => row.filter((_, idx) => idx !== colIdx)));
     };
 
     // セル編集
     const handleCellChange = (rowIdx: number, colIdx: number, value: string) => {
-        const updatedRows: RowCell[][] = rowCells.map((row, index) =>
+        const updatedRows: RowCell[][] = editRowCells.map((row, index) =>
             index === rowIdx ? row.map((cell, c) => (c === colIdx ? { ...cell, value } : cell)) : row
         );
         setEditRowCells(updatedRows);
     };
 
     // 行追加
-    const handleAddRow = () => setEditRowCells([...rowCells, Array(columns.length).fill("")]);
+    const handleAddRow = () => setEditRowCells([...editRowCells, Array(editColumns.length).fill("")]);
 
 
     // ラベル名を取得する関数
@@ -361,7 +362,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                     </Typography>
                 )}
             </Paper>
-            <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+            <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
                 <DialogTitle>{isEditing && !isLocked ? (
                     <TextField
                         fullWidth
@@ -377,32 +378,32 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                             <Table>
                                 <TableHead>
                                     <TableRow>
-                                        {columns.map((col, idx) => (
+                                        {editColumns.map((col, idx) => (
                                             <TableCell key={col.id}>
                                                 <TextField
                                                     value={col.name}
                                                     variant="outlined"
                                                     onChange={e => {
-                                                        const newColumns = [...columns];
+                                                        const newColumns = [...editColumns];
                                                         newColumns[idx] = { ...newColumns[idx], name: e.target.value };
                                                         setEditColumns(newColumns);
                                                     }}
                                                     sx={{ width: 200 }}
                                                 />
-                                                <IconButton size="small" onClick={() => handleDeleteColumn(idx)} disabled={columns.length <= 1}>
+                                                <IconButton size="small" onClick={() => handleDeleteColumn(idx)} disabled={editColumns.length <= 1}>
                                                     <DeleteIcon fontSize="small" />
                                                 </IconButton>
                                             </TableCell>
                                         ))}
                                         <TableCell>
-                                            <IconButton onClick={handleAddColumn} disabled={columns.length >= 5}>
+                                            <IconButton onClick={handleAddColumn} disabled={editColumns.length >= 5}>
                                                 <AddIcon />
                                             </IconButton>
                                         </TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {rowCells.map((row, rowIdx) => (
+                                    {editRowCells.map((row, rowIdx) => (
                                         <TableRow key={rowIdx}>
                                             {row.map((cell, colIdx) => (
                                                 <TableCell key={colIdx}>
