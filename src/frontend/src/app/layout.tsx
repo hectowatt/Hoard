@@ -178,7 +178,7 @@ export default function RootLayout({
 													<img
 														src="/Hoard_logo.png"
 														alt="Hoard Logo"
-														style={{ height: 35, objectFit: "contain" }}
+														style={{ height: 29, objectFit: "contain" }}
 													/>
 												</Box>
 												<Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>{searchBar}</Box>
