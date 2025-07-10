@@ -5,9 +5,9 @@
   "main": "server.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.ts",
+    "start": "node dist/server.js",
     "dev": "nodemon",
-    "build": "echo 'No build step required'",
+    "build": "npx tsc",
     "migrate": "typeorm-ts-node-esm migration:run -d ./DataSource.ts",
     "typeorm": "typeorm-ts-node-esm",
     "generate": "npm run typeorm migration:generate -- --dataSource ./DataSource.ts --pretty ./migrations/InitialSchema"

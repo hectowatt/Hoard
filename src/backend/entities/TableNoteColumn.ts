@@ -1,5 +1,4 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
-import Note from "./Note.js";
 import TableNote from "./TableNote.js";
 
 @Entity({ name: "table_note_column" })
@@ -13,6 +12,6 @@ export default class NoteTableColumn {
     @Column({ name: "order", type: "int", default: 0 })
     order: number;
 
-    @ManyToOne(() => TableNote, note => note.id, { onDelete: "CASCADE" })
-    note: Note;
+    @ManyToOne(() => TableNote, tableNote => tableNote.id, { onDelete: "CASCADE" })
+    tableNote: TableNote;
 }
