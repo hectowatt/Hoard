@@ -271,7 +271,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
     const handleSaveTableNote = async () => {
         try {
             const response = await fetch("/api/tablenotes", {
-                method: "POST",
+                method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -293,7 +293,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
             setOpen(false);
             setEditColumns([{ id: 1, name: "カラム1", order: 1 }]);
             setEditRowCells([[{ id: 1, rowIndex: 0, value: "", columnId: 1 }]]);
-            // ノート登録時のコールバック関数を呼び出す
+            // テーブルノート登録時のコールバック関数を呼び出す
             if (typeof onSave === "function") {
                 onSave(result.tableNote.id, result.tableNote.title, editLabel || "", isLocked, result.tableNote.updatedate, editColumns, editRowCells);
             }
@@ -421,12 +421,11 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                             </Table>
                             <Button onClick={handleAddRow} sx={{ m: 2 }}><AddIcon /></Button>
                         </TableContainer>
+                    ) : (
+                        <Typography variant="body1" sx={{ whiteSpace: "pre-line", mb: 2 }}>
+                            {isLocked ? "このノートはロックされています" : < TableChartOutlinedIcon />}
+                        </Typography>
                     )
-                        : (
-                            <Typography variant="body1" sx={{ whiteSpace: "pre-line", mb: 2 }}>
-                                {isLocked ? "このノートはロックされています" : <LockOutlinedIcon />}
-                            </Typography>
-                        )
                     }
                     <Typography variant="caption" color="textSecondary" sx={{ display: "block" }}>
                         作成日: {formatDate(createdate)}

@@ -3,26 +3,16 @@ import { AppDataSource } from '../DataSource.js';
 import TableNoteCell from '../entities/TableNoteCell.js';
 import TableNoteColumn from '../entities/TableNoteColumn.js';
 import TableNote from '../entities/TableNote.js';
-import Note from '../entities/Note.js';
-import { EntityManager } from 'typeorm';
-import { table } from 'console';
-
 const router = Router();
-
-
-
 // 【INSERT】テーブルノート登録API
 router.post('/', async (req, res) => {
     const { title, columns, rowCells, label, is_locked } = req.body;
-
     if (!title && !columns && !rowCells) {
         return res.status(400).json({ error: "Must set tablenote title, columns, rows" });
     }
-
     try {
-        var savedTableNote: TableNote = null;
-
-        await AppDataSource.transaction(async (transactionalEntityManager: EntityManager) => {
+        var savedTableNote = null;
+        await AppDataSource.transaction(async (transactionalEntityManager) => {
             // table_noテーブルにデータを登録
             const tableNoteRepository = transactionalEntityManager.getRepository(TableNote);
             const newTableNote = tableNoteRepository.create({
@@ -33,23 +23,18 @@ router.post('/', async (req, res) => {
                 updatedate: new Date()
             });
             savedTableNote = await tableNoteRepository.save(newTableNote);
-
             // columnの登録
             const columnRepository = transactionalEntityManager.getRepository(TableNoteColumn);
-            const columnIdMap: { [key: string]: string } = {};
+            const columnIdMap = {};
             for (const col of columns) {
-                const newColumn = columnRepository.create(
-                    {
-                        name: col.name,
-                        order: col.order ?? 0,
-                        tableNote: savedTableNote
-                    }
-                );
-
+                const newColumn = columnRepository.create({
+                    name: col.name,
+                    order: col.order ?? 0,
+                    tableNote: savedTableNote
+                });
                 const savedColumn = await columnRepository.save(newColumn);
                 columnIdMap[col.id] = savedColumn.id; // カラム名とIDのマッピングを作成
             }
-
             // rowCellの登録
             const cellRepository = transactionalEntityManager.getRepository(TableNoteCell);
             for (let rowIndex = 0; rowIndex < rowCells.length; rowIndex++) {
@@ -67,41 +52,38 @@ router.post('/', async (req, res) => {
                     await cellRepository.save(newCell);
                 }
             }
-
             console.log('TableNote inserted with ID: ', savedTableNote.id);
         });
-        res.status(201).json({ message: "Save TableNote success!" , tableNote: savedTableNote});
-    } catch (error) {
+        res.status(201).json({ message: "Save TableNote success!", tableNote: savedTableNote });
+    }
+    catch (error) {
         console.error("Error saving TableNote:", error);
         res.status(500).json({ error: "Failed to save TableNote" });
     }
 });
-
 // 【SELECT】テーブルノート取得API
 router.get('/', async (req, res) => {
     try {
-
         const tableNoteRepository = AppDataSource.getRepository(TableNote);
-        const tableNotes = await tableNoteRepository.find({where: {is_deleted: false }, order: { createdate: 'DESC' }});
+        const tableNotes = await tableNoteRepository.find({ where: { is_deleted: false }, order: { createdate: 'DESC' } });
         if (!tableNotes) {
             return res.status(404).json({ error: "TableNote not found" });
         }
-
         // 返却するテーブルノートの配列
-        let tableNoteArray: { id: string; title: string; label_id: string; is_locked: boolean; createdate: string; updatedate: string; columns: {id:string, name: string, order: number}[]; rowCells: {id: string,rowIndex: number,value: string,columnId?: string}[][] }[] = [];
-
+        let tableNoteArray = [];
         // 各テーブルノートのカラムとセルを取得
-        for(var i=0; i< tableNotes.length; i++) {
+        for (var i = 0; i < tableNotes.length; i++) {
             const tableNote = tableNotes[i];
             const columnRepository = AppDataSource.getRepository(TableNoteColumn);
             const cellRepository = AppDataSource.getRepository(TableNoteCell);
             const columns = await columnRepository.find({ where: { tableNote: { id: tableNote.id } }, order: { order: 'ASC' } });
             const rowCells = await cellRepository.find({ where: { tableNote: { id: tableNote.id } }, order: { row_index: 'ASC' } });
             // rowCellsをrow_indexごとにグループ化して2次元配列に変換
-            const groupedRowCells: { id: string; rowIndex: number; value: string; columnId?: string }[][] = [];
+            const groupedRowCells = [];
             rowCells.forEach(cell => {
                 const rowIdx = cell.row_index;
-                if (!groupedRowCells[rowIdx]) groupedRowCells[rowIdx] = [];
+                if (!groupedRowCells[rowIdx])
+                    groupedRowCells[rowIdx] = [];
                 groupedRowCells[rowIdx].push({
                     id: cell.id,
                     rowIndex: cell.row_index,
@@ -121,39 +103,35 @@ router.get('/', async (req, res) => {
             });
         }
         res.status(200).json(tableNoteArray);
-    } catch (error) {
+    }
+    catch (error) {
         console.error("Error fetching TableNote:", error);
         res.status(500).json({ error: 'Failed to fetch TableNote' });
     }
 });
-
-
 // 【UPDATE】テーブルノート更新API
 router.put('/', async (req, res) => {
     const { id, newTitle, newColumns, newRowCells, newLabel, is_locked } = req.body;
-    console.log("id: " , id);
-    console.log("newTitle: " , newTitle);
+    console.log("id: ", id);
+    console.log("newTitle: ", newTitle);
     console.log("newRowCells: ", newRowCells);
     console.log("newLable: ", newLabel);
-    console.log("is_locked: ",is_locked);
+    console.log("is_locked: ", is_locked);
     try {
-        await AppDataSource.transaction(async (transactionalEntityManager: EntityManager) => {
+        await AppDataSource.transaction(async (transactionalEntityManager) => {
             const tableNoteRepository = transactionalEntityManager.getRepository(TableNote);
             const columnRepository = transactionalEntityManager.getRepository(TableNoteColumn);
             const cellRepository = transactionalEntityManager.getRepository(TableNoteCell);
-
             const tableNote = await tableNoteRepository.findOneBy({ id: id });
             if (!tableNote) {
                 return res.status(404).json({ error: "note not found" });
             }
-
             // ノート情報更新
             tableNote.title = newTitle;
             tableNote.label_id = newLabel || null;
             tableNote.is_locked = is_locked || false;
             tableNote.updatedate = new Date();
             await tableNoteRepository.save(tableNote);
-
             // --- カラムの更新 ---
             // 既存カラム取得
             const dbColumns = await columnRepository.find({ where: { tableNote: { id: tableNote.id } }, order: { order: 'ASC' } });
@@ -161,30 +139,28 @@ router.put('/', async (req, res) => {
             const dbColumnIds = dbColumns.map(col => col.id);
             // 新カラムIDセット（新規はidがない場合もあるので注意）
             const newColumnIds = newColumns.map(col => col.id).filter(Boolean);
-
             // 削除対象カラム
             const columnsToDelete = dbColumns.filter(col => !newColumnIds.includes(col.id));
             // 追加・更新対象カラム
             const columnsToUpsert = newColumns;
-
             // カラム削除
             for (const col of columnsToDelete) {
                 await columnRepository.delete(col.id);
             }
-
             // カラム追加・更新
-            const columnIdMap: { [key: string]: string } = {};
+            const columnIdMap = {};
             for (const col of columnsToUpsert) {
                 let savedColumn;
                 if (col.id && dbColumnIds.includes(col.id)) {
                     // 既存カラムは更新
-                    const existCol = await columnRepository.findOneBy({id: col.id});
-                    if(existCol){
-                      existCol.name = col.name;
-                      existCol.order = col.order ?? 0;
-                      savedColumn = await columnRepository.save(existCol);
+                    const existCol = await columnRepository.findOneBy({ id: col.id });
+                    if (existCol) {
+                        existCol.name = col.name;
+                        existCol.order = col.order ?? 0;
+                        savedColumn = await columnRepository.save(existCol);
                     }
-                } else {
+                }
+                else {
                     // 新規カラムは追加
                     const newCol = columnRepository.create({
                         name: col.name,
@@ -195,22 +171,18 @@ router.put('/', async (req, res) => {
                 }
                 columnIdMap[col.id] = savedColumn.id;
             }
-
             // --- セルの更新 ---
             // 既存セル取得
             const dbCells = await cellRepository.find({ where: { tableNote: { id: tableNote.id } } });
             const dbCellIds = dbCells.map(cell => cell.id);
-
             // 新セルを1次元配列化
             const flatNewCells = newRowCells.flat();
-
             // 削除対象セル
             const newCellIds = flatNewCells.map(cell => cell.id).filter(Boolean);
             const cellsToDelete = dbCells.filter(cell => !newCellIds.includes(cell.id));
             for (const cell of cellsToDelete) {
                 await cellRepository.delete(cell.id);
             }
-
             // 追加・更新対象セル
             for (let rowIndex = 0; rowIndex < newRowCells.length; rowIndex++) {
                 const row = newRowCells[rowIndex];
@@ -220,15 +192,16 @@ router.put('/', async (req, res) => {
                     const dbColumnId = columnIdMap[cell.columnId] || cell.columnId;
                     if (cell.id && dbCellIds.includes(cell.id)) {
                         // 既存セルは更新
-                      const existCell = await cellRepository.findOneBy({id: cell.id});
-                      if(existCell){
-                        existCell.row_index = rowIndex;
-                        existCell.value = cell.value;
-                        existCell.tableNote = tableNote;
-                        const columnEntity = await columnRepository.findOneBy({ id: dbColumnId });
-                        existCell.column = columnEntity;
-                      }
-                    } else {
+                        const existCell = await cellRepository.findOneBy({ id: cell.id });
+                        if (existCell) {
+                            existCell.row_index = rowIndex;
+                            existCell.value = cell.value;
+                            existCell.tableNote = tableNote;
+                            const columnEntity = await columnRepository.findOneBy({ id: dbColumnId });
+                            existCell.column = columnEntity;
+                        }
+                    }
+                    else {
                         // 新規セルは追加
                         const newCell = cellRepository.create({
                             row_index: rowIndex,
@@ -240,14 +213,14 @@ router.put('/', async (req, res) => {
                     }
                 }
             }
-
             // レスポンス用データ再取得
             const columns = await columnRepository.find({ where: { tableNote: { id: tableNote.id } }, order: { order: 'ASC' } });
             const rowCells = await cellRepository.find({ where: { tableNote: { id: tableNote.id } }, order: { row_index: 'ASC' } });
-            const groupedRowCells: { id: string; rowIndex: number; value: string; columnId?: string }[][] = [];
+            const groupedRowCells = [];
             rowCells.forEach(cell => {
                 const rowIdx = cell.row_index;
-                if (!groupedRowCells[rowIdx]) groupedRowCells[rowIdx] = [];
+                if (!groupedRowCells[rowIdx])
+                    groupedRowCells[rowIdx] = [];
                 groupedRowCells[rowIdx].push({
                     id: cell.id,
                     rowIndex: cell.row_index,
@@ -255,7 +228,6 @@ router.put('/', async (req, res) => {
                     columnId: cell.column ? cell.column.id : undefined
                 });
             });
-
             res.status(200).json({
                 message: "Save TableNote success!",
                 tableNote: {
@@ -269,104 +241,102 @@ router.put('/', async (req, res) => {
                 }
             });
         });
-    } catch (error) {
+    }
+    catch (error) {
         console.error("Error update TableNote:", error);
         res.status(500).json({ error: "Failed to update TableNote" });
     }
 });
 // ...existing code...
-
 // 【DELETE】Notes削除用API
 router.delete('/:id', async (req, res) => {
-  const { id } = req.params;
-  console.log("delete id: ", id);
-  try {
-    const tableNoteRepository = AppDataSource.getRepository(TableNote);
-    const tableNote = await tableNoteRepository.findOneBy({ id: id });
-    if (!tableNote) {
-      return res.status(404).json({ error: "Note not found" });
+    const { id } = req.params;
+    console.log("delete id: ", id);
+    try {
+        const tableNoteRepository = AppDataSource.getRepository(TableNote);
+        const tableNote = await tableNoteRepository.findOneBy({ id: id });
+        if (!tableNote) {
+            return res.status(404).json({ error: "Note not found" });
+        }
+        tableNote.is_deleted = true; // 論理削除のためフラグを立てる
+        tableNote.deletedate = new Date(); // 削除日時を設定
+        await tableNoteRepository.save(tableNote);
+        res.status(200).json({ message: "TableNote moved to trash successfully" });
     }
-    tableNote.is_deleted = true; // 論理削除のためフラグを立てる
-    tableNote.deletedate = new Date(); // 削除日時を設定
-    await tableNoteRepository.save(tableNote);
-    res.status(200).json({ message: "TableNote moved to trash successfully" });
-  } catch (error) {
-    console.error("Error deleting TableNote:", error);
-    res.status(500).json({ error: "Failed moved to trash" });
-  }
+    catch (error) {
+        console.error("Error deleting TableNote:", error);
+        res.status(500).json({ error: "Failed moved to trash" });
+    }
 });
-
 /************ TrashNote ************/
-
 // 【SELECT】TrashNote取得API
 router.get('/trash', async (req, res) => {
-  try {
-    const noteRepository = AppDataSource.getRepository(TableNote);
-    const notes = await noteRepository.find({ where: { is_deleted: true }, order: { deletedate: 'DESC' } });
-    res.status(200).json(notes);
-  } catch (error) {
-    console.error("Error fetching trash TableNotes:", error);
-    res.status(500).json({ error: 'Failed to fetch trash TableNotes' });
-  }
+    try {
+        const noteRepository = AppDataSource.getRepository(TableNote);
+        const notes = await noteRepository.find({ where: { is_deleted: true }, order: { deletedate: 'DESC' } });
+        res.status(200).json(notes);
+    }
+    catch (error) {
+        console.error("Error fetching trash TableNotes:", error);
+        res.status(500).json({ error: 'Failed to fetch trash TableNotes' });
+    }
 });
-
 // 【DELETE】TrashNote削除用API
 router.delete('/trash/:id', async (req, res) => {
-  const { id } = req.params;
-  console.log("delete id: ", id);
-  try {
-    const noteRepository = AppDataSource.getRepository(TableNote);
-    const note = await noteRepository.findOneBy({ id: id });
-    if (!note) {
-      return res.status(404).json({ error: "TableNotes not found" });
+    const { id } = req.params;
+    console.log("delete id: ", id);
+    try {
+        const noteRepository = AppDataSource.getRepository(TableNote);
+        const note = await noteRepository.findOneBy({ id: id });
+        if (!note) {
+            return res.status(404).json({ error: "TableNotes not found" });
+        }
+        await noteRepository.remove(note);
+        res.status(200).json({ message: "TableNote deleted successfully" });
     }
-    await noteRepository.remove(note);
-    res.status(200).json({ message: "TableNote deleted successfully" });
-  } catch (error) {
-    console.error("Error deleting TableNote:", error);
-    res.status(500).json({ error: "Failed to delete TableNote" });
-  }
+    catch (error) {
+        console.error("Error deleting TableNote:", error);
+        res.status(500).json({ error: "Failed to delete TableNote" });
+    }
 });
-
 // 【UPDATE】TableNote復元用API
 router.put('/trash', async (req, res) => {
-  const { id } = req.body;
-
-  try {
-    const noteRepository = AppDataSource.getRepository(TableNote);
-    const note = await noteRepository.findOneBy({ id: id });
-    if (!note) {
-      return res.status(404).json({ error: "Can't find TableNote" });
+    const { id } = req.body;
+    try {
+        const noteRepository = AppDataSource.getRepository(TableNote);
+        const note = await noteRepository.findOneBy({ id: id });
+        if (!note) {
+            return res.status(404).json({ error: "Can't find TableNote" });
+        }
+        note.is_deleted = false; // 論理削除フラグを解除
+        note.deletedate = null; // 削除日時をnullに設定
+        const restoredNote = await noteRepository.save(note);
+        console.log('Note restored: ', restoredNote.updatedate);
+        res.status(200).json({ message: "Restore TableNote success!", note: restoredNote });
     }
-    note.is_deleted = false; // 論理削除フラグを解除
-    note.deletedate = null; // 削除日時をnullに設定
-    const restoredNote = await noteRepository.save(note);
-    console.log('Note restored: ', restoredNote.updatedate);
-    res.status(200).json({ message: "Restore TableNote success!", note: restoredNote });
-  } catch (error) {
-    console.error("Error restoring TableNote", error);
-    res.status(500).json({ error: "Failed to restore TableNotea" });
-  }
+    catch (error) {
+        console.error("Error restoring TableNote", error);
+        res.status(500).json({ error: "Failed to restore TableNotea" });
+    }
 });
-
-
 // 【UPDATE】TableNoteロック状態更新用API
 router.put('/lock', async (req, res) => {
-  const { id, isLocked } = req.body;
-  try {
-    const noteRepository = AppDataSource.getRepository(TableNote);
-    const note = await noteRepository.findOneBy({ id: id });
-    if (!note) {
-      return res.status(404).json({ error: "Can't find TableNote" });
+    const { id, isLocked } = req.body;
+    try {
+        const noteRepository = AppDataSource.getRepository(TableNote);
+        const note = await noteRepository.findOneBy({ id: id });
+        if (!note) {
+            return res.status(404).json({ error: "Can't find TableNote" });
+        }
+        note.is_locked = isLocked; // ロック状態を更新
+        const updatedNote = await noteRepository.save(note);
+        console.log('Note lock state updated: ', updatedNote.is_locked);
+        res.status(200).json({ message: "Update lock state success!", note: updatedNote });
     }
-    note.is_locked = isLocked; // ロック状態を更新
-    const updatedNote = await noteRepository.save(note);
-    console.log('Note lock state updated: ', updatedNote.is_locked);
-    res.status(200).json({ message: "Update lock state success!", note: updatedNote });
-  } catch (error) {
-    console.error("Error updating lock state", error);
-    res.status(500).json({ error: "Failed to update lock state" });
-  }
+    catch (error) {
+        console.error("Error updating lock state", error);
+        res.status(500).json({ error: "Failed to update lock state" });
+    }
 });
-
 export default router;
+//# sourceMappingURL=TableNoteRoutes.js.map
