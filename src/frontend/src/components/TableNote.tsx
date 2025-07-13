@@ -276,6 +276,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
+                    id: id,
                     title: title,
                     columns: editColumns,
                     rowCells: editRowCells,

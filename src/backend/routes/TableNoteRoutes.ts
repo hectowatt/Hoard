@@ -130,12 +130,7 @@ router.get('/', async (req, res) => {
 
 // 【UPDATE】テーブルノート更新API
 router.put('/', async (req, res) => {
-    const { id, newTitle, newColumns, newRowCells, newLabel, is_locked } = req.body;
-    console.log("id: " , id);
-    console.log("newTitle: " , newTitle);
-    console.log("newRowCells: ", newRowCells);
-    console.log("newLable: ", newLabel);
-    console.log("is_locked: ",is_locked);
+    const { id, title, columns, rowCells, label, is_locked } = req.body;
     try {
         await AppDataSource.transaction(async (transactionalEntityManager: EntityManager) => {
             const tableNoteRepository = transactionalEntityManager.getRepository(TableNote);
@@ -148,8 +143,8 @@ router.put('/', async (req, res) => {
             }
 
             // ノート情報更新
-            tableNote.title = newTitle;
-            tableNote.label_id = newLabel || null;
+            tableNote.title = title;
+            tableNote.label_id = label || null;
             tableNote.is_locked = is_locked || false;
             tableNote.updatedate = new Date();
             await tableNoteRepository.save(tableNote);
@@ -160,12 +155,12 @@ router.put('/', async (req, res) => {
             // 既存カラムIDセット
             const dbColumnIds = dbColumns.map(col => col.id);
             // 新カラムIDセット（新規はidがない場合もあるので注意）
-            const newColumnIds = newColumns.map(col => col.id).filter(Boolean);
+            const newColumnIds = columns.map(col => col.id).filter(Boolean);
 
             // 削除対象カラム
             const columnsToDelete = dbColumns.filter(col => !newColumnIds.includes(col.id));
             // 追加・更新対象カラム
-            const columnsToUpsert = newColumns;
+            const columnsToUpsert = columns;
 
             // カラム削除
             for (const col of columnsToDelete) {
@@ -202,7 +197,7 @@ router.put('/', async (req, res) => {
             const dbCellIds = dbCells.map(cell => cell.id);
 
             // 新セルを1次元配列化
-            const flatNewCells = newRowCells.flat();
+            const flatNewCells = rowCells.flat();
 
             // 削除対象セル
             const newCellIds = flatNewCells.map(cell => cell.id).filter(Boolean);
@@ -212,8 +207,8 @@ router.put('/', async (req, res) => {
             }
 
             // 追加・更新対象セル
-            for (let rowIndex = 0; rowIndex < newRowCells.length; rowIndex++) {
-                const row = newRowCells[rowIndex];
+            for (let rowIndex = 0; rowIndex < rowCells.length; rowIndex++) {
+                const row = rowCells[rowIndex];
                 for (let colIndex = 0; colIndex < row.length; colIndex++) {
                     const cell = row[colIndex];
                     // columnIdのマッピング
@@ -242,10 +237,10 @@ router.put('/', async (req, res) => {
             }
 
             // レスポンス用データ再取得
-            const columns = await columnRepository.find({ where: { tableNote: { id: tableNote.id } }, order: { order: 'ASC' } });
-            const rowCells = await cellRepository.find({ where: { tableNote: { id: tableNote.id } }, order: { row_index: 'ASC' } });
+            const updatedColumns = await columnRepository.find({ where: { tableNote: { id: tableNote.id } }, order: { order: 'ASC' } });
+            const updatedRowCells = await cellRepository.find({ where: { tableNote: { id: tableNote.id } }, order: { row_index: 'ASC' } });
             const groupedRowCells: { id: string; rowIndex: number; value: string; columnId?: string }[][] = [];
-            rowCells.forEach(cell => {
+            updatedRowCells.forEach(cell => {
                 const rowIdx = cell.row_index;
                 if (!groupedRowCells[rowIdx]) groupedRowCells[rowIdx] = [];
                 groupedRowCells[rowIdx].push({
@@ -264,7 +259,7 @@ router.put('/', async (req, res) => {
                     is_locked: tableNote.is_locked,
                     createdate: tableNote.createdate.toISOString(),
                     updatedate: tableNote.updatedate.toISOString(),
-                    columns: columns.map(col => ({ id: col.id, name: col.name, order: col.order })),
+                    columns: updatedColumns.map(col => ({ id: col.id, name: col.name, order: col.order })),
                     rowCells: groupedRowCells
                 }
             });
