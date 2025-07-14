@@ -70,6 +70,12 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
     const [editRowCells, setEditRowCells] = useState<RowCell[][]>(rowCells);
 
 
+    // 初期状態でのタイトル設定
+    useEffect(() => {
+        setEditTitle(title);
+        setEditLabel(label_id || null);
+    }, [title, label_id]);
+
     // propsを変更用のstateに格納
     useEffect(() => {
         setEditColumns(columns);
@@ -277,7 +283,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                 },
                 body: JSON.stringify({
                     id: id,
-                    title: title,
+                    title: editTitle,
                     columns: editColumns,
                     rowCells: editRowCells,
                     label: editLabel,
@@ -371,7 +377,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                         onChange={e => setEditTitle(e.target.value)}
                         variant="standard" />
                 ) : (
-                    title
+                    editTitle
                 )}</DialogTitle>
                 <DialogContent>
                     {isEditing && !isLocked ? (

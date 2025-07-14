@@ -222,6 +222,7 @@ router.put('/', async (req, res) => {
                         existCell.tableNote = tableNote;
                         const columnEntity = await columnRepository.findOneBy({ id: dbColumnId });
                         existCell.column = columnEntity;
+                        await cellRepository.save(existCell);
                       }
                     } else {
                         // 新規セルは追加
