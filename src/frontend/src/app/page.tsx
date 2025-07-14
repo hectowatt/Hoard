@@ -112,7 +112,7 @@ export default function Home() {
       setTableNotes(prevTableNote =>
         prevTableNote.map(
           tableNote => tableNote.id === id ? {
-            ...tableNote, title: newTitle, label_id: newLabel, is_Locked: is_Locked, updatedate: newUpdateDate
+            ...tableNote, title: newTitle, label_id: newLabel, is_Locked: is_Locked, updatedate: newUpdateDate, columns: newColumn, rowCells: newRowCells
           }
             : tableNote)
       );
