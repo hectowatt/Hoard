@@ -1,13 +1,13 @@
 import React, { useEffect } from "react";
 import { Box, Paper, Typography, Dialog, DialogTitle, DialogContent, TextField, Button, FormControl, Select, MenuItem, InputLabel } from "@mui/material";
 import { useLabelContext } from "@/context/LabelProvider";
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
 
 interface trashNoteProps {
     id: string;
     title: string;
     label_id: string;
-    isLocked: boolean;
+    is_locked: boolean;
     createdate: string;
     updatedate: string;
     onRestore?: (id: string, newTitle: string, newLabel: string, newUpdateDate: string) => void;
@@ -27,7 +27,7 @@ const formatDate = (exString: string) => {
 }
 
 // 削除ページに並ぶトラッシュテーブルノートコンポーネント
-export default function TrashTableNote({ id, title, label_id, isLocked, createdate, updatedate, onRestore, onDelete }: trashNoteProps) {
+export default function TrashTableNote({ id, title, label_id, is_locked, createdate, updatedate, onRestore, onDelete }: trashNoteProps) {
 
     const [open, setOpen] = React.useState(false);
     const [editTitle, setEditTitle] = React.useState(title);
@@ -125,7 +125,7 @@ export default function TrashTableNote({ id, title, label_id, isLocked, createda
                     {title}
                 </Typography>
                 <Typography variant="body1" sx={{ mb: 1, whiteSpace: "pre-line" }}>
-                    <LockOutlinedIcon />
+                    {is_locked ? "このノートはロックされています" : <TableChartOutlinedIcon />}
                 </Typography>
                 <Typography variant="caption" color="textSecondary" sx={{ display: "block" }}>
                     作成日: {formatDate(createdate)}
@@ -147,7 +147,7 @@ export default function TrashTableNote({ id, title, label_id, isLocked, createda
                 </DialogTitle>
                 <DialogContent>
                     <Typography variant="body1" sx={{ mb: 1, whiteSpace: "pre-line" }}>
-                        <LockOutlinedIcon />
+                        {is_locked ? "このノートはロックされています" : <TableChartOutlinedIcon />}
                     </Typography>
                     <Typography variant="caption" color="textSecondary" sx={{ display: "block" }}>
                         作成日: {formatDate(createdate)}
