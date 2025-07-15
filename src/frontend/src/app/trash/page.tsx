@@ -138,7 +138,7 @@ export default function Home() {
               id={tableNote.id}
               title={tableNote.title}
               label_id={tableNote.label_id}
-              isLocked={tableNote.isLocked}
+              is_locked={tableNote.isLocked}
               createdate={tableNote.createdate}
               updatedate={tableNote.updatedate}
               onRestore={handleSaveTableNote}
