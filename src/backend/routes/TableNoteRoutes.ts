@@ -270,7 +270,6 @@ router.put('/', async (req, res) => {
         res.status(500).json({ error: "Failed to update TableNote" });
     }
 });
-// ...existing code...
 
 // 【DELETE】Notes削除用API
 router.delete('/:id', async (req, res) => {
@@ -311,12 +310,12 @@ router.delete('/trash/:id', async (req, res) => {
   const { id } = req.params;
   console.log("delete id: ", id);
   try {
-    const noteRepository = AppDataSource.getRepository(TableNote);
-    const note = await noteRepository.findOneBy({ id: id });
-    if (!note) {
+    const tableNoteRepository = AppDataSource.getRepository(TableNote);
+    const tableNote = await tableNoteRepository.findOneBy({ id: id });
+    if (!tableNote) {
       return res.status(404).json({ error: "TableNotes not found" });
     }
-    await noteRepository.remove(note);
+    await tableNoteRepository.remove(tableNote);
     res.status(200).json({ message: "TableNote deleted successfully" });
   } catch (error) {
     console.error("Error deleting TableNote:", error);
@@ -329,14 +328,14 @@ router.put('/trash', async (req, res) => {
   const { id } = req.body;
 
   try {
-    const noteRepository = AppDataSource.getRepository(TableNote);
-    const note = await noteRepository.findOneBy({ id: id });
-    if (!note) {
+    const tableNoteRepository = AppDataSource.getRepository(TableNote);
+    const tableNote = await tableNoteRepository.findOneBy({ id: id });
+    if (!tableNote) {
       return res.status(404).json({ error: "Can't find TableNote" });
     }
-    note.is_deleted = false; // 論理削除フラグを解除
-    note.deletedate = null; // 削除日時をnullに設定
-    const restoredNote = await noteRepository.save(note);
+    tableNote.is_deleted = false; // 論理削除フラグを解除
+    tableNote.deletedate = null; // 削除日時をnullに設定
+    const restoredNote = await tableNoteRepository.save(tableNote);
     console.log('Note restored: ', restoredNote.updatedate);
     res.status(200).json({ message: "Restore TableNote success!", note: restoredNote });
   } catch (error) {
@@ -350,13 +349,13 @@ router.put('/trash', async (req, res) => {
 router.put('/lock', async (req, res) => {
   const { id, isLocked } = req.body;
   try {
-    const noteRepository = AppDataSource.getRepository(TableNote);
-    const note = await noteRepository.findOneBy({ id: id });
-    if (!note) {
+    const tableNoteRepository = AppDataSource.getRepository(TableNote);
+    const tableNote = await tableNoteRepository.findOneBy({ id: id });
+    if (!tableNote) {
       return res.status(404).json({ error: "Can't find TableNote" });
     }
-    note.is_locked = isLocked; // ロック状態を更新
-    const updatedNote = await noteRepository.save(note);
+    tableNote.is_locked = isLocked; // ロック状態を更新
+    const updatedNote = await tableNoteRepository.save(tableNote);
     console.log('Note lock state updated: ', updatedNote.is_locked);
     res.status(200).json({ message: "Update lock state success!", note: updatedNote });
   } catch (error) {

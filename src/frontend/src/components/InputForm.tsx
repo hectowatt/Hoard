@@ -181,6 +181,8 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
     }
 
     // カラム追加
+    // 既存のeditColumnsに新しいカラムを追加する
+    // さらに、既存のRowCellの各行に対して末尾に新規セルを追加する
     const handleAddColumn = () => {
         const addColumnId = Date.now();
         if (editColumns.length >= 5) return;
@@ -204,7 +206,19 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
     };
 
     // 行追加
-    const handleAddRow = () => setEditRowCells([...editRowCells, Array(editColumns.length).fill("")]);
+    // 既存のeditRowCellsに新しい行を追加する
+    // 新しい行は、列の数分の新規セルを生成して追加する
+    const handleAddRow = () => {
+        setEditRowCells([
+            ...editRowCells,
+            editColumns.map((col, idx) => ({
+                id: Date.now() + idx,
+                rowIndex: editRowCells.length,
+                value: "",
+                columnId: col.id,
+            }))
+        ]);
+    };
 
     return (
         <Box sx={{ maxWidth: 800, mx: 'auto', mt: 4, p: 2 }}

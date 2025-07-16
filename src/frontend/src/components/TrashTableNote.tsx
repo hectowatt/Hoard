@@ -62,7 +62,7 @@ export default function TrashTableNote({ id, title, label_id, is_locked, created
                 },
             });
             if (!response.ok) {
-                throw new Error("Failed to delete note");
+                throw new Error("Failed to delete tableNote");
             }
             const result = await response.json();
             console.log("Delete success!", result);
