@@ -10,7 +10,8 @@
     "build": "npx tsc",
     "migrate": "typeorm-ts-node-esm migration:run -d ./DataSource.ts",
     "typeorm": "typeorm-ts-node-esm",
-    "generate": "npm run typeorm migration:generate -- --dataSource ./DataSource.ts --pretty ./migrations/InitialSchema"
+    "generate": "npm run typeorm migration:generate -- --dataSource ./DataSource.ts --pretty ./migrations/InitialSchema",
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
