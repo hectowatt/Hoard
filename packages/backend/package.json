@@ -4,14 +4,13 @@
   "version": "1.0.0",
   "main": "server.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "node dist/server.js",
     "dev": "nodemon",
     "build": "npx tsc",
     "migrate": "typeorm-ts-node-esm migration:run -d ./DataSource.ts",
     "typeorm": "typeorm-ts-node-esm",
-    "generate": "npm run typeorm migration:generate -- --dataSource ./DataSource.ts --pretty ./migrations/InitialSchema",
-    "test": "jest"
+    "generate": "npm run typeorm migration:generate -- --dataSource ./DataSource.ts --pretty ./migrations/InitialSchema"
   },
   "keywords": [],
   "author": "",
@@ -25,6 +24,7 @@
     "pg": "^8.13.3",
     "reflect-metadata": "^0.2.2",
     "typeorm": "^0.3.21",
+    "typescript": "^5.8.3",
     "ws": "^8.18.1"
   },
   "devDependencies": {

@@ -1,7 +1,12 @@
+// jest.config.js
 export default {
+  preset: "ts-jest",
   testEnvironment: "jsdom",
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
   transform: {
-    "^.+\\.(js|jsx|ts|tsx)$": ["babel-jest", { presets: ["@babel/preset-env", "@babel/preset-react"] }]
+    "^.+\\.(ts|tsx)$": ["ts-jest", {
+      tsconfig: "tsconfig.jest.json"
+    }]
   },
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1"

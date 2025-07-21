@@ -241,7 +241,7 @@ export default function RootLayout({
 											{children}
 										</Box>
 									</Box>
-									<CreateLabelDialog open={labelDialogOpen} onClose={() => setLabelDialogOpen(false)} onLabelUpdate={fetchLabels} />
+									<CreateLabelDialog open={labelDialogOpen} onClose={() => setLabelDialogOpen(false)} />
 								</LabelProvider>
 							</TableNoteProvider>
 						</NoteProvider>
