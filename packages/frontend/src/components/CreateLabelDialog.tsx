@@ -8,7 +8,6 @@ interface LabelDialogProps {
     open: boolean;
     onClose: () => void;
     notes?: { id: string, title: string, content: string, label_id: string, createdate: string, updatedate: string }[];
-    onLabelUpdate?: (labels: { id: string, labelname: string, createDate: string }[]) => void;
 }
 
 // ナビゲーションバー左のラベル編集用ダイアログコンポーネント
