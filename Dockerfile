@@ -5,12 +5,12 @@ FROM node:22.14.0
 WORKDIR /app
 
 # backendの依存関係をインストール
-COPY ./src/backend/package*.json ./src/backend/
-RUN cd ./src/backend && npm install
+COPY ./packages/backend/package*.json ./packages/backend/
+RUN cd ./packages/backend && npm install
 
 # frontendの依存関係をインストール
-COPY ./src/frontend/package*.json ./src/frontend/
-RUN cd ./src/frontend && npm install
+COPY ./packages/frontend/package*.json ./packages/frontend/
+RUN cd ./packages/frontend && npm install
 
 # ソースコードをコピー
-COPY ./src ./src
+COPY ./packages ./packages

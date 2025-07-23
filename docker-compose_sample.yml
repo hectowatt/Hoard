@@ -18,9 +18,9 @@ services:
         ipv4_address: 192.168.1.100
     volumes:
       - ./:/app
-      - /app/src/backend/node_modules
-      - /app/src/frontend/node_modules
-    command: /bin/sh -c "cd /app/src/frontend && npm run build && npm run start & cd /app/src/backend && npm run start"
+      - /app/packages/backend/node_modules
+      - /app/packages/frontend/node_modules
+    command: /bin/sh -c "cd /app/packages/frontend && npm run build && npm run start & cd /app/packages/backend && npm run start"
 
   db:
     image: postgres:15
