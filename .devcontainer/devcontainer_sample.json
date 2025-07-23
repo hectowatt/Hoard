@@ -3,7 +3,7 @@
     "dockerComposeFile": "../docker-compose.yml",
     "service": "app",
     "workspaceFolder": "/app",
-    "postCreateCommand": "cd /app/src/frontend && npm install && cd /app/src/backend && npm install && npm run generate && npm run migrate",
+    "postCreateCommand": "cd /app/packages/frontend && npm install && cd /app/packages/backend && npm install && npm run generate && npm run migrate",
     "remoteEnv": {
         "DATABASE_URL": "postgres://hoard_user:hoard_password@db:5432/hoard_db"
     }
