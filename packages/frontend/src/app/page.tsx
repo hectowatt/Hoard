@@ -8,6 +8,7 @@ import { useLabelContext } from "@/context/LabelProvider";
 import { useNoteContext } from "@/context/NoteProvider";
 import { useTableNoteContext } from "@/context/TableNoteProvider";
 import TableNote from "@/components/TableNote";
+import { useSearchWordContext } from "@/context/SearchWordProvider";
 
 type Column = {
   id: number;
@@ -26,6 +27,10 @@ export default function Home() {
   const { notes, setNotes, fetchNotes } = useNoteContext();
   const { labels, fetchLabels } = useLabelContext();
   const { tableNotes, setTableNotes, fetchTableNotes } = useTableNoteContext();
+  const { searchWord } = useSearchWordContext();
+
+  const trimmedSearchWord = searchWord ? searchWord.trim().toLowerCase() : "";
+  const filterdNotes = searchWord ? notes.filter(note => note.title.toLowerCase().includes(trimmedSearchWord) || note.content.toLowerCase().includes(trimmedSearchWord)) : notes;
 
   useEffect(() => {
     fetchNotes();
@@ -139,7 +144,7 @@ export default function Home() {
       <InputForm onInsert={handleInsert} onInsertTableNote={handleInsertTableNote} />
       {/* ノートとテーブルノート一覧表示 */}
       <Grid container spacing={2}>
-        {notes.map((note, index) => (
+        {filterdNotes.map((note, index) => (
           <Grid key={index}>
             {/* Noteコンポーネントを生成 */}
             <Note {...note} onSave={handleSave} onDelete={handleDelete} />

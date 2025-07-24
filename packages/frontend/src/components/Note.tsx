@@ -3,8 +3,6 @@ import { Box, Paper, Typography, Dialog, DialogTitle, DialogContent, TextField, 
 import { useLabelContext } from "@/context/LabelProvider";
 import NoEncryptionGmailerrorredOutlinedIcon from '@mui/icons-material/NoEncryptionGmailerrorredOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import TableNote from "./TableNote";
-import { useNoteContext } from "@/context/NoteProvider";
 
 interface NoteProps {
     id: string;
