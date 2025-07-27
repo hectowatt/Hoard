@@ -43,5 +43,22 @@ describe("InputForm", () => {
         )
 
         expect(screen.getByPlaceholderText("ノートを入力...")).toBeVisible();
-    })
+    });
+
+    it("openがtrueのとき、タイトル入力フィールドが表示される", async () => {
+        render(
+            <NoteProvider>
+                <LabelProvider>
+                    <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
+                </LabelProvider>
+            </NoteProvider>
+        );
+
+        await act(async () => {
+            fireEvent.click(screen.getByPlaceholderText("ノートを入力..."));
+        });
+
+        const titleInput = await screen.findByPlaceholderText("タイトル");
+        expect(titleInput).toBeVisible();
+    });
 })
