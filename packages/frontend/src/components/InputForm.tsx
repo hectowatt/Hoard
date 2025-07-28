@@ -277,7 +277,7 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                         <IconButton
                             onClick={() => setIsLocked(!isLocked)}
                             sx={{ ml: 1 }}>
-                            {isLocked ? <LockOutlinedIcon /> : <NoEncryptionGmailerrorredOutlinedIcon />}
+                            {isLocked ? <LockOutlinedIcon data-testid="ロック" /> : <NoEncryptionGmailerrorredOutlinedIcon data-testid="アンロック" />}
                         </IconButton>
                         <IconButton
                             onClick={() => setTableNoteOpen(true)}

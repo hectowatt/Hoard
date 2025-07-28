@@ -61,4 +61,72 @@ describe("InputForm", () => {
         const titleInput = await screen.findByPlaceholderText("タイトル");
         expect(titleInput).toBeVisible();
     });
+
+    it("openがtrueのとき、保存ボタンが表示される", async () => {
+        render(
+            <NoteProvider>
+                <LabelProvider>
+                    <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
+                </LabelProvider>
+            </NoteProvider>
+        );
+
+        await act(async () => {
+            fireEvent.click(screen.getByPlaceholderText("ノートを入力..."));
+        });
+
+        const Input = await screen.getByText("保存");
+        expect(Input).toBeVisible();
+    });
+
+    it("openがtrueのとき、キャンセルボタンが表示される", async () => {
+        render(
+            <NoteProvider>
+                <LabelProvider>
+                    <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
+                </LabelProvider>
+            </NoteProvider>
+        );
+
+        await act(async () => {
+            fireEvent.click(screen.getByPlaceholderText("ノートを入力..."));
+        });
+
+        const Input = await screen.getByText("キャンセル");
+        expect(Input).toBeVisible();
+    });
+
+    it("openがtrueのとき、ラベルのドロップダウンが表示される", async () => {
+        render(
+            <NoteProvider>
+                <LabelProvider>
+                    <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
+                </LabelProvider>
+            </NoteProvider>
+        );
+
+        await act(async () => {
+            fireEvent.click(screen.getByPlaceholderText("ノートを入力..."));
+        });
+
+        const Input = await screen.getByLabelText("ラベル");
+        expect(Input).toBeVisible();
+    });
+
+    it("openがtrueのとき、ロックアイコンが表示される", async () => {
+        render(
+            <NoteProvider>
+                <LabelProvider>
+                    <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
+                </LabelProvider>
+            </NoteProvider>
+        );
+
+        await act(async () => {
+            fireEvent.click(screen.getByPlaceholderText("ノートを入力..."));
+        });
+
+        const Input = await screen.getByTestId("アンロック");
+        expect(Input).toBeInTheDocument();
+    });
 })
