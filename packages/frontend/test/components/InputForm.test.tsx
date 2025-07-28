@@ -1,9 +1,10 @@
 import React, { act } from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import InputForm from "../../src/components/InputForm";
 import { LabelProvider } from "@/context/LabelProvider";
 import { NoteProvider } from "@/context/NoteProvider";
+import { time } from "console";
 
 // ラベルコンテキストのモック
 const mockLabels = [
@@ -75,8 +76,8 @@ describe("InputForm", () => {
             fireEvent.click(screen.getByPlaceholderText("ノートを入力..."));
         });
 
-        const Input = await screen.getByText("保存");
-        expect(Input).toBeVisible();
+        const input = await screen.getByText("保存");
+        expect(input).toBeVisible();
     });
 
     it("openがtrueのとき、キャンセルボタンが表示される", async () => {
@@ -92,8 +93,8 @@ describe("InputForm", () => {
             fireEvent.click(screen.getByPlaceholderText("ノートを入力..."));
         });
 
-        const Input = await screen.getByText("キャンセル");
-        expect(Input).toBeVisible();
+        const input = await screen.getByText("キャンセル");
+        expect(input).toBeVisible();
     });
 
     it("openがtrueのとき、ラベルのドロップダウンが表示される", async () => {
@@ -109,8 +110,8 @@ describe("InputForm", () => {
             fireEvent.click(screen.getByPlaceholderText("ノートを入力..."));
         });
 
-        const Input = await screen.getByLabelText("ラベル");
-        expect(Input).toBeVisible();
+        const input = await screen.getByLabelText("ラベル");
+        expect(input).toBeVisible();
     });
 
     it("openがtrueのとき、ロックアイコンが表示される", async () => {
@@ -126,7 +127,142 @@ describe("InputForm", () => {
             fireEvent.click(screen.getByPlaceholderText("ノートを入力..."));
         });
 
-        const Input = await screen.getByTestId("アンロック");
-        expect(Input).toBeInTheDocument();
+        const input = await screen.getByTestId("unlock");
+        expect(input).toBeInTheDocument();
+    });
+
+    it("openがtrueのとき、テーブルノートアイコンが表示される", async () => {
+        render(
+            <NoteProvider>
+                <LabelProvider>
+                    <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
+                </LabelProvider>
+            </NoteProvider>
+        );
+
+        await act(async () => {
+            fireEvent.click(screen.getByPlaceholderText("ノートを入力..."));
+        });
+
+        const input = await screen.getByTestId("tablenote");
+        expect(input).toBeInTheDocument();
+    });
+
+    it("タイトルを入力できる", async () => {
+        render(
+            <NoteProvider>
+                <LabelProvider>
+                    <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
+                </LabelProvider>
+            </NoteProvider>
+        );
+        await act(async () => {
+            fireEvent.click(screen.getByPlaceholderText("ノートを入力..."));
+        });
+        const input = await screen.findByPlaceholderText("タイトル") as HTMLInputElement;
+
+        await act(async () => {
+            fireEvent.change(input, { target: { value: "新しいタイトル" } });
+        });
+
+        expect(input.value).toBe("新しいタイトル");
+    });
+
+    it("contentを入力できる", async () => {
+        render(
+            <NoteProvider>
+                <LabelProvider>
+                    <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
+                </LabelProvider>
+            </NoteProvider>
+        );
+        await act(async () => {
+            fireEvent.click(screen.getByPlaceholderText("ノートを入力..."));
+        });
+        const input = await screen.findByPlaceholderText("ノートを入力...") as HTMLInputElement;
+
+        await act(async () => {
+            fireEvent.change(input, { target: { value: "新しい内容" } });
+        });
+
+        expect(input.value).toBe("新しい内容");
+    });
+
+    it("ロックとアンロックを切り替えられる", async () => {
+        render(
+            <NoteProvider>
+                <LabelProvider>
+                    <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
+                </LabelProvider>
+            </NoteProvider>
+        );
+        await act(async () => {
+            fireEvent.click(screen.getByPlaceholderText("ノートを入力..."));
+        });
+        const unlockIcon = await screen.getByTestId("unlock");
+
+        await act(async () => {
+            fireEvent.click(unlockIcon);
+        });
+
+        const lockIcon = await screen.getByTestId("lock");
+
+        expect(lockIcon).toBeInTheDocument();
+    });
+
+    it("テーブルノート編集画面を開くことができる", async () => {
+        render(
+            <NoteProvider>
+                <LabelProvider>
+                    <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
+                </LabelProvider>
+            </NoteProvider>
+        );
+        await act(async () => {
+            fireEvent.click(screen.getByPlaceholderText("ノートを入力..."));
+        });
+        const tableNoteIcon = await screen.getByTestId("tablenote");
+
+        await act(async () => {
+            fireEvent.click(tableNoteIcon);
+        });
+
+        const column1 = await screen.getByDisplayValue("カラム1");
+
+        await waitFor(() => {
+            expect(column1).toBeVisible();
+        });
+
+    });
+
+    it("フォーカスが外れたときに縮小化される", async () => {
+        render(
+            <>
+                <NoteProvider>
+                    <LabelProvider>
+                        <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
+                    </LabelProvider>
+                </NoteProvider>
+                <input data-testid="dummy-input" placeholder="ダミー入力" />
+            </>
+        );
+
+        await act(async () => {
+            const noteInput = screen.getByPlaceholderText("ノートを入力...");
+            fireEvent.focus(noteInput);
+        });
+
+        await screen.findByPlaceholderText("タイトル");
+
+        // dummyにフォーカスを移す
+        const dummyInput = screen.getByTestId("dummy-input");
+        await act(async () => {
+            fireEvent.click(dummyInput);
+        });
+
+        // Collapse が閉じてタイトルが消えるのを確認
+        await waitFor(() => {
+            expect(screen.queryByPlaceholderText("タイトル")).not.toBeVisible();
+        });
     });
 })
