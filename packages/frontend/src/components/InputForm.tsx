@@ -251,8 +251,8 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                 />
                 <Collapse in={expanded}>
                     <Box sx={{ display: 'flex', justifyContent: 'flex-start', mt: 1 }}>
-                        <Button onClick={saveButtonClick} sx={{ color: "#696969" }}>保存</Button>
-                        <Button onClick={handleCollapse} sx={{ color: "#696969" }}>キャンセル</Button>
+                        <Button onClick={saveButtonClick} variant="contained" sx={{ mr: 1 }}>保存</Button>
+                        <Button onClick={handleCollapse} variant="contained">キャンセル</Button>
                         <FormControl size="small" sx={{ minWidth: 120, ml: 2 }}>
                             <InputLabel id="select-label">ラベル</InputLabel>
                             <Select
