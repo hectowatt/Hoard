@@ -358,7 +358,7 @@ export default function Note({
                             <>
                                 <Button onClick={handleSave} variant="contained" sx={{ mr: 1 }}>保存</Button>
                                 <Button onClick={() => setIsEditing(false)} variant="contained">キャンセル</Button>
-                                <FormControl size="small" sx={{ minWidth: 120, ml: 2 }}>
+                                <FormControl size="small" sx={{ minWidth: 120, ml: 2 }} data-testid="label-select">
                                     <InputLabel id="select-label">ラベル</InputLabel>
                                     <Select
                                         labelId="select-label"
