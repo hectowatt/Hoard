@@ -150,4 +150,69 @@ describe("Note", () => {
         expect(screen.getByTestId("label-select")).toHaveTextContent("プライベート");
     });
 
+    it("フォーカスが外れたときに縮小化される", async () => {
+        render(
+            <>
+                <NoteProvider>
+                    <LabelProvider>
+                        <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={"label1"} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
+                    </LabelProvider>
+                </NoteProvider>
+                <input data-testid="dummy-input" placeholder="ダミー入力" />
+            </>
+        );
+
+        await act(async () => {
+            fireEvent.click(screen.getByText("テストノートタイトル"));
+        });
+
+
+
+        // DialogのBackdropを取得してクリック
+        const backdrop = document.querySelector('.MuiBackdrop-root') as HTMLElement;
+        expect(backdrop).toBeTruthy();
+
+        fireEvent.mouseDown(backdrop);
+        fireEvent.click(backdrop);
+
+
+        await waitFor(() => {
+            expect(screen.queryByRole("dialog")).toBeNull();
+        });
+    });
+
+    it("ロックボタンをクリックするとロックされる", async () => {
+        render(
+            <NoteProvider>
+                <LabelProvider>
+                    <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
+                </LabelProvider>
+            </NoteProvider>
+        );
+
+        await act(async () => {
+            fireEvent.click(screen.getByText("テストノートタイトル"));
+        });
+
+        const lockIcon = screen.getByTestId("unlock");
+
+        global.fetch = jest.fn().mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({ password_id: "dummy" }),
+        }).mockResolvedValueOnce({
+            ok: true,
+            json: async () => ({}),
+        });
+
+        await act(async () => {
+            fireEvent.click(lockIcon);
+        });
+
+        await waitFor(() => {
+            const texts = screen.getAllByText("このノートはロックされています");
+            expect(texts.length).toBeGreaterThan(0);
+            expect(texts[0]).toBeVisible();
+        });
+    });
+
 });
