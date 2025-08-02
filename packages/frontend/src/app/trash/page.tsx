@@ -9,8 +9,8 @@ import TrashTableNote from "@/components/TrashTableNote";
 
 // 削除されたNoteを表示するページコンテンツ
 export default function Home() {
-  const [trashNotes, setTrashNotes] = useState<{ id: string, title: string; content: string; label_id: string, isLocked: boolean, createdate: string; updatedate: string }[]>([]);
-  const [trashTableNotes, setTrashTableNotes] = useState<{ id: string, title: string; label_id: string, isLocked: boolean, createdate: string; updatedate: string }[]>([]);
+  const [trashNotes, setTrashNotes] = useState<{ id: string, title: string; content: string; label_id: string, is_locked: boolean, createdate: string; updatedate: string }[]>([]);
+  const [trashTableNotes, setTrashTableNotes] = useState<{ id: string, title: string; label_id: string, is_locked: boolean, createdate: string; updatedate: string }[]>([]);
   const { labels, fetchLabels } = useLabelContext();
 
   // 画面描画時にDBからノートを全件取得して表示する
@@ -124,7 +124,7 @@ export default function Home() {
               title={note.title}
               content={note.content}
               label_id={note.label_id}
-              is_locked={note.isLocked}
+              is_locked={note.is_locked}
               createdate={note.createdate}
               updatedate={note.updatedate}
               onRestore={handleSave}
@@ -138,7 +138,7 @@ export default function Home() {
               id={tableNote.id}
               title={tableNote.title}
               label_id={tableNote.label_id}
-              is_locked={tableNote.isLocked}
+              is_locked={tableNote.is_locked}
               createdate={tableNote.createdate}
               updatedate={tableNote.updatedate}
               onRestore={handleSaveTableNote}
