@@ -215,4 +215,16 @@ describe("Note", () => {
         });
     });
 
+    it("ロックされているノートはロックされている旨がcontentに表示される", async () => {
+        render(
+            <NoteProvider>
+                <LabelProvider>
+                    <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={true} onSave={mockOnSave} onDelete={mockOnDelete} />
+                </LabelProvider>
+            </NoteProvider>
+        );
+
+        expect(screen.getByText("このノートはロックされています")).toBeVisible();
+    });
+
 });
