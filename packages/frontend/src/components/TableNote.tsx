@@ -103,7 +103,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
         setEditRowCells(editRowCells.map(row => row.filter((_, idx) => idx !== colIdx)));
     };
 
-    // セル編集
+    // 行編集
     const handleCellChange = (rowIdx: number, colIdx: number, value: string) => {
         const updatedRows: RowCell[][] = editRowCells.map((row, index) =>
             index === rowIdx ? row.map((cell, c) => (c === colIdx ? { ...cell, value } : cell)) : row
@@ -111,16 +111,24 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
         setEditRowCells(updatedRows);
     };
 
+    // 行削除
+    const handleDeleteRow = (rowIdx: number) => {
+        if (editRowCells.length <= 1) return;
+        setEditRowCells(editRowCells.filter((_, idx) => idx !== rowIdx));
+    };
+
     // 行追加
     // 既存のeditRowCellsに新しい行を追加する
     // 新しい行は、列の数分の新規セルを生成して追加する
     const handleAddRow = () => setEditRowCells([...editRowCells,
-    editColumns.map((col, idx) => ({
-        id: Date.now() + idx,
-        rowIndex: editRowCells.length,
-        value: "",
-        columnId: col.id
-    }))]);
+    editColumns.map((col, idx) => (
+        {
+            id: Date.now() + idx,
+            rowIndex: editRowCells.length,
+            value: "",
+            columnId: col.id
+        }
+    ))]);
 
 
     // ラベル名を取得する関数
@@ -408,13 +416,13 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                                                     sx={{ width: 200 }}
                                                 />
                                                 <IconButton size="small" onClick={() => handleDeleteColumn(idx)} disabled={editColumns.length <= 1}>
-                                                    <DeleteIcon fontSize="small" />
+                                                    <DeleteIcon fontSize="small" data-testid="deletecolumnicon" />
                                                 </IconButton>
                                             </TableCell>
                                         ))}
                                         <TableCell>
                                             <IconButton onClick={handleAddColumn} disabled={editColumns.length >= 5}>
-                                                <AddIcon />
+                                                <AddIcon data-testid="addColumnIcon" />
                                             </IconButton>
                                         </TableCell>
                                     </TableRow>
@@ -432,11 +440,21 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                                                     />
                                                 </TableCell>
                                             ))}
+                                            <TableCell>
+                                                <IconButton
+                                                    size="small"
+                                                    onClick={() => handleDeleteRow(rowIdx)}
+                                                    disabled={editRowCells.length <= 1}
+                                                    data-testid="deleterowicon"
+                                                >
+                                                    <DeleteIcon fontSize="small" />
+                                                </IconButton>
+                                            </TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>
                             </Table>
-                            <Button onClick={handleAddRow} sx={{ m: 2 }}><AddIcon /></Button>
+                            <Button onClick={handleAddRow} sx={{ m: 2 }}><AddIcon data-testid="addRowIcon" /></Button>
                         </TableContainer>
                     ) : (
                         <Typography variant="body1" sx={{ whiteSpace: "pre-line", mb: 2 }}>
@@ -461,7 +479,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                             <>
                                 <Button onClick={handleSaveTableNote} variant="contained" sx={{ mr: 1 }}>保存</Button>
                                 <Button onClick={() => setIsEditing(false)} variant="contained">キャンセル</Button>
-                                <FormControl size="small" sx={{ minWidth: 120, ml: 2 }}>
+                                <FormControl size="small" sx={{ minWidth: 120, ml: 2 }} data-testid="label-select">
                                     <InputLabel id="select-label">ラベル</InputLabel>
                                     <Select
                                         labelId="select-label"
@@ -492,7 +510,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                                 <IconButton
                                     onClick={handleLock}
                                     sx={{ ml: 1, color: isLocked ? "primary.main" : "text.secondary" }}>
-                                    {isLocked ? <LockOutlinedIcon /> : <NoEncryptionGmailerrorredOutlinedIcon />}
+                                    {isLocked ? <LockOutlinedIcon data-testid="lock" /> : <NoEncryptionGmailerrorredOutlinedIcon data-testid="unlock" />}
                                 </IconButton>
 
                             </>
@@ -503,7 +521,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                                 <IconButton
                                     onClick={handleLock}
                                     sx={{ ml: 1, color: isLocked ? "primary.main" : "text.secondary" }}>
-                                    {isLocked ? <LockOutlinedIcon /> : <NoEncryptionGmailerrorredOutlinedIcon />}
+                                    {isLocked ? <LockOutlinedIcon data-testid="lock" /> : <NoEncryptionGmailerrorredOutlinedIcon data-testid="unlock" />}
                                 </IconButton>
                             </>
                         )}
