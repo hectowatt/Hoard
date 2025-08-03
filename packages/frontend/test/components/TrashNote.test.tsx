@@ -28,6 +28,19 @@ const mockNote = {
     onDelete: jest.fn(),
 };
 
+// ロックされた削除済みノートのモック
+const mockLockedNote = {
+    id: "1",
+    title: "テストノート",
+    content: "これはテストノートです。",
+    label_id: "label1",
+    is_locked: true,
+    createdate: "2024-07-01T12:00:00Z",
+    updatedate: "2024-07-02T12:00:00Z",
+    onRestore: jest.fn(),
+    onDelete: jest.fn(),
+};
+
 // ラベルコンテキストのモック
 const mockLabels = [
     { id: "label1", labelname: "仕事" },
@@ -85,5 +98,17 @@ describe("TrashNote", () => {
         });
         expect(screen.getByText("復元")).toBeVisible();
         expect(screen.getByText("完全に削除")).toBeVisible();
+    });
+
+    it("ロックされているノートはロックされている旨がcontentに表示される", async () => {
+        render(
+            <NoteProvider>
+                <LabelProvider>
+                    <TrashNote {...mockLockedNote} />
+                </LabelProvider>
+            </NoteProvider>
+        );
+
+        expect(screen.getByText("このノートはロックされています")).toBeVisible();
     });
 });
