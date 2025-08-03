@@ -3,7 +3,7 @@ import { Box, Paper, Typography, Dialog, DialogTitle, DialogContent, TextField, 
 import { useLabelContext } from "@/context/LabelProvider";
 import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
 
-interface trashNoteProps {
+interface trashTableNoteProps {
     id: string;
     title: string;
     label_id: string;
@@ -27,7 +27,7 @@ const formatDate = (exString: string) => {
 }
 
 // 削除ページに並ぶトラッシュテーブルノートコンポーネント
-export default function TrashTableNote({ id, title, label_id, is_locked, createdate, updatedate, onRestore, onDelete }: trashNoteProps) {
+export default function TrashTableNote({ id, title, label_id, is_locked, createdate, updatedate, onRestore, onDelete }: trashTableNoteProps) {
 
     const [open, setOpen] = React.useState(false);
     const [editTitle, setEditTitle] = React.useState(title);
