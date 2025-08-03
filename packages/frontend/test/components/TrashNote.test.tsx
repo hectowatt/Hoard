@@ -83,9 +83,10 @@ describe("TrashNote", () => {
         expect(screen.getByRole("dialog")).toBeVisible();
         expect(screen.getByText("復元")).toBeVisible();
         expect(screen.getByText("完全に削除")).toBeVisible();
+        expect(screen.getByText("キャンセル")).toBeVisible();
     });
 
-    it("復元ボタン・削除ボタンが押せる", async () => {
+    it("復元ボタン・削除ボタンが表示される", async () => {
         render(
             <NoteProvider>
                 <LabelProvider>
