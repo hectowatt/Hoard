@@ -4,7 +4,6 @@ import "@testing-library/jest-dom";
 import InputForm from "../../src/components/InputForm";
 import { LabelProvider } from "@/context/LabelProvider";
 import { NoteProvider } from "@/context/NoteProvider";
-import { time } from "console";
 
 // ラベルコンテキストのモック
 const mockLabels = [

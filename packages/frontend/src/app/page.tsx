@@ -147,13 +147,13 @@ export default function Home() {
         {filterdNotes.map((note, index) => (
           <Grid key={index}>
             {/* Noteコンポーネントを生成 */}
-            <Note {...note} onSave={handleSave} onDelete={handleDelete} />
+            <Note {...note} onSave={handleSave} onDelete={handleDelete} data-testid="note" />
           </Grid>
         ))}
         {tableNotes.map((tableNote, index) => (
           <Grid key={index}>
             {/* TableNoteコンポーネントを生成 */}
-            <TableNote {...tableNote} onSave={handleSaveTableNote} onDelete={handleDeleteTableNote} />
+            <TableNote {...tableNote} onSave={handleSaveTableNote} onDelete={handleDeleteTableNote} data-testid="tablenote" />
           </Grid>
         ))}
 
