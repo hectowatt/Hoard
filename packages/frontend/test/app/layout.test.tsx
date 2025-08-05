@@ -37,7 +37,7 @@ describe("RootLayout", () => {
         expect(screen.getByText("Child Content")).toBeInTheDocument();
     });
 
-    it("toggles color mode", () => {
+    it("カラーテーマ切り替え", () => {
         render(
             <RootLayout>
                 <div>Toggle Test</div>
