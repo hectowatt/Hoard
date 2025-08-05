@@ -98,8 +98,9 @@ export default function Home() {
             width: "500px",
             borderRadius: "5px"
           }}
+          data-testid="passwordinput"
         />
-        <Button onClick={handleSavePassword} variant="contained" sx={{ ml: 2 }}>保存</Button>
+        <Button onClick={handleSavePassword} variant="contained" sx={{ ml: 2 }} data-testid="save">保存</Button>
       </form>
 
       {/* TODO: テーマ選択のUIをここに追加 */}
