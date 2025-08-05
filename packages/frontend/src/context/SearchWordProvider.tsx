@@ -16,7 +16,6 @@ export function useSearchWordContext() {
 
 export const SearchWordProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [searchWord, setSearchWord] = React.useState<string>("");
-    console.log("SearchWordProvider initialized:", { searchWord, setSearchWord });
 
     return (
         <SearchWordContext.Provider value={{ searchWord, setSearchWord }}>
