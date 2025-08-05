@@ -115,7 +115,7 @@ export default function Home() {
 
   return (
     <Container>
-      <p>ゴミ箱内のノートは７日後に削除されます</p>
+      <p data-testid="description">ゴミ箱内のノートは７日後に削除されます</p>
       <Grid container spacing={2}>
         {trashNotes.map(note => (
           <Grid key={note.id}>
@@ -129,6 +129,7 @@ export default function Home() {
               updatedate={note.updatedate}
               onRestore={handleSave}
               onDelete={handleDelete}
+              data-testid="trashnote"
             />
           </Grid>
         ))}
@@ -143,6 +144,7 @@ export default function Home() {
               updatedate={tableNote.updatedate}
               onRestore={handleSaveTableNote}
               onDelete={handleDeleteTableNote}
+              data-testid="trashtablenote"
             />
           </Grid>
         ))}

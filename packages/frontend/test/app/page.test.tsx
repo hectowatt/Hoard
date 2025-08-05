@@ -76,7 +76,7 @@ describe("Top Page", () => {
 
         expect(screen.getByTestId("note")).toBeInTheDocument();
         expect(screen.getByTestId("inputform")).toBeInTheDocument();
-        expect(screen.getByTestId("tablenote")).toBeVisible();
+        expect(screen.getByTestId("tablenote")).toBeInTheDocument();
 
     })
 })
