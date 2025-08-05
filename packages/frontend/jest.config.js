@@ -9,6 +9,7 @@ export default {
     }]
   },
   moduleNameMapper: {
+    "^next/font/google$": "<rootDir>/__mocks__/next/font/google.ts",
     "^@/(.*)$": "<rootDir>/src/$1"
   }
 };
