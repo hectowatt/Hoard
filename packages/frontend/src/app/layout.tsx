@@ -158,6 +158,7 @@ export default function RootLayout({
 														sx={{ position: "fixed", top: 16, right: 16, zIndex: 2000 }}
 														onClick={toggleColorMode}
 														color="inherit"
+														data-testid="togglecolormode"
 													>
 														{mode === "dark" ? <Brightness2OutlinedIcon /> : <LightModeOutlinedIcon />}
 													</IconButton>
