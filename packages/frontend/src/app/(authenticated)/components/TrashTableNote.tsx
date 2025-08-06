@@ -1,16 +1,16 @@
 import React, { useEffect } from "react";
-import { Box, Paper, Typography, Dialog, DialogTitle, DialogContent, TextField, Button, FormControl, Select, MenuItem, InputLabel } from "../../node_modules/@mui/material";
-import { useLabelContext } from "@/context/LabelProvider";
+import { Box, Paper, Typography, Dialog, DialogTitle, DialogContent, TextField, Button, FormControl, Select, MenuItem, InputLabel } from "@mui/material";
+import { useLabelContext } from "@/app/(authenticated)/context/LabelProvider";
+import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
 
-interface trashNoteProps {
+interface trashTableNoteProps {
     id: string;
     title: string;
-    content: string;
     label_id: string;
     is_locked: boolean;
     createdate: string;
     updatedate: string;
-    onRestore?: (id: string, newTitle: string, newContent: string, newLabel: string, newUpdateDate: string) => void;
+    onRestore?: (id: string, newTitle: string, newLabel: string, newUpdateDate: string) => void;
     onDelete?: (id: string) => void;
 }
 
@@ -26,22 +26,19 @@ const formatDate = (exString: string) => {
     return `${year}/${month}/${day}`;
 }
 
-// 削除ページに並ぶトラッシュノートコンポーネント
-export default function TrashNote({ id, title, content, label_id, is_locked, createdate, updatedate, onRestore, onDelete }: trashNoteProps) {
+// 削除ページに並ぶトラッシュテーブルノートコンポーネント
+export default function TrashTableNote({ id, title, label_id, is_locked, createdate, updatedate, onRestore, onDelete }: trashTableNoteProps) {
 
     const [open, setOpen] = React.useState(false);
     const [editTitle, setEditTitle] = React.useState(title);
-    const [editContent, setEditContent] = React.useState(content);
     const [isEditing, setIsEditing] = React.useState(false);
     const [updateDateAfterSaving, setUpdateDateAfterSaving] = React.useState(updatedate);
     const [editLabel, setEditLabel] = React.useState(label_id ?? "");
-    const [isLocked, setIsLocked] = React.useState(false);
 
     const { labels } = useLabelContext();
 
     const handleOpen = () => {
         setEditTitle(title);
-        setEditContent(content);
         setOpen(true);
         setIsEditing(false);
     };
@@ -49,17 +46,23 @@ export default function TrashNote({ id, title, content, label_id, is_locked, cre
     // フォーカスが外れた時の処理
     const handleClose = () => setOpen(false);
 
+    // キャンセルボタン押下時
+    const handleCancel = () => {
+        setIsEditing(false);
+        setOpen(false);
+    };
+
     // 削除ボタン押下処理
     const handleDelete = async () => {
         try {
-            const response = await fetch(`http://localhost/api/notes/trash/${id}`, {
+            const response = await fetch(`http://localhost/api/tablenotes/trash/${id}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
                 },
             });
             if (!response.ok) {
-                throw new Error("Failed to delete note");
+                throw new Error("Failed to delete tableNote");
             }
             const result = await response.json();
             console.log("Delete success!", result);
@@ -78,7 +81,7 @@ export default function TrashNote({ id, title, content, label_id, is_locked, cre
     // 復元ボタン押下処理
     const handleSave = async () => {
         try {
-            const response = await fetch("/api/notes/trash", {
+            const response = await fetch("/api/tablenotes/trash", {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -96,7 +99,7 @@ export default function TrashNote({ id, title, content, label_id, is_locked, cre
             console.log("Restore success!", result);
 
             if (typeof onRestore === "function") {
-                onRestore(id, editTitle, editContent, editLabel, result.note.updatedate);
+                onRestore(id, editTitle, editLabel, result.note.updatedate);
             }
         } catch (error) {
             console.error("Error saving note", error);
@@ -104,7 +107,6 @@ export default function TrashNote({ id, title, content, label_id, is_locked, cre
         }
         setIsEditing(false);
         setEditTitle(editTitle);
-        setEditContent(editContent);
         setUpdateDateAfterSaving(new Date().toISOString());
         setOpen(false);
     };
@@ -123,7 +125,7 @@ export default function TrashNote({ id, title, content, label_id, is_locked, cre
                     {title}
                 </Typography>
                 <Typography variant="body1" sx={{ mb: 1, whiteSpace: "pre-line" }}>
-                    {is_locked ? "このノートはロックされています" : content}
+                    {is_locked ? "このノートはロックされています" : <TableChartOutlinedIcon />}
                 </Typography>
                 <Typography variant="caption" color="textSecondary" sx={{ display: "block" }}>
                     作成日: {formatDate(createdate)}
@@ -145,7 +147,7 @@ export default function TrashNote({ id, title, content, label_id, is_locked, cre
                 </DialogTitle>
                 <DialogContent>
                     <Typography variant="body1" sx={{ mb: 1, whiteSpace: "pre-line" }}>
-                        {is_locked ? "このノートはロックされています" : content}
+                        {is_locked ? "このノートはロックされています" : <TableChartOutlinedIcon />}
                     </Typography>
                     <Typography variant="caption" color="textSecondary" sx={{ display: "block" }}>
                         作成日: {formatDate(createdate)}
@@ -162,7 +164,7 @@ export default function TrashNote({ id, title, content, label_id, is_locked, cre
                         <>
                             <Button onClick={handleSave} variant="contained" sx={{ mr: 1 }}>復元</Button>
                             <Button onClick={handleDelete} variant="contained" sx={{ mr: 1 }}>完全に削除</Button>
-                            <Button onClick={() => setIsEditing(false)} variant="contained">キャンセル</Button>
+                            <Button onClick={handleCancel} variant="contained">キャンセル</Button>
                         </>
                     </Box>
                 </DialogContent>

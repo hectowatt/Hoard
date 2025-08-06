@@ -1,9 +1,9 @@
 import React, { act } from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import '@testing-library/jest-dom';
-import TrashNote from "../../src/components/TrashNote";
-import { LabelProvider } from "@/context/LabelProvider";
-import { NoteProvider } from "@/context/NoteProvider";
+import TrashNote from "../../src/app/(authenticated)/components/TrashNote";
+import { LabelProvider } from "@/app/(authenticated)/context/LabelProvider";
+import { NoteProvider } from "@/app/(authenticated)/context/NoteProvider";
 
 jest.mock("@/context/LabelProvider", () => {
     return {

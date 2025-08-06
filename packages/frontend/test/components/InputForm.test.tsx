@@ -1,9 +1,9 @@
 import React, { act } from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import InputForm from "../../src/components/InputForm";
-import { LabelProvider } from "@/context/LabelProvider";
-import { NoteProvider } from "@/context/NoteProvider";
+import InputForm from "../../src/app/(authenticated)/components/InputForm";
+import { LabelProvider } from "@/app/(authenticated)/context/LabelProvider";
+import { NoteProvider } from "@/app/(authenticated)/context/NoteProvider";
 
 // ラベルコンテキストのモック
 const mockLabels = [

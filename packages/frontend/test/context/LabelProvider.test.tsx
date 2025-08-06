@@ -1,7 +1,7 @@
 // LabelProvider.test.tsx
 import React from "react";
 import { render, waitFor, screen } from "@testing-library/react";
-import { LabelProvider, useLabelContext } from "@/context/LabelProvider";
+import { LabelProvider, useLabelContext } from "@/app/(authenticated)/context/LabelProvider";
 import "@testing-library/jest-dom";
 
 const mockLabels = [

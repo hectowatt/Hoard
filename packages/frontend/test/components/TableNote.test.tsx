@@ -1,7 +1,7 @@
 import React, { act } from "react";
 import { render, screen, fireEvent, within, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import Note from "../../src/components/Note";
+import Note from "../../src/app/(authenticated)/components/Note";
 // ラベルコンテキストのモック
 const mockLabels = [
     { id: "label1", labelname: "仕事" },
@@ -34,9 +34,9 @@ jest.mock("@/context/LabelProvider", () => {
     };
 });
 
-import { LabelProvider } from "@/context/LabelProvider";
-import { NoteProvider } from "@/context/NoteProvider";
-import TableNote from "@/components/TableNote";
+import { LabelProvider } from "@/app/(authenticated)/context/LabelProvider";
+import { NoteProvider } from "@/app/(authenticated)/context/NoteProvider";
+import TableNote from "@/app/(authenticated)/components/TableNote";
 
 
 describe("TableNote", () => {

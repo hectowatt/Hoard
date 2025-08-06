@@ -18,10 +18,10 @@ jest.mock("@/context/LabelProvider", () => {
     };
 });
 
-import { LabelProvider } from "@/context/LabelProvider";
-import { NoteProvider } from "@/context/NoteProvider";
-import TableNote from "@/components/TableNote";
-import TrashTableNote from "@/components/TrashTableNote";
+import { LabelProvider } from "@/app/(authenticated)/context/LabelProvider";
+import { NoteProvider } from "@/app/(authenticated)/context/NoteProvider";
+import TableNote from "@/app/(authenticated)/components/TableNote";
+import TrashTableNote from "@/app/(authenticated)/components/TrashTableNote";
 
 
 describe("TrashTableNote", () => {

@@ -1,7 +1,7 @@
 // NoteProvider.test.tsx
 import React from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { SearchWordProvider, useSearchWordContext } from "@/context/SearchWordProvider";
+import { SearchWordProvider, useSearchWordContext } from "@/app/(authenticated)/context/SearchWordProvider";
 import "@testing-library/jest-dom";
 
 const ConsumerComponent = () => {

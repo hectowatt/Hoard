@@ -14,7 +14,7 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
-import { useLabelContext } from "@/context/LabelProvider";
+import { useLabelContext } from "@/app/(authenticated)/context/LabelProvider";
 import NoEncryptionGmailerrorredOutlinedIcon from '@mui/icons-material/NoEncryptionGmailerrorredOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 

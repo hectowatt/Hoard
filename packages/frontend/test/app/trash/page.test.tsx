@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
-import Home from "../../../src/app/trash/page";
+import Home from "../../../src/app/(authenticated)/trash/page";
 import "@testing-library/jest-dom";
 
 // モック：TrashNote, TrashTableNote
