@@ -1,6 +1,6 @@
 "use client";
 
-import { useSearchWordContext } from "@/context/SearchWordProvider";
+import { useSearchWordContext } from "@/app/(authenticated)/context/SearchWordProvider";
 import { IconButton, InputAdornment, TextField } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 

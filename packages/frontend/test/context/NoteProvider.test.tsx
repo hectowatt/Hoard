@@ -1,7 +1,7 @@
 // NoteProvider.test.tsx
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
-import { NoteProvider, useNoteContext } from "@/context/NoteProvider";
+import { NoteProvider, useNoteContext } from "@/app/(authenticated)/context/NoteProvider";
 import "@testing-library/jest-dom";
 
 // モックデータ

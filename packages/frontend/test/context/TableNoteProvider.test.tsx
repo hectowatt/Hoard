@@ -1,7 +1,7 @@
 // NoteProvider.test.tsx
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
-import { TableNoteProvider, useTableNoteContext } from "@/context/TableNoteProvider"; // パスを調整してください
+import { TableNoteProvider, useTableNoteContext } from "@/app/(authenticated)/context/TableNoteProvider"; // パスを調整してください
 import "@testing-library/jest-dom";
 
 type Column = {

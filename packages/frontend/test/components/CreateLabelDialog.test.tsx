@@ -1,9 +1,9 @@
 import React, { act } from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import CreateLabelDialog from "../../src/components/CreateLabelDialog";
-import { LabelProvider } from "@/context/LabelProvider";
-import { NoteProvider } from "@/context/NoteProvider";
+import CreateLabelDialog from "../../src/app/(authenticated)/components/CreateLabelDialog";
+import { LabelProvider } from "@/app/(authenticated)/context/LabelProvider";
+import { NoteProvider } from "@/app/(authenticated)/context/NoteProvider";
 
 // ラベルコンテキストのモック
 const mockLabels = [

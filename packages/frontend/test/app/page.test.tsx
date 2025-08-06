@@ -1,9 +1,9 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { NoteProvider } from "@/context/NoteProvider";
-import { LabelProvider } from "@/context/LabelProvider";
-import Home from "../../src/app/page";
+import { NoteProvider } from "@/app/(authenticated)/context/NoteProvider";
+import { LabelProvider } from "@/app/(authenticated)/context/LabelProvider";
+import Home from "../../src/app/(authenticated)/page";
 
 // ラベルコンテキストのモック
 const mockLabels = [

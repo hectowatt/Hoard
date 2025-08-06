@@ -1,14 +1,15 @@
 "use client";
 
-import InputForm from "../components/InputForm";
-import Note from "@/components/Note";
+import InputForm from "./components/InputForm";
+import Note from "@/app/(authenticated)/components/Note";
 import React, { use, useEffect, useState } from "react";
 import { Container, Grid } from "@mui/material";
-import { useLabelContext } from "@/context/LabelProvider";
-import { useNoteContext } from "@/context/NoteProvider";
-import { useTableNoteContext } from "@/context/TableNoteProvider";
-import TableNote from "@/components/TableNote";
-import { useSearchWordContext } from "@/context/SearchWordProvider";
+import { useLabelContext } from "@/app/(authenticated)/context/LabelProvider";
+import { useNoteContext } from "@/app/(authenticated)/context/NoteProvider";
+import { useTableNoteContext } from "@/app/(authenticated)/context/TableNoteProvider";
+import TableNote from "@/app/(authenticated)/components/TableNote";
+import { useSearchWordContext } from "@/app/(authenticated)/context/SearchWordProvider";
+import { redirect } from "next/navigation";
 
 type Column = {
   id: number;
@@ -40,6 +41,10 @@ export default function Home() {
     fetchTableNotes();
   }, []);
 
+  // 未ログインの場合はログインページにリダイレクト
+  if (!notes) {
+    redirect("/login");
+  }
 
   // ノート初期登録時のコールバック関数
   const handleInsert = (newId: string, newTitle: string, newContent: string, LabelId: string, is_locked: boolean) => {

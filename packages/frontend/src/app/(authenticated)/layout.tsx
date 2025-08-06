@@ -28,14 +28,14 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import IconButton from "@mui/material/IconButton";
 import { createTheme } from "@mui/material/styles";
 import { ThemeProvider } from "@mui/material/styles";
-import CreateLabelDialog from "@/components/CreateLabelDialog";
-import { LabelProvider } from "../context/LabelProvider";
-import { NoteProvider } from "@/context/NoteProvider";
-import { TableNoteProvider } from "@/context/TableNoteProvider";
+import CreateLabelDialog from "@/app/(authenticated)/components/CreateLabelDialog";
+import { LabelProvider } from "./context/LabelProvider";
+import { NoteProvider } from "@/app/(authenticated)/context/NoteProvider";
+import { TableNoteProvider } from "@/app/(authenticated)/context/TableNoteProvider";
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import Brightness2OutlinedIcon from '@mui/icons-material/Brightness2Outlined';
-import { SearchWordProvider, useSearchWordContext } from "@/context/SearchWordProvider";
-import SearchWordBar from "@/components/SearchWordBar";
+import { SearchWordProvider, useSearchWordContext } from "@/app/(authenticated)/context/SearchWordProvider";
+import SearchWordBar from "@/app/(authenticated)/components/SearchWordBar";
 
 const inter = Inter({ subsets: ["latin"] });
 

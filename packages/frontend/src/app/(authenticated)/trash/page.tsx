@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import { Container, Grid } from "@mui/material";
-import { useLabelContext } from "@/context/LabelProvider";
-import TrashNote from "@/components/TrashNote";
-import TrashTableNote from "@/components/TrashTableNote";
+import { useLabelContext } from "@/app/(authenticated)/context/LabelProvider";
+import TrashNote from "@/app/(authenticated)/components/TrashNote";
+import TrashTableNote from "@/app/(authenticated)/components/TrashTableNote";
 
 
 // 削除されたNoteを表示するページコンテンツ

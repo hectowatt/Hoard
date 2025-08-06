@@ -1,6 +1,6 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import RootLayout from "../../src/app/layout";
+import RootLayout from "../../src/app/(authenticated)/layout";
 import "@testing-library/jest-dom";
 
 // fetch モック
