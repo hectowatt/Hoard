@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class InitialSchema1751777758120 implements MigrationInterface {
-    name = 'InitialSchema1751777758120'
+export class InitialSchema1754741455771 implements MigrationInterface {
+    name = 'InitialSchema1754741455771'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
@@ -45,7 +45,7 @@ export class InitialSchema1751777758120 implements MigrationInterface {
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
                 "name" text NOT NULL,
                 "order" integer NOT NULL DEFAULT '0',
-                "noteId" uuid,
+                "tableNoteId" uuid,
                 CONSTRAINT "PK_72237b0712452e76e396d8e6c2c" PRIMARY KEY ("id")
             )
         `);
@@ -54,7 +54,7 @@ export class InitialSchema1751777758120 implements MigrationInterface {
                 "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
                 "row_index" integer NOT NULL,
                 "value" text NOT NULL,
-                "noteId" uuid,
+                "tableNoteId" uuid,
                 "columnId" uuid,
                 CONSTRAINT "PK_ec2465dc634f22cd9f25397a89a" PRIMARY KEY ("id")
             )
@@ -64,6 +64,17 @@ export class InitialSchema1751777758120 implements MigrationInterface {
                 "password_id" uuid NOT NULL DEFAULT uuid_generate_v4(),
                 "password_hashed" text NOT NULL,
                 CONSTRAINT "PK_ae3c9ececc9e15d40199ba93578" PRIMARY KEY ("password_id")
+            )
+        `);
+        await queryRunner.query(`
+            CREATE TABLE "user" (
+                "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+                "username" text NOT NULL,
+                "password" text NOT NULL,
+                "createdate" TIMESTAMP NOT NULL DEFAULT now(),
+                "updatedate" TIMESTAMP NOT NULL DEFAULT now(),
+                CONSTRAINT "UQ_78a916df40e02a9deb1c4b75edb" UNIQUE ("username"),
+                CONSTRAINT "PK_cace4a159ff9f2512dd42373760" PRIMARY KEY ("id")
             )
         `);
         await queryRunner.query(`
@@ -78,11 +89,11 @@ export class InitialSchema1751777758120 implements MigrationInterface {
         `);
         await queryRunner.query(`
             ALTER TABLE "table_note_column"
-            ADD CONSTRAINT "FK_ca013f6d9f8582095102873ee87" FOREIGN KEY ("noteId") REFERENCES "table_note"("id") ON DELETE CASCADE ON UPDATE NO ACTION
+            ADD CONSTRAINT "FK_37c7563317669eec23c737eecc9" FOREIGN KEY ("tableNoteId") REFERENCES "table_note"("id") ON DELETE CASCADE ON UPDATE NO ACTION
         `);
         await queryRunner.query(`
             ALTER TABLE "table_note_cell"
-            ADD CONSTRAINT "FK_1ee5456a281ded3a883b1af2a7b" FOREIGN KEY ("noteId") REFERENCES "table_note"("id") ON DELETE CASCADE ON UPDATE NO ACTION
+            ADD CONSTRAINT "FK_ca83547a76c08f413d498b5fbd2" FOREIGN KEY ("tableNoteId") REFERENCES "table_note"("id") ON DELETE CASCADE ON UPDATE NO ACTION
         `);
         await queryRunner.query(`
             ALTER TABLE "table_note_cell"
@@ -95,16 +106,19 @@ export class InitialSchema1751777758120 implements MigrationInterface {
             ALTER TABLE "table_note_cell" DROP CONSTRAINT "FK_e1363aa24c35f1d60968eae9360"
         `);
         await queryRunner.query(`
-            ALTER TABLE "table_note_cell" DROP CONSTRAINT "FK_1ee5456a281ded3a883b1af2a7b"
+            ALTER TABLE "table_note_cell" DROP CONSTRAINT "FK_ca83547a76c08f413d498b5fbd2"
         `);
         await queryRunner.query(`
-            ALTER TABLE "table_note_column" DROP CONSTRAINT "FK_ca013f6d9f8582095102873ee87"
+            ALTER TABLE "table_note_column" DROP CONSTRAINT "FK_37c7563317669eec23c737eecc9"
         `);
         await queryRunner.query(`
             ALTER TABLE "table_note" DROP CONSTRAINT "FK_3b3a77dac446c76e219da7969b3"
         `);
         await queryRunner.query(`
             ALTER TABLE "note" DROP CONSTRAINT "FK_c0f7461fdc1dd48bb8cca0ba6de"
+        `);
+        await queryRunner.query(`
+            DROP TABLE "user"
         `);
         await queryRunner.query(`
             DROP TABLE "password"
