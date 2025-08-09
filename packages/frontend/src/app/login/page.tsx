@@ -13,8 +13,27 @@ export default function LoginPage() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
         console.log("ログイン:", { username, password });
+        const response = await fetch("/api/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+                username: username,
+                password: password
+            })
+        })
+
+        if (response.ok) {
+            console.log("ログイン成功");
+        } else {
+            const errorData = await response.json();
+            console.error("ログイン失敗:", errorData.message);
+            alert("ログインに失敗しました: " + errorData.message);
+        }
     };
 
     return (
