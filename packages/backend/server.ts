@@ -4,6 +4,8 @@ import cors from 'cors';
 import { WebSocketServer } from 'ws';
 import pg from 'pg';
 import { AppDataSource } from './DataSource.js';
+import loginRoutets from './routes/LoginRoutes.js';
+import userRoutes from './routes/UserRoutes.js';
 import noteRoutes from './routes/NoteRoutes.js';
 import labelRoutes from './routes/LabelRoutes.js';
 import passwordRoutes from './routes/PasswordRoutes.js';
@@ -61,6 +63,8 @@ app.get('/', (req, res) => {
   res.send('WebSocket Server is running');
 });
 
+app.use('/api/login', loginRoutets);
+app.use('/api/user', userRoutes);
 app.use('/api/notes', noteRoutes);
 app.use('/api/labels', labelRoutes);
 app.use('/api/password', passwordRoutes);
