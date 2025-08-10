@@ -31,7 +31,6 @@ export default function LoginPage() {
             console.log("ログイン成功");
         } else {
             const errorData = await response.json();
-            console.error("ログイン失敗:", errorData.message);
             alert("ログインに失敗しました: " + errorData.message);
         }
     };
