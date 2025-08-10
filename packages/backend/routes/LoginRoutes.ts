@@ -2,14 +2,19 @@ import { Router } from 'express';
 import { AppDataSource } from '../DataSource.js';
 import  jwt  from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
+import 'dotenv/config';
 
 const router = Router();
-const SECRET = "my_jwt_secret_key";
+const SECRET = process.env.SECRET || 'hoard_secret';
 
 router.post('/', async (req, res) => {
     const {username, password} = req.body;
     try{
-        if(username === "admin" && password === "password"){
+        const userRepository = AppDataSource.getRepository('User');
+        const user = await userRepository.findOne({ where: { username } });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
             // トークンの作成
             const token = jwt.sign({username}, SECRET, { expiresIn: '1d' });
             res.cookie("token", token, {
@@ -19,8 +24,7 @@ router.post('/', async (req, res) => {
                 maxAge: 24*60*60*1000 // 1day
             });
         return res.json({success: true})
-        }
-        res.status(401).json({message: "Invalid credentials"});
+        
     }catch(error){
         console.error("Error during login:", error);
         res.status(500).json({ error: "Login failed" });

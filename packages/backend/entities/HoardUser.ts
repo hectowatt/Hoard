@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from "typeorm";
 
-@Entity({ name: "user" })
+@Entity({ name: "hoard_user" })
 export default class User {
 
     @PrimaryGeneratedColumn("uuid")
