@@ -9,7 +9,6 @@ const SearchWordContext = createContext<searchWordType | undefined>(undefined);
 
 export function useSearchWordContext() {
     const ctx = useContext(SearchWordContext);
-    console.log("useSearchWordContext called, ctx:", ctx);
     if (!ctx) throw new Error("SearchWordContext must be used within SearchWordProvider");
     return ctx;
 }

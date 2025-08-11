@@ -1,0 +1,46 @@
+import { Router } from 'express';
+import { AppDataSource } from '../DataSource.js';
+
+import HoardUser from '../entities/HoardUser.js';
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+
+
+const router = Router();
+const SECRET = process.env.SECRET || 'hoard_secret';
+
+function authenticateToken(req, res, next) {
+    const token = req.cookies.token;
+    if (!token) return res.sendStatus(401); // Unauthorized
+    jwt.verify(token, SECRET, (err, user) => {
+        if (err) return res.sendStatus(403); // Forbidden
+        req.userId = user.id;
+        next();
+    });
+};
+
+// 【SELECT】User取得API
+router.get('/', async (req, res) => {
+    const userRepository = AppDataSource.getRepository('HoardUser');
+    const users = await userRepository.find();
+    res.status(200).json(users);
+});
+
+// 【INSERT】User登録API
+router.post('/', async (req, res) => {
+    const { username, password } = req.body;
+    const userRepository = AppDataSource.getRepository(HoardUser);
+    const password_hashed = await bcrypt.hash(password, 10);
+    const newUser = userRepository.create({
+        username: username,
+        password: password_hashed,
+        createdate: new Date(),
+        updatedate: new Date()
+    });
+
+    const savedUser = await userRepository.save(newUser);
+    res.status(201).json({ message: "regist user success!" });
+})
+
+
+export default router;
