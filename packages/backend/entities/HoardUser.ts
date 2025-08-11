@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from "typeorm";
 
 @Entity({ name: "hoard_user" })
-export default class User {
+export default class HoardUser {
 
     @PrimaryGeneratedColumn("uuid")
     id: string;
@@ -21,4 +21,5 @@ export default class User {
     // updatedate
     @UpdateDateColumn({ name: "updatedate", type: "timestamp" })
     updatedate: Date;
+
 }

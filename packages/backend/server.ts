@@ -5,7 +5,7 @@ import { WebSocketServer } from 'ws';
 import pg from 'pg';
 import { AppDataSource } from './DataSource.js';
 import loginRoutets from './routes/LoginRoutes.js';
-import userRoutes from './routes/UserRoutes.js';
+import hoardUserRoutes from './routes/HoardUserRoutes.js';
 import noteRoutes from './routes/NoteRoutes.js';
 import labelRoutes from './routes/LabelRoutes.js';
 import passwordRoutes from './routes/PasswordRoutes.js';
@@ -64,7 +64,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/login', loginRoutets);
-app.use('/api/user', userRoutes);
+app.use('/api/user', hoardUserRoutes);
 app.use('/api/notes', noteRoutes);
 app.use('/api/labels', labelRoutes);
 app.use('/api/password', passwordRoutes);

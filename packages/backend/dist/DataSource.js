@@ -6,6 +6,7 @@ import TableNote from "./entities/TableNote.js";
 import TableNoteColumn from "./entities/TableNoteColumn.js";
 import TableNoteCell from "./entities/TableNoteCell.js";
 import Password from "./entities/Password.js";
+import HoardUser from "./entities/HoardUser.js";
 export const AppDataSource = new DataSource({
     type: "postgres",
     host: process.env.PG_HOST || "localhost",
@@ -21,7 +22,8 @@ export const AppDataSource = new DataSource({
         TableNote,
         TableNoteColumn,
         TableNoteCell,
-        Password
+        Password,
+        HoardUser
     ], // エンティティのパス
     migrations: ["./migrations/*.ts"], // マイグレーションのパス
     subscribers: [],
