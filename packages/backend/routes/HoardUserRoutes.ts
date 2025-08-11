@@ -39,6 +39,15 @@ router.post('/', async (req, res) => {
     });
 
     const savedUser = await userRepository.save(newUser);
+    const token = jwt.sign({ id: savedUser.id, username: savedUser.username }, SECRET, { expiresIn: '1d' });
+                res.cookie("token", token, {
+                    domain: "localhost",
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === 'production' ? 'true' : 'false',
+                    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+                    path: "/",
+                    maxAge: 24 * 60 * 60 * 1000 // 1day
+                });
     res.status(201).json({ message: "regist user success!" });
 })
 
