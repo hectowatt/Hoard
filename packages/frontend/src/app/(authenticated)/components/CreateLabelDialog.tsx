@@ -36,6 +36,7 @@ export default function CreateLabelDialog({ open, onClose }: LabelDialogProps) {
                 body: JSON.stringify({
                     labelName: input,
                 }),
+                credentials: "include"
             })
 
             if (!response.ok) {
@@ -76,6 +77,7 @@ export default function CreateLabelDialog({ open, onClose }: LabelDialogProps) {
                 headers: {
                     "Content-Type": "application/json",
                 },
+                credentials: "include"
             });
             if (!response.ok) {
                 throw new Error("Failed to delete label");

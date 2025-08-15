@@ -83,6 +83,7 @@ export default function Note({
                 headers: {
                     "Content-Type": "application/json",
                 },
+                credentials: "include"
             });
             if (!response.ok) {
                 throw new Error("Failed to delete note");
@@ -120,6 +121,7 @@ export default function Note({
                     label: editLabel,
                     isLocked: isLocked,
                 }),
+                credentials: "include"
             })
 
             if (!response.ok) {
@@ -162,7 +164,8 @@ export default function Note({
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"
-                    }
+                    },
+                    credentials: "include"
                 });
 
                 if (responseSelect.ok) {
@@ -192,7 +195,8 @@ export default function Note({
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"
-                    }
+                    },
+                    credentials: "include"
                 });
 
                 if (responseSelect.ok) {
@@ -208,7 +212,8 @@ export default function Note({
                             body: JSON.stringify({
                                 id: id,
                                 isLocked: true, // ロック状態にする
-                            })
+                            }),
+                            credentials: "include"
                         });
                         if (!responseLock.ok) {
                             console.error("Failed to lock note");
@@ -247,6 +252,7 @@ export default function Note({
                 password_id: passwordId,
                 passwordString: inputPassword
             }),
+            credentials: "include"
         });
 
         if (responseCompare.ok) {
@@ -264,7 +270,8 @@ export default function Note({
                         body: JSON.stringify({
                             id: id,
                             isLocked: false, // ロック解除
-                        })
+                        }),
+                        credentials: "include"
                     });
                     if (!responseUnlock.ok) {
                         throw new Error("Failed to unlock note");

@@ -22,6 +22,7 @@ export default function Home() {
         headers: {
           "content-type": "application/json",
         },
+        credentials: "include"
       });
 
       if (!response.ok) {
@@ -50,6 +51,7 @@ export default function Home() {
         headers: {
           "content-type": "application/json",
         },
+        credentials: "include"
       });
 
       if (!response.ok) {

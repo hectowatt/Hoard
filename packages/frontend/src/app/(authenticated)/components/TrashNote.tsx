@@ -57,6 +57,7 @@ export default function TrashNote({ id, title, content, label_id, is_locked, cre
                 headers: {
                     "Content-Type": "application/json",
                 },
+                credentials: "include"
             });
             if (!response.ok) {
                 throw new Error("Failed to delete note");
@@ -86,6 +87,7 @@ export default function TrashNote({ id, title, content, label_id, is_locked, cre
                 body: JSON.stringify({
                     id: id
                 }),
+                credentials: "include"
             })
 
             if (!response.ok) {

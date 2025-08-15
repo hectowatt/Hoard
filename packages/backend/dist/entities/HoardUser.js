@@ -8,30 +8,30 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from "typeorm";
-let User = class User {
+let HoardUser = class HoardUser {
 };
 __decorate([
     PrimaryGeneratedColumn("uuid"),
     __metadata("design:type", String)
-], User.prototype, "id", void 0);
+], HoardUser.prototype, "id", void 0);
 __decorate([
     Column({ name: "username", type: "text", nullable: false, unique: true }),
     __metadata("design:type", String)
-], User.prototype, "username", void 0);
+], HoardUser.prototype, "username", void 0);
 __decorate([
     Column({ name: "password", type: "text", nullable: false }),
     __metadata("design:type", String)
-], User.prototype, "password", void 0);
+], HoardUser.prototype, "password", void 0);
 __decorate([
     CreateDateColumn({ name: "createdate", type: "timestamp" }),
     __metadata("design:type", Date)
-], User.prototype, "createdate", void 0);
+], HoardUser.prototype, "createdate", void 0);
 __decorate([
     UpdateDateColumn({ name: "updatedate", type: "timestamp" }),
     __metadata("design:type", Date)
-], User.prototype, "updatedate", void 0);
-User = __decorate([
+], HoardUser.prototype, "updatedate", void 0);
+HoardUser = __decorate([
     Entity({ name: "hoard_user" })
-], User);
-export default User;
+], HoardUser);
+export default HoardUser;
 //# sourceMappingURL=HoardUser.js.map

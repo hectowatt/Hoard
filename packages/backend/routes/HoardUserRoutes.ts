@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { AppDataSource } from '../DataSource.js';
-
+import { authMiddleware } from '../middleware/AuthMiddleware.js';
 import HoardUser from '../entities/HoardUser.js';
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -9,25 +9,26 @@ import jwt from "jsonwebtoken";
 const router = Router();
 const SECRET = process.env.SECRET || 'hoard_secret';
 
-function authenticateToken(req, res, next) {
-    const token = req.cookies.token;
-    if (!token) return res.sendStatus(401); // Unauthorized
-    jwt.verify(token, SECRET, (err, user) => {
-        if (err) return res.sendStatus(403); // Forbidden
-        req.userId = user.id;
-        next();
-    });
-};
+// 【SELECT】User存在確認API
+router.get('/isexist', async (req, res) => {
+    const userRepository = AppDataSource.getRepository('HoardUser');
+    const users = await userRepository.find();
+    if(users && users.length > 0) {
+        return res.status(200).json({ exists: true });
+    }else{
+        return res.status(200).json({ exists: false });
+    }
+});
 
 // 【SELECT】User取得API
-router.get('/', async (req, res) => {
+router.get('/',authMiddleware, async (req, res) => {
     const userRepository = AppDataSource.getRepository('HoardUser');
     const users = await userRepository.find();
     res.status(200).json(users);
 });
 
 // 【INSERT】User登録API
-router.post('/', async (req, res) => {
+router.post('/',authMiddleware, async (req, res) => {
     const { username, password } = req.body;
     const userRepository = AppDataSource.getRepository(HoardUser);
     const password_hashed = await bcrypt.hash(password, 10);
