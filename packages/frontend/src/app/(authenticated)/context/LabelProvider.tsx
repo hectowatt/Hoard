@@ -22,7 +22,7 @@ export const LabelProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const fetchLabels = useCallback(async () => {
         const response = await fetch("/api/labels", {
             method: "GET",
-            headers: { "Content-Type": "application/json" },
+            credentials: "include"
         });
         if (!response.ok) throw new Error("Failed to fetch labels");
         const data = await response.json();

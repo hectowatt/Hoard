@@ -25,11 +25,11 @@ export default function LoginPage() {
             headers: {
                 "Content-Type": "application/json",
             },
-            credentials: "include",
             body: JSON.stringify({
                 username: username,
                 password: password
-            })
+            }),
+            credentials: "include"
         })
 
         if (response.ok) {
@@ -48,11 +48,11 @@ export default function LoginPage() {
             headers: {
                 "Content-Type": "application/json",
             },
-            credentials: "include",
             body: JSON.stringify({
                 username: username,
                 password: password
-            })
+            }),
+            credentials: "include"
         })
 
         if (response.ok) {
@@ -66,20 +66,20 @@ export default function LoginPage() {
 
     // 既存ユーザ存在チェック
     const checkUserExists = async () => {
-        const response = await fetch("/api/user", {
+        const response = await fetch("/api/user/isexist", {
             method: "GET",
             credentials: "include"
         });
         if (response.ok) {
-            const userData = await response.json();
-            if (userData && userData.length > 0) {
+            const isExist = await response.json();
+            if (isExist && isExist.exists === true) {
                 setIsUserExists(true);
             }
         } else {
             console.error("failed to check user existence");
         };
 
-    }
+    };
 
     useEffect(() => {
         checkUserExists();

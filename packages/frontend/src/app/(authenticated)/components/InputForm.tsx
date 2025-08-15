@@ -96,6 +96,7 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                     label: editLabelId, // nullの場合はnullが送信される
                     isLocked: isLocked, // ロック状態を送信
                 }),
+                credentials: "include"
             })
 
             if (!response.ok) {
@@ -159,6 +160,7 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                     label: editLabelId,
                     is_locked: isLocked,
                 }),
+                credentials: "include"
             })
 
             if (!response.ok) {

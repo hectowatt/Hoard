@@ -1,11 +1,12 @@
 import { Router } from 'express';
 import { AppDataSource } from '../DataSource.js';
 import Label from '../entities/Label.js';
+import { authMiddleware } from '../middleware/AuthMiddleware.js';
 
 const router = Router();
 
 // 【INSERT】ラベル登録API
-router.post('/', async (req, res) => {
+router.post('/', authMiddleware,async (req, res) => {
   const { labelName } = req.body;
 
   if (!labelName) {
@@ -29,10 +30,10 @@ router.post('/', async (req, res) => {
 });
 
 // 【SELECT】label全件取得API
-router.get('/', async (req, res) => {
+router.get('/', authMiddleware,async (req, res) => {
   try {
     const labelRepository = AppDataSource.getRepository(Label);
-    // Notesを全件取得する
+    // labelを全件取得する
     const labels = await labelRepository.find();
     res.status(200).json(labels);
   } catch (error) {
@@ -42,7 +43,7 @@ router.get('/', async (req, res) => {
 });
 
 // 【DELETE】ラベル削除API
-router.delete('/:id', async (req, res) => {
+router.delete('/:id',authMiddleware, async (req, res) => {
   const { id } = req.params;
   console.log("delete label id: ", id);
   try {

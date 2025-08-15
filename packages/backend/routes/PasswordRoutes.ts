@@ -2,11 +2,12 @@ import { Router } from 'express';
 import { AppDataSource } from '../DataSource.js';
 import Password from '../entities/Password.js';
 import bcrypt from "bcrypt";
+import { authMiddleware } from '../middleware/AuthMiddleware.js';
 
 const router = Router();
 
 // 【INSERT】パスワード登録API
-router.post('/', async (req, res) => {
+router.post('/',authMiddleware, async (req, res) => {
     const { passwordString } = req.body;
 
     if (!passwordString) {
@@ -31,7 +32,7 @@ router.post('/', async (req, res) => {
 });
 
 // 【SELECT】パスワードid取得API
-router.get('/', async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
     try {
         const passwordRepository = AppDataSource.getRepository(Password);
         // passwordを取得する
@@ -49,7 +50,7 @@ router.get('/', async (req, res) => {
 });
 
 // 【UPDATE】パスワード更新API
-router.put('/', async (req, res) => {
+router.put('/',authMiddleware, async (req, res) => {
     const { password_id, passwordString } = req.body;
     try {
         const passwordRepository = AppDataSource.getRepository(Password);
@@ -68,7 +69,7 @@ router.put('/', async (req, res) => {
 });
 
 // 【SELECT】パスワード取得API（リクエスト値とDBのハッシュ化されたパスワードが一致するかを返却）
-router.post('/compare', async (req, res) => {
+router.post('/compare',authMiddleware, async (req, res) => {
     try {
         const password_id = req.body.password_id;
         const passwordString = req.body.passwordString;

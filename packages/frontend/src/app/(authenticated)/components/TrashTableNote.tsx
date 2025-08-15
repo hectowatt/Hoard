@@ -60,6 +60,7 @@ export default function TrashTableNote({ id, title, label_id, is_locked, created
                 headers: {
                     "Content-Type": "application/json",
                 },
+                credentials: "include"
             });
             if (!response.ok) {
                 throw new Error("Failed to delete tableNote");
@@ -89,6 +90,7 @@ export default function TrashTableNote({ id, title, label_id, is_locked, created
                 body: JSON.stringify({
                     id: id
                 }),
+                credentials: "include"
             })
 
             if (!response.ok) {

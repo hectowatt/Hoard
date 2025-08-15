@@ -169,7 +169,8 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"
-                    }
+                    },
+                    credentials: "include"
                 });
 
                 if (responseSelect.ok) {
@@ -199,7 +200,8 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json"
-                    }
+                    },
+                    credentials: "include"
                 });
 
                 if (responseSelect.ok) {
@@ -215,7 +217,8 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                             body: JSON.stringify({
                                 id: id,
                                 isLocked: true, // ロック状態にする
-                            })
+                            }),
+                            credentials: "include"
                         });
                         if (!responseLock.ok) {
                             console.error("Failed to lock note");
@@ -254,6 +257,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                 password_id: passwordId,
                 passwordString: inputPassword
             }),
+            credentials: "include"
         });
 
         if (responseCompare.ok) {
@@ -271,7 +275,8 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                         body: JSON.stringify({
                             id: id,
                             isLocked: false, // ロック解除
-                        })
+                        }),
+                        credentials: "include"
                     });
                     if (!responseUnlock.ok) {
                         throw new Error("Failed to unlock note");
@@ -307,6 +312,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                     label: editLabel,
                     is_locked: isLocked,
                 }),
+                credentials: "include"
             })
 
             if (!response.ok) {
@@ -335,6 +341,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                 headers: {
                     "Content-Type": "application/json",
                 },
+                credentials: "include"
             });
             if (!response.ok) {
                 throw new Error("Failed to delete note");

@@ -3,16 +3,15 @@ import { AppDataSource } from '../DataSource.js';
 import TableNoteCell from '../entities/TableNoteCell.js';
 import TableNoteColumn from '../entities/TableNoteColumn.js';
 import TableNote from '../entities/TableNote.js';
-import Note from '../entities/Note.js';
+import { authMiddleware } from '../middleware/AuthMiddleware.js';
 import { EntityManager } from 'typeorm';
-import { table } from 'console';
 
 const router = Router();
 
 
 
 // 【INSERT】テーブルノート登録API
-router.post('/', async (req, res) => {
+router.post('/',authMiddleware, async (req, res) => {
     const { title, columns, rowCells, label, is_locked } = req.body;
 
     if (!title && !columns && !rowCells) {
@@ -78,7 +77,7 @@ router.post('/', async (req, res) => {
 });
 
 // 【SELECT】テーブルノート取得API
-router.get('/', async (req, res) => {
+router.get('/', authMiddleware,async (req, res) => {
     try {
 
         const tableNoteRepository = AppDataSource.getRepository(TableNote);
@@ -129,7 +128,7 @@ router.get('/', async (req, res) => {
 
 
 // 【UPDATE】テーブルノート更新API
-router.put('/', async (req, res) => {
+router.put('/', authMiddleware,async (req, res) => {
     const { id, title, columns, rowCells, label, is_locked } = req.body;
     try {
         await AppDataSource.transaction(async (transactionalEntityManager: EntityManager) => {
@@ -272,7 +271,7 @@ router.put('/', async (req, res) => {
 });
 
 // 【DELETE】Notes削除用API
-router.delete('/:id', async (req, res) => {
+router.delete('/:id',authMiddleware, async (req, res) => {
   const { id } = req.params;
   console.log("delete id: ", id);
   try {
@@ -294,7 +293,7 @@ router.delete('/:id', async (req, res) => {
 /************ TrashNote ************/
 
 // 【SELECT】TrashNote取得API
-router.get('/trash', async (req, res) => {
+router.get('/trash',authMiddleware, async (req, res) => {
   try {
     const noteRepository = AppDataSource.getRepository(TableNote);
     const notes = await noteRepository.find({ where: { is_deleted: true }, order: { deletedate: 'DESC' } });
@@ -306,7 +305,7 @@ router.get('/trash', async (req, res) => {
 });
 
 // 【DELETE】TrashNote削除用API
-router.delete('/trash/:id', async (req, res) => {
+router.delete('/trash/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
   console.log("delete id: ", id);
   try {
@@ -324,7 +323,7 @@ router.delete('/trash/:id', async (req, res) => {
 });
 
 // 【UPDATE】TableNote復元用API
-router.put('/trash', async (req, res) => {
+router.put('/trash', authMiddleware, async (req, res) => {
   const { id } = req.body;
 
   try {
@@ -346,7 +345,7 @@ router.put('/trash', async (req, res) => {
 
 
 // 【UPDATE】TableNoteロック状態更新用API
-router.put('/lock', async (req, res) => {
+router.put('/lock', authMiddleware, async (req, res) => {
   const { id, isLocked } = req.body;
   try {
     const tableNoteRepository = AppDataSource.getRepository(TableNote);

@@ -20,7 +20,8 @@ export default function Home() {
       method: "GET",
       headers: {
         "Content-Type": "application/json"
-      }
+      },
+      credentials: "include"
     });
 
     if (responseSelect.ok) {
@@ -43,7 +44,8 @@ export default function Home() {
           body: JSON.stringify({
             password_id: password_id,
             passwordString: passwordString
-          })
+          }),
+          credentials: "include"
         });
 
         if (response.ok) {
@@ -60,7 +62,8 @@ export default function Home() {
           headers: {
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({ passwordString: passwordString })
+          body: JSON.stringify({ passwordString: passwordString }),
+          credentials: "include"
         });
 
         if (response.ok) {

@@ -36,6 +36,9 @@ import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import Brightness2OutlinedIcon from '@mui/icons-material/Brightness2Outlined';
 import { SearchWordProvider, useSearchWordContext } from "@/app/(authenticated)/context/SearchWordProvider";
 import SearchWordBar from "@/app/(authenticated)/components/SearchWordBar";
+import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
+import { Router } from "next/router";
+import { useRouter } from "next/navigation";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -76,6 +79,8 @@ export default function RootLayout({
 	const [labels, setLabels] = React.useState<string[]>([]);
 	const [mode, setMode] = React.useState<"light" | "dark">("light");
 
+	const router = useRouter();
+
 	// カスタムテーマの作成
 	const theme = React.useMemo(
 		() =>
@@ -105,6 +110,7 @@ export default function RootLayout({
 			headers: {
 				"Content-Type": "application/json",
 			},
+			credentials: "include"
 		});
 		if (!response.ok) {
 			throw new Error("Failed to fetch labels");
@@ -121,6 +127,27 @@ export default function RootLayout({
 	const toggleColorMode = () => {
 		setMode((prev) => (prev === "light" ? "dark" : "light"));
 	};
+
+	const handleLogOut = async () => {
+		try {
+			const response = await fetch("/api/logout", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				credentials: "include"
+			})
+
+			if (response.ok) {
+				alert("ログアウトしました。");
+				// ログアウト後はログインページにリダイレクト
+				router.push("/login");
+			}
+		} catch (error) {
+			console.error("Logout failed:", error);
+			alert("ログアウトに失敗しました。");
+		}
+	}
 
 
 	return (
@@ -155,12 +182,19 @@ export default function RootLayout({
 													</Box>
 													<Box sx={{ flexGrow: 1 }} />
 													<IconButton
-														sx={{ position: "fixed", top: 16, right: 16, zIndex: 2000 }}
+														sx={{ position: "fixed", top: 12, right: 70, zIndex: 2000 }}
 														onClick={toggleColorMode}
 														color="inherit"
 														data-testid="togglecolormode"
 													>
 														{mode === "dark" ? <Brightness2OutlinedIcon /> : <LightModeOutlinedIcon />}
+													</IconButton>
+													<IconButton
+														sx={{ position: "fixed", top: 12, right: 15, zIndex: 2000 }}
+														onClick={handleLogOut}
+														color="inherit"
+														data-testid="togglecolormode">
+														<LogoutOutlinedIcon></LogoutOutlinedIcon>
 													</IconButton>
 												</Toolbar>
 											</AppBar>

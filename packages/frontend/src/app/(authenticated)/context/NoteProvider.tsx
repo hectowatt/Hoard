@@ -23,7 +23,10 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Noteを取得
     const fetchNotes = async () => {
-        const response = await fetch("/api/notes");
+        const response = await fetch("/api/notes", {
+            method: "GET",
+            credentials: "include"
+        });
         if (!response.ok) throw new Error("Failed to fetch notes");
         const data = await response.json();
         setNotes(data);

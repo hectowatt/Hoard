@@ -1,11 +1,12 @@
 import { Router } from 'express';
 import { AppDataSource } from '../DataSource.js';
 import Note from '../entities/Note.js';
+import { authMiddleware } from '../middleware/AuthMiddleware.js';
 
 const router = Router();
 
 // 【SELECT】Notes全件取得API
-router.get('/', async (req, res) => {
+router.get('/',authMiddleware, async (req, res) => {
   try {
     const noteRepository = AppDataSource.getRepository(Note);
     // Notesを全件取得する
@@ -18,7 +19,7 @@ router.get('/', async (req, res) => {
 });
 
 // 【INSERT】Notes登録API
-router.post('/', async (req, res) => {
+router.post('/',authMiddleware, async (req, res) => {
   const { title, content, label, isLocked } = req.body;
 
   try {
@@ -42,7 +43,7 @@ router.post('/', async (req, res) => {
 });
 
 // 【UPDATE】Notes更新用API
-router.put('/', async (req, res) => {
+router.put('/',authMiddleware, async (req, res) => {
   const { id, title, content, label, isLocked } = req.body;
 
   try {
@@ -66,7 +67,7 @@ router.put('/', async (req, res) => {
 });
 
 // 【DELETE】Notes削除用API
-router.delete('/:id', async (req, res) => {
+router.delete('/:id',authMiddleware, async (req, res) => {
   const { id } = req.params;
   console.log("delete id: ", id);
   try {
@@ -89,7 +90,7 @@ router.delete('/:id', async (req, res) => {
 /************ TrashNote ************/
 
 // 【SELECT】TrashNote取得API
-router.get('/trash', async (req, res) => {
+router.get('/trash',authMiddleware, async (req, res) => {
   try {
     const noteRepository = AppDataSource.getRepository(Note);
     const notes = await noteRepository.find({ where: { is_deleted: true }, order: { deletedate: 'DESC' } });
@@ -101,7 +102,7 @@ router.get('/trash', async (req, res) => {
 });
 
 // 【DELETE】TrashNote削除用API
-router.delete('/trash/:id', async (req, res) => {
+router.delete('/trash/:id',authMiddleware, async (req, res) => {
   const { id } = req.params;
   console.log("delete id: ", id);
   try {
@@ -119,7 +120,7 @@ router.delete('/trash/:id', async (req, res) => {
 });
 
 // 【UPDATE】Notes復元用API
-router.put('/trash', async (req, res) => {
+router.put('/trash',authMiddleware, async (req, res) => {
   const { id } = req.body;
 
   try {
@@ -141,7 +142,7 @@ router.put('/trash', async (req, res) => {
 
 
 // 【UPDATE】Notesロック状態更新用API
-router.put('/lock', async (req, res) => {
+router.put('/lock',authMiddleware, async (req, res) => {
   const { id, isLocked } = req.body;
   try {
     const noteRepository = AppDataSource.getRepository(Note);

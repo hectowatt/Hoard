@@ -5,6 +5,7 @@ import { WebSocketServer } from 'ws';
 import pg from 'pg';
 import { AppDataSource } from './DataSource.js';
 import loginRoutets from './routes/LoginRoutes.js';
+import logoutRoutets from './routes/LogoutRoutes.js';
 import hoardUserRoutes from './routes/HoardUserRoutes.js';
 import noteRoutes from './routes/NoteRoutes.js';
 import labelRoutes from './routes/LabelRoutes.js';
@@ -12,6 +13,7 @@ import passwordRoutes from './routes/PasswordRoutes.js';
 import tableNoteRoutes from './routes/TableNoteRoutes.js';
 import { LessThan } from 'typeorm';
 import Note from './entities/Note.js';
+import cookieParser from 'cookie-parser';
 const { Pool } = pg;
 const app = express();
 const port = 4000;
@@ -22,8 +24,10 @@ app.use(cors({
         'http://192.168.1.100:3500',
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    Credential: true
 }));
+app.use(cookieParser());
 // PostgreSQL接続設定
 const pool = new Pool({
     host: process.env.PG_HOST || 'localhost',
@@ -54,6 +58,7 @@ app.get('/', (req, res) => {
     res.send('WebSocket Server is running');
 });
 app.use('/api/login', loginRoutets);
+app.use('/api/logout', logoutRoutets);
 app.use('/api/user', hoardUserRoutes);
 app.use('/api/notes', noteRoutes);
 app.use('/api/labels', labelRoutes);
