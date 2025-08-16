@@ -14,6 +14,7 @@ import tableNoteRoutes from './routes/TableNoteRoutes.js';
 import { LessThan } from 'typeorm';
 import Note from './entities/Note.js';
 import cookieParser from 'cookie-parser';
+import TableNote from './entities/TableNote.js';
 
 const { Pool } = pg;
 const app = express();
@@ -80,12 +81,18 @@ app.use('/api/tableNotes', tableNoteRoutes);
 // 定期的に古いノートを削除する関数（７日経過したら削除）
 async function deleteOldNotes() {
   const noteRepository = AppDataSource.getRepository(Note);
+  const tableNoteRepository = AppDataSource.getRepository(TableNote);
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
   await noteRepository.delete({
     is_deleted: true,
     deletedate: LessThan(sevenDaysAgo)
   });
+  await tableNoteRepository.delete({
+    is_deleted: true,
+    deletedate: LessThan(sevenDaysAgo)
+  });
+  console.log('Old notes deleted successfully');
 }
 
-// サーバー起動時に定期実行（例: 1時間ごと）
+// サーバー起動時に定期実行
 setInterval(deleteOldNotes, 60 * 60 * 1000);
