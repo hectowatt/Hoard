@@ -99,6 +99,7 @@ export default function LoginPage() {
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         fullWidth
+                        data-testid="username"
                     />
                     <TextField
                         label="パスワード"
@@ -106,17 +107,20 @@ export default function LoginPage() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         fullWidth
+                        data-testid="password"
                     />
                     {isUserExists ? <Button
                         variant="contained"
                         color="primary"
                         onClick={handleLogin}
+                        data-testid="login"
                     >
                         ログイン
                     </Button> : <Button
                         variant="contained"
                         color="primary"
                         onClick={handleRegistUser}
+                        data-testid="makeuser"
                     >
                         ユーザ作成
                     </Button>}

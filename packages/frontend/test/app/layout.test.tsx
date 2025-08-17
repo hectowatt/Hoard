@@ -52,7 +52,7 @@ describe("RootLayout", () => {
         expect(toggleButton.querySelector("svg")).toBeInTheDocument();
     });
 
-    it("opens label dialog when ラベル is clicked", async () => {
+    it("ラベルアイテムがクリックされたとき、ダイアログが表示される", async () => {
         render(
             <RootLayout>
                 <div>Label Dialog Test</div>
