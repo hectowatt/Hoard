@@ -17,7 +17,7 @@ import cookieParser from 'cookie-parser';
 import TableNote from './entities/TableNote.js';
 
 const { Pool } = pg;
-const app = express();
+export const app = express();
 const port = 4000;
 
 // JSONボディのパースを有効にする
@@ -42,11 +42,11 @@ const pool = new Pool({
   database: process.env.PG_DATABASE || 'mydatabase',
 });
 
-const server = app.listen(port, () => {
+export const hoardserver = app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
 
-const wss = new WebSocketServer({ server });
+const wss = new WebSocketServer({ server: hoardserver });
 
 // WebSocket接続時の処理
 wss.on('connection', (ws) => {
@@ -95,4 +95,4 @@ async function deleteOldNotes() {
 }
 
 // サーバー起動時に定期実行
-setInterval(deleteOldNotes, 60 * 60 * 1000);
+if(process.env.NODE_ENV !== 'test'){setInterval(deleteOldNotes, 60 * 60 * 1000);}

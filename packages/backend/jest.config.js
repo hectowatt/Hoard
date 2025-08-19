@@ -1,10 +1,21 @@
 export default {
-  preset: "ts-jest",
-  testEnvironment: "jsdom",
+  preset: "ts-jest/presets/default-esm",
+  testEnvironment: "node",
+  extensionsToTreatAsEsm: [".ts"],
+
   transform: {
-    "^.+\\.(js|jsx|ts|tsx)$": ["babel-jest", { presets: ["@babel/preset-env", "@babel/preset-react"] }]
+    "^.+\\.(ts|tsx|js)$": [
+      "ts-jest",
+      {
+        useESM: true,
+      },
+    ],
   },
+
   moduleNameMapper: {
-    "^@/(.*)$": "<rootDir>/src/$1"
-  }
+    "^@/(.*)$": "<rootDir>/dist/$1",
+    "^../../DataSource.js$": "<rootDir>/dist/DataSource.js",
+  },
+
+  roots: ["<rootDir>/dist", "<rootDir>/test"],
 };
