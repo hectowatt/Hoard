@@ -14,8 +14,9 @@ import tableNoteRoutes from './routes/TableNoteRoutes.js';
 import { LessThan } from 'typeorm';
 import Note from './entities/Note.js';
 import cookieParser from 'cookie-parser';
+import TableNote from './entities/TableNote.js';
 const { Pool } = pg;
-const app = express();
+export const app = express();
 const port = 4000;
 // JSONボディのパースを有効にする
 app.use(express.json());
@@ -36,10 +37,10 @@ const pool = new Pool({
     password: process.env.PG_PASSWORD || 'password',
     database: process.env.PG_DATABASE || 'mydatabase',
 });
-const server = app.listen(port, () => {
+export const hoardserver = app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
 });
-const wss = new WebSocketServer({ server });
+const wss = new WebSocketServer({ server: hoardserver });
 // WebSocket接続時の処理
 wss.on('connection', (ws) => {
     console.log('Client connected');
@@ -67,12 +68,20 @@ app.use('/api/tableNotes', tableNoteRoutes);
 // 定期的に古いノートを削除する関数（７日経過したら削除）
 async function deleteOldNotes() {
     const noteRepository = AppDataSource.getRepository(Note);
+    const tableNoteRepository = AppDataSource.getRepository(TableNote);
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     await noteRepository.delete({
         is_deleted: true,
         deletedate: LessThan(sevenDaysAgo)
     });
+    await tableNoteRepository.delete({
+        is_deleted: true,
+        deletedate: LessThan(sevenDaysAgo)
+    });
+    console.log('Old notes deleted successfully');
 }
-// サーバー起動時に定期実行（例: 1時間ごと）
-setInterval(deleteOldNotes, 60 * 60 * 1000);
+// サーバー起動時に定期実行
+if (process.env.NODE_ENV !== 'test') {
+    setInterval(deleteOldNotes, 60 * 60 * 1000);
+}
 //# sourceMappingURL=server.js.map

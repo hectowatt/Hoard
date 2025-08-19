@@ -5,7 +5,6 @@ import 'dotenv/config';
 import bcrypt from "bcrypt";
 import { nanoid } from 'nanoid'; 
 import { Redis } from 'ioredis';
-import { authMiddleware } from '../middleware/AuthMiddleware.js';
 
 const router = Router();
 const SECRET = process.env.SECRET || 'hoard_secret';
