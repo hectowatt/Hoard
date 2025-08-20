@@ -8,8 +8,8 @@ import { server } from "typescript";
 // Redis をモック
 jest.unstable_mockModule("ioredis", () => ({
   Redis: jest.fn().mockImplementation(() => ({
-    set: jest.fn().mockResolvedValue("OK"),
-    get: jest.fn().mockResolvedValue("valid"),
+    set: jest.fn().mockImplementation(() => Promise.resolve("OK")),
+    get: jest.fn().mockImplementation(() => Promise.resolve("valid")),
   })),
 }));
 
@@ -23,7 +23,7 @@ const mockUser = {
 // DataSource をモック
 jest.unstable_mockModule("../../dist/DataSource.js", () => ({
   AppDataSource: {
-    initialize: jest.fn().mockResolvedValue(true),
+    initialize: jest.fn().mockImplementation(() => Promise.resolve(true)),
     getRepository: jest.fn().mockReturnValue({
       findOne: jest.fn(({ where }) => {
         if (where.username === mockUser.username) {
@@ -77,7 +77,7 @@ describe("POST /login", () => {
 
   afterAll(async () => {
     if (hoardserver) {
-      await new Promise((resolve, reject) => {
+      await new Promise<void>((resolve, reject) => {
         hoardserver.close((err) => (err ? reject(err) : resolve()));
       });
     };
