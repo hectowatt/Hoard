@@ -1,0 +1,80 @@
+import request from "supertest";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { jest } from '@jest/globals';
+import { AppDataSource } from "../../dist/DataSource.js";
+import { idText, server } from "typescript";
+
+import type { Label } from "../../dist/entities/Label.js";
+import { authMiddleware } from "../../middleware/AuthMiddleware.js";
+import type { Request, Response, NextFunction } from "express";
+
+// Redis をモック
+jest.unstable_mockModule("ioredis", () => ({
+  Redis: jest.fn().mockImplementation(() => ({
+    set: jest.fn().mockImplementation(() => Promise.resolve("OK")),
+    get: jest.fn().mockImplementation(() => Promise.resolve("valid")),
+  })),
+}));
+
+// ラベルのモック
+const mockLabels = [
+    {id:1, labelname: "work", createdate: new Date(), notes: []},
+    {id:2, labelname: "study", createdate: new Date(), notes: []}   
+]
+
+// AuthMiddlewareをモック
+jest.unstable_mockModule('../../dist/middleware/AuthMiddleware', () => ({
+    authMiddleware: jest.fn((req : Request, res: Response, next: NextFunction) => {
+        next();
+    }),
+}));
+
+// DataSource をモック
+jest.unstable_mockModule("../../dist/DataSource.js", () => ({
+  AppDataSource: {
+    initialize: jest.fn().mockImplementation(() => Promise.resolve(true)),
+    getRepository: jest.fn().mockReturnValue({
+      find: jest.fn(() => {
+        return Promise.resolve(mockLabels);
+      }),
+      findOneBy: jest.fn(({where}) => {
+        if(where.id === mockLabels[0].id){
+            return Promise.resolve(mockLabels[0]);
+        }else if(where.id === mockLabels[1].id){
+            return Promise.resolve(mockLabels[1]);
+        }
+      }),
+      create: jest.fn((data: { labelname: string; createdate: Date }) => {
+        return { id:3, ...data}
+      }),
+      save: jest.fn((label: Label) => {
+        return Promise.resolve({
+          id: 3,
+          labelname: label.labelname,
+          createdate: new Date(),
+        });
+      })
+    }),
+  },
+}));
+
+// モックが終わってから import
+const { app, hoardserver } = await import("../../dist/server.js");
+
+describe("/labels", () => {
+    it("POST /labels should return 201 and message, registered label", async () => {
+        const res = await request(app)
+            .post("/api/labels")
+            .send({ labelName: "test" });
+
+        console.log("FULL Response:", res.body);
+
+        expect(res.status).toBe(201);
+
+        expect(res.body.message).toBe("Save label success!");
+
+        expect(res.body.label).toHaveProperty("id");
+        expect(res.body.label.labelname).toBe("test");
+    });
+});
