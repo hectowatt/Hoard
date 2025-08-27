@@ -68,8 +68,6 @@ describe("/labels", () => {
             .post("/api/labels")
             .send({ labelName: "test" });
 
-        console.log("FULL Response:", res.body);
-
         expect(res.status).toBe(201);
 
         expect(res.body.message).toBe("Save label success!");
@@ -77,4 +75,34 @@ describe("/labels", () => {
         expect(res.body.label).toHaveProperty("id");
         expect(res.body.label.labelname).toBe("test");
     });
+
+    it("GET /labels should return 200 and all labels", async() => {
+        const res = await request(app)
+        .get("/api/labels");
+
+        expect(res.status).toBe(200);
+        expect(res.body[0].id).toBe(1);
+        expect(res.body[1].id).toBe(2);
+        expect(res.body[0].labelname).toBe("work");
+        expect(res.body[1].labelname).toBe("study");
+        
+    });
+
+    afterAll(async () => {
+    if (hoardserver) {
+      await new Promise<void>((resolve, reject) => {
+        hoardserver.close((err) => (err ? reject(err) : resolve()));
+      });
+    };
+
+
+    if (AppDataSource.destroy && typeof AppDataSource.destroy === "function") {
+      try {
+        await AppDataSource.destroy();
+      } catch (error) {
+      }
+    };
+
+    jest.clearAllTimers();
+  });
 });
