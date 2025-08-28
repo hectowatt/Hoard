@@ -19,8 +19,8 @@ jest.unstable_mockModule("ioredis", () => ({
 
 // ラベルのモック
 const mockLabels = [
-    {id:1, labelname: "work", createdate: new Date(), notes: []},
-    {id:2, labelname: "study", createdate: new Date(), notes: []}   
+    {id:"1", labelname: "work", createdate: new Date(), notes: []},
+    {id:"2", labelname: "study", createdate: new Date(), notes: []}   
 ]
 
 // AuthMiddlewareをモック
@@ -38,12 +38,13 @@ jest.unstable_mockModule("../../dist/DataSource.js", () => ({
       find: jest.fn(() => {
         return Promise.resolve(mockLabels);
       }),
-      findOneBy: jest.fn(({where}) => {
-        if(where.id === mockLabels[0].id){
+      findOneBy: jest.fn(({id}) => {
+        if(id === mockLabels[0].id){
             return Promise.resolve(mockLabels[0]);
-        }else if(where.id === mockLabels[1].id){
+        }else if(id === mockLabels[1].id){
             return Promise.resolve(mockLabels[1]);
         }
+        return Promise.resolve(null);
       }),
       create: jest.fn((data: { labelname: string; createdate: Date }) => {
         return { id:3, ...data}
@@ -54,6 +55,9 @@ jest.unstable_mockModule("../../dist/DataSource.js", () => ({
           labelname: label.labelname,
           createdate: new Date(),
         });
+      }),
+      remove: jest.fn((label: Label) => {
+        return Promise.resolve(label);
       })
     }),
   },
@@ -86,6 +90,22 @@ describe("/labels", () => {
         expect(res.body[0].labelname).toBe("work");
         expect(res.body[1].labelname).toBe("study");
         
+    });
+
+    it("DELETE /labels should return 200 and message", async() => {
+      const res = await request(app)
+      .delete("/api/labels/1");
+
+      expect(res.status).toBe(200);
+      expect(res.body.message).toBe("Label deleted successfully");
+    });
+
+    it("DELETE /labels with NOT exists label should return 404 and message", async() => {
+      const res = await request(app)
+      .delete("/api/labels/3");
+
+      expect(res.status).toBe(404);
+      expect(res.body.error).toBe("Label not found");
     });
 
     afterAll(async () => {
