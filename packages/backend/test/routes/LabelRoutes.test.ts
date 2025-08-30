@@ -109,6 +109,16 @@ describe("/labels", () => {
     expect(res.body[1].labelname).toBe("study");
   });
 
+  it("GET /labels and Error occured should return 500 and message", async() => {
+    mockRepo.find.mockImplementationOnce(() => Promise.reject(new Error("DB find error")));
+
+    const res = await request(app)
+    .get("/api/labels");
+
+    expect(res.status).toBe(500);
+    expect(res.body.error).toBe("Failed to fetch labels");
+  })
+
   it("DELETE /labels should return 200 and message", async () => {
     const res = await request(app)
       .delete("/api/labels/1");
@@ -124,6 +134,16 @@ describe("/labels", () => {
     expect(res.status).toBe(404);
     expect(res.body.error).toBe("Label not found");
   });
+
+  it("DELETE /labels and Error occured should return 500 and message", async() => {
+    mockRepo.findOneBy.mockImplementationOnce(() => Promise.reject(new Error("DB findOneBy error")));
+
+    const res = await request(app)
+    .delete("/api/labels/1");
+
+    expect(res.status).toBe(500);
+    expect(res.body.error).toBe("Failed to delete label");
+  })
 
   afterAll(async () => {
     if (hoardserver) {
