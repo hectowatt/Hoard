@@ -39,7 +39,7 @@ router.get('/', authMiddleware, async (req, res) => {
 });
 // 【DELETE】ラベル削除API
 router.delete('/:id', authMiddleware, async (req, res) => {
-    const { id } = req.params;
+    const id = req.params;
     console.log("delete label id: ", id);
     try {
         const labelRepository = AppDataSource.getRepository(Label);
