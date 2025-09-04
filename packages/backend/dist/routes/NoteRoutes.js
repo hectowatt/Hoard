@@ -78,7 +78,7 @@ router.delete('/:id', authMiddleware, async (req, res) => {
     }
     catch (error) {
         console.error("Error deleting note:", error);
-        res.status(500).json({ error: "Failed moved to trash" });
+        res.status(500).json({ error: "Failed to move note to trash" });
     }
 });
 /************ TrashNote ************/
@@ -102,7 +102,7 @@ router.delete('/trash/:id', authMiddleware, async (req, res) => {
         const noteRepository = AppDataSource.getRepository(Note);
         const note = await noteRepository.findOneBy({ id: id });
         if (!note) {
-            return res.status(404).json({ error: "Note not found" });
+            return res.status(404).json({ error: "TrashNote not found" });
         }
         await noteRepository.remove(note);
         res.status(200).json({ message: "Note deleted successfully" });
@@ -119,7 +119,7 @@ router.put('/trash', authMiddleware, async (req, res) => {
         const noteRepository = AppDataSource.getRepository(Note);
         const note = await noteRepository.findOneBy({ id: id });
         if (!note) {
-            return res.status(404).json({ error: "Can't find note" });
+            return res.status(404).json({ error: "TrashNote not found" });
         }
         note.is_deleted = false; // 論理削除フラグを解除
         note.deletedate = null; // 削除日時をnullに設定
