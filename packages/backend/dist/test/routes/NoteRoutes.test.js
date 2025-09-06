@@ -110,7 +110,7 @@ describe("NoteRoutes", () => {
         expect(res.body.note).toHaveProperty("updatedate");
     });
     it("POST /notes and Error occured should return 500 and message", async () => {
-        mockRepo.save.mockImplementationOnce(() => Promise.reject(new Error("DB find error")));
+        mockRepo.save.mockImplementationOnce(() => Promise.reject(new Error("DB save error")));
         const response = await request(app)
             .post("/api/notes")
             .send({ title: "test title3", content: "test content3", label: "1", isLocked: false });
@@ -229,9 +229,34 @@ describe("NoteRoutes", () => {
     it("PUT /notes/trash and error occured should return 500 and message", async () => {
         mockRepo.findOneBy.mockImplementationOnce(() => Promise.reject(new Error("DB find error")));
         const response = await request(app)
-            .delete("/api/notes/trash/2");
+            .put("/api/notes/trash")
+            .send({ id: 3 });
         expect(response.status).toBe(500);
-        expect(response.body.error).toBe("Failed to delete note");
+        expect(response.body.error).toBe("Failed to restore notes");
+    });
+    it("PUT /notes/lock should return 200 and message", async () => {
+        const response = await request(app)
+            .put("/api/notes/lock")
+            .send({ id: "1", isLocked: true });
+        expect(response.status).toBe(200);
+        expect(response.body.message).toBe("Update lock state success!");
+        expect(response.body.note.id).toBe("1");
+        expect(response.body.note.is_locked).toBe(true);
+    });
+    it("PUT /notes/lock with NOT exist note should return 404 and message", async () => {
+        const response = await request(app)
+            .put("/api/notes/lock")
+            .send({ id: "999", isLocked: true });
+        expect(response.status).toBe(404);
+        expect(response.body.error).toBe("Can't find note");
+    });
+    it("PUT /notes/lock and error occured should return 500 and message", async () => {
+        mockRepo.findOneBy.mockImplementationOnce(() => Promise.reject(new Error("DB find error")));
+        const response = await request(app)
+            .put("/api/notes/lock")
+            .send({ id: "1", isLocked: true });
+        expect(response.status).toBe(500);
+        expect(response.body.error).toBe("Failed to update lock state");
     });
     afterAll(async () => {
         if (hoardserver) {
