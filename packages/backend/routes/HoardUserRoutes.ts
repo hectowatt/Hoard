@@ -13,43 +13,47 @@ const SECRET = process.env.SECRET || 'hoard_secret';
 router.get('/isexist', async (req, res) => {
     const userRepository = AppDataSource.getRepository('HoardUser');
     const users = await userRepository.find();
-    if(users && users.length > 0) {
+    if (users && users.length > 0) {
         return res.status(200).json({ exists: true });
-    }else{
+    } else {
         return res.status(200).json({ exists: false });
     }
 });
 
 // 【SELECT】User取得API
-router.get('/',authMiddleware, async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
     const userRepository = AppDataSource.getRepository('HoardUser');
     const users = await userRepository.find();
     res.status(200).json(users);
 });
 
 // 【INSERT】User登録API
-router.post('/',authMiddleware, async (req, res) => {
-    const { username, password } = req.body;
-    const userRepository = AppDataSource.getRepository(HoardUser);
-    const password_hashed = await bcrypt.hash(password, 10);
-    const newUser = userRepository.create({
-        username: username,
-        password: password_hashed,
-        createdate: new Date(),
-        updatedate: new Date()
-    });
+router.post('/', authMiddleware, async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        const userRepository = AppDataSource.getRepository(HoardUser);
+        const password_hashed = await bcrypt.hash(password, 10);
+        const newUser = userRepository.create({
+            username: username,
+            password: password_hashed,
+            createdate: new Date(),
+            updatedate: new Date()
+        });
 
-    const savedUser = await userRepository.save(newUser);
-    const token = jwt.sign({ id: savedUser.id, username: savedUser.username }, SECRET, { expiresIn: '1d' });
-                res.cookie("token", token, {
-                    domain: "localhost",
-                    httpOnly: true,
-                    secure: process.env.NODE_ENV === 'production' ? 'true' : 'false',
-                    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-                    path: "/",
-                    maxAge: 24 * 60 * 60 * 1000 // 1day
-                });
-    res.status(201).json({ message: "regist user success!" });
+        const savedUser = await userRepository.save(newUser);
+        const token = jwt.sign({ id: savedUser.id, username: savedUser.username }, SECRET, { expiresIn: '1d' });
+        res.cookie("token", token, {
+            domain: "localhost",
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production' ? 'true' : 'false',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            path: "/",
+            maxAge: 24 * 60 * 60 * 1000 // 1day
+        });
+        res.status(201).json({ message: "regist user success!" });
+    } catch (error) {
+        res.status(500).json({ message: "Internal server error" });
+    }
 })
 
 
