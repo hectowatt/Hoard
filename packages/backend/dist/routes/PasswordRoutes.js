@@ -67,15 +67,15 @@ router.post('/compare', authMiddleware, async (req, res) => {
     try {
         const password_id = req.body.password_id;
         const passwordString = req.body.passwordString;
-        console.log("サーバに届いたパスワードid:", password_id);
-        console.log("サーバに届いたパスワード文字列:", passwordString);
         if (!passwordString) {
             return res.status(400).json({ error: "Must set password string" });
         }
         const passwordRepository = AppDataSource.getRepository(Password);
         // passwordを取得する
         const password = await passwordRepository.findOneBy({ password_id: password_id });
-        console.log("取得したパスワード:", password);
+        if (password === null) {
+            return res.status(404).json({ error: "Password not found" });
+        }
         const isMatch = await bcrypt.compare(passwordString, password.password_hashed);
         console.log("パスワードの一致:", isMatch);
         res.status(200).json({ isMatch: isMatch });

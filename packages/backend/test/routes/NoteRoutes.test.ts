@@ -135,7 +135,7 @@ describe("NoteRoutes", () => {
   });
 
   it("POST /notes and Error occured should return 500 and message", async () => {
-    mockRepo.save.mockImplementationOnce(() => Promise.reject(new Error("DB find error")));
+    mockRepo.save.mockImplementationOnce(() => Promise.reject(new Error("DB save error")));
 
     const response = await request(app)
       .post("/api/notes")
