@@ -3,7 +3,7 @@ import TableNoteColumn from "./TableNoteColumn.js";
 import TableNote from "./TableNote.js";
 
 @Entity({ name: "table_note_cell" })
-export default class NoteTableCell {
+export default class TableNoteCell {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 

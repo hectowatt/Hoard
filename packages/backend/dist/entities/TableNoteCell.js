@@ -10,30 +10,30 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
 import TableNoteColumn from "./TableNoteColumn.js";
 import TableNote from "./TableNote.js";
-let NoteTableCell = class NoteTableCell {
+let TableNoteCell = class TableNoteCell {
 };
 __decorate([
     PrimaryGeneratedColumn("uuid"),
     __metadata("design:type", String)
-], NoteTableCell.prototype, "id", void 0);
+], TableNoteCell.prototype, "id", void 0);
 __decorate([
     Column({ name: "row_index", type: "int" }),
     __metadata("design:type", Number)
-], NoteTableCell.prototype, "row_index", void 0);
+], TableNoteCell.prototype, "row_index", void 0);
 __decorate([
     Column({ name: "value", type: "text" }),
     __metadata("design:type", String)
-], NoteTableCell.prototype, "value", void 0);
+], TableNoteCell.prototype, "value", void 0);
 __decorate([
     ManyToOne(() => TableNote, tableNote => tableNote.id, { onDelete: "CASCADE" }),
     __metadata("design:type", TableNote)
-], NoteTableCell.prototype, "tableNote", void 0);
+], TableNoteCell.prototype, "tableNote", void 0);
 __decorate([
     ManyToOne(() => TableNoteColumn, column => column.id, { onDelete: "CASCADE" }),
     __metadata("design:type", TableNoteColumn)
-], NoteTableCell.prototype, "column", void 0);
-NoteTableCell = __decorate([
+], TableNoteCell.prototype, "column", void 0);
+TableNoteCell = __decorate([
     Entity({ name: "table_note_cell" })
-], NoteTableCell);
-export default NoteTableCell;
+], TableNoteCell);
+export default TableNoteCell;
 //# sourceMappingURL=TableNoteCell.js.map

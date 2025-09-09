@@ -27,7 +27,6 @@ router.get('/', authMiddleware, async (req, res) => {
 router.post('/', authMiddleware, async (req, res) => {
     try {
         const { username, password } = req.body;
-        console.log("パラメータ：", username, password);
         const userRepository = AppDataSource.getRepository(HoardUser);
         const password_hashed = await bcrypt.hash(password, 10);
         const newUser = userRepository.create({
