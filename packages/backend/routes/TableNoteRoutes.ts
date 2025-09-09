@@ -12,7 +12,7 @@ const router = Router();
 
 // 【INSERT】テーブルノート登録API
 router.post('/',authMiddleware, async (req, res) => {
-    const { title, columns, rowCells, label, is_locked } = req.body;
+    const { title, columns, rowCells, label_id, is_locked } = req.body;
 
     if (!title && !columns && !rowCells) {
         return res.status(400).json({ error: "Must set tablenote title, columns, rows" });
@@ -22,11 +22,11 @@ router.post('/',authMiddleware, async (req, res) => {
         var savedTableNote: TableNote = null;
 
         await AppDataSource.transaction(async (transactionalEntityManager: EntityManager) => {
-            // table_noテーブルにデータを登録
+            // table_noteテーブルにデータを登録
             const tableNoteRepository = transactionalEntityManager.getRepository(TableNote);
             const newTableNote = tableNoteRepository.create({
                 title: title,
-                label_id: label || null, // ラベルがない場合はnullを設定
+                label_id: label_id || null, // ラベルがない場合はnullを設定
                 is_locked: is_locked || false, // ロック状態を設定
                 createdate: new Date(),
                 updatedate: new Date()
@@ -119,6 +119,7 @@ router.get('/', authMiddleware,async (req, res) => {
                 rowCells: groupedRowCells
             });
         }
+        console.log("tablenotearray:", tableNoteArray);
         res.status(200).json(tableNoteArray);
     } catch (error) {
         console.error("Error fetching TableNote:", error);

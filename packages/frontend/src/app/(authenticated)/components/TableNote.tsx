@@ -309,7 +309,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                     title: editTitle,
                     columns: editColumns,
                     rowCells: editRowCells,
-                    label: editLabel,
+                    label_id: editLabel,
                     is_locked: isLocked,
                 }),
                 credentials: "include"

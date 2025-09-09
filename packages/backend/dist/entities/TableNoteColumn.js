@@ -9,26 +9,26 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
 import TableNote from "./TableNote.js";
-let NoteTableColumn = class NoteTableColumn {
+let TableNoteColumn = class TableNoteColumn {
 };
 __decorate([
     PrimaryGeneratedColumn("uuid"),
     __metadata("design:type", String)
-], NoteTableColumn.prototype, "id", void 0);
+], TableNoteColumn.prototype, "id", void 0);
 __decorate([
     Column({ name: "name", type: "text" }),
     __metadata("design:type", String)
-], NoteTableColumn.prototype, "name", void 0);
+], TableNoteColumn.prototype, "name", void 0);
 __decorate([
     Column({ name: "order", type: "int", default: 0 }),
     __metadata("design:type", Number)
-], NoteTableColumn.prototype, "order", void 0);
+], TableNoteColumn.prototype, "order", void 0);
 __decorate([
     ManyToOne(() => TableNote, tableNote => tableNote.id, { onDelete: "CASCADE" }),
     __metadata("design:type", TableNote)
-], NoteTableColumn.prototype, "tableNote", void 0);
-NoteTableColumn = __decorate([
+], TableNoteColumn.prototype, "tableNote", void 0);
+TableNoteColumn = __decorate([
     Entity({ name: "table_note_column" })
-], NoteTableColumn);
-export default NoteTableColumn;
+], TableNoteColumn);
+export default TableNoteColumn;
 //# sourceMappingURL=TableNoteColumn.js.map
