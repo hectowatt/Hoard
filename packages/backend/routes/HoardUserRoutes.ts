@@ -28,7 +28,7 @@ router.get('/', authMiddleware, async (req, res) => {
 });
 
 // 【INSERT】User登録API
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', async (req, res) => {
     try {
         const { username, password } = req.body;
         const userRepository = AppDataSource.getRepository(HoardUser);
