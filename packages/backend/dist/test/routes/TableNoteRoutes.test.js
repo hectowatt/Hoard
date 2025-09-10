@@ -19,15 +19,16 @@ const mockTableNotes = [
 ];
 // テーブルノートのカラムのモック
 const mockTableNoteColumns = [
-    { id: "1", name: "test column1", order: 1, tableNote: mockTableNotes[1] },
-    { id: "2", name: "test column2", order: 2, tableNote: mockTableNotes[1] },
+    { id: "1", name: "test column1", order: 1, tableNote: mockTableNotes[0] },
+    { id: "2", name: "test column2", order: 2, tableNote: mockTableNotes[0] },
     { id: "3", name: "test column3", order: 1, tableNote: mockTableNotes[1] },
 ];
 // テーブルノートのセルのモック
 const mockTableNoteCells = [
     { id: "1", row_index: 0, value: "test cell1", tableNote: mockTableNotes[0], column: mockTableNoteColumns[0] },
-    { id: "2", row_index: 1, value: "test cell2", tableNote: mockTableNotes[0], column: mockTableNoteColumns[1] },
+    { id: "2", row_index: 0, value: "test cell2", tableNote: mockTableNotes[0], column: mockTableNoteColumns[1] },
     { id: "3", row_index: 0, value: "test cell3", tableNote: mockTableNotes[1], column: mockTableNoteColumns[2] },
+    { id: "4", row_index: 1, value: "test cell4", tableNote: mockTableNotes[1], column: mockTableNoteColumns[2] },
 ];
 // 削除済みノートのモック
 const mockDeletedTableNotes = [
@@ -70,7 +71,17 @@ const mockRepoTableNote = {
 };
 // TableNoteColumnのリポジトリをモック
 const mockRepoTableNoteColumn = {
-    find: jest.fn(() => Promise.resolve(mockTableNoteColumns)),
+    find: jest.fn((options) => {
+        if (options?.where?.tableNote?.id === "1") {
+            return Promise.resolve([mockTableNoteColumns[0], mockTableNoteColumns[1]]);
+        }
+        if (options?.where?.tableNote?.id === "2") {
+            return Promise.resolve([
+                mockTableNoteColumns[2]
+            ]);
+        }
+        return Promise.resolve([]);
+    }),
     findOneBy: jest.fn(({ id }) => {
         if (id === mockTableNoteColumns[0].id) {
             return Promise.resolve(mockTableNoteColumns[0]);
@@ -98,15 +109,20 @@ const mockRepoTableNoteColumn = {
 };
 // TableNoteCellのリポジトリをモック
 const mockRepoTableNoteCell = {
-    find: jest.fn(() => Promise.resolve(mockTableNoteCells)),
+    find: jest.fn((options) => {
+        if (options?.where?.tableNote?.id) {
+            return Promise.resolve(mockTableNoteCells.filter(cell => cell.tableNote.id === options.where.tableNote.id));
+        }
+        return Promise.resolve(mockTableNoteCells);
+    }),
     findOneBy: jest.fn(({ id }) => {
-        if (id === mockTableNoteCells[0].id) {
+        if (id === mockTableNoteCells[0][0].id) {
             return Promise.resolve(mockTableNoteCells[0]);
         }
-        else if (id === mockTableNoteCells[1].id) {
+        else if (id === mockTableNoteCells[0][1].id) {
             return Promise.resolve(mockTableNoteCells[1]);
         }
-        else if (id === mockTableNoteCells[2].id) {
+        else if (id === mockTableNoteCells[1][0].id) {
             return Promise.resolve(mockTableNoteCells[2]);
         }
         return Promise.resolve(null);
@@ -184,12 +200,49 @@ describe("TableNoteRoutes", () => {
         const response = await request(app)
             .get("/api/tablenotes");
         expect(response.status).toBe(200);
-        expect(response.body[0]).toHaveProperty("id");
-        expect(response.body[0].title).toBe("test title");
-        expect(response.body[0].label_id).toBe(mockLabels[0].id);
+        expect(response.body[0].id).toBe("1");
+        expect(response.body[0].title).toBe("test title1");
+        expect(response.body[0].label_id).toBe("1");
         expect(response.body[0].is_locked).toBe(false);
         expect(response.body[0]).toHaveProperty("createdate");
         expect(response.body[0]).toHaveProperty("updatedate");
+        expect(response.body[0].columns[0].id).toBe("1");
+        expect(response.body[0].columns[0].name).toBe("test column1");
+        expect(response.body[0].columns[0].order).toBe(1);
+        expect(response.body[0].columns[1].id).toBe("2");
+        expect(response.body[0].columns[1].name).toBe("test column2");
+        expect(response.body[0].columns[1].order).toBe(2);
+        expect(response.body[0].rowCells[0][0].id).toBe("1");
+        expect(response.body[0].rowCells[0][0].rowIndex).toBe(0);
+        expect(response.body[0].rowCells[0][0].value).toBe("test cell1");
+        expect(response.body[0].rowCells[0][0]).toHaveProperty("columnId");
+        expect(response.body[0].rowCells[0][1].id).toBe("2");
+        expect(response.body[0].rowCells[0][1].rowIndex).toBe(0);
+        expect(response.body[0].rowCells[0][1].value).toBe("test cell2");
+        expect(response.body[0].rowCells[0][1]).toHaveProperty("columnId");
+        expect(response.body[0].rowCells[0][0].id).toBe("1");
+        expect(response.body[0].rowCells[0][0].rowIndex).toBe(0);
+        expect(response.body[0].rowCells[0][0].value).toBe("test cell1");
+        expect(response.body[0].rowCells[0][0]).toHaveProperty("columnId");
+        expect(response.body[0].rowCells[0][1].id).toBe("2");
+        expect(response.body[0].rowCells[0][1].rowIndex).toBe(0);
+        expect(response.body[0].rowCells[0][1].value).toBe("test cell2");
+        expect(response.body[0].rowCells[0][1]).toHaveProperty("columnId");
+        expect(response.body[1].id).toBe("2");
+        expect(response.body[1].title).toBe("test title2");
+        expect(response.body[1].label_id).toBe("2");
+        expect(response.body[1].is_locked).toBe(true);
+        expect(response.body[1]).toHaveProperty("createdate");
+        expect(response.body[1]).toHaveProperty("updatedate");
+        expect(response.body[1].columns[0].id).toBe("3");
+        expect(response.body[1].columns[0].name).toBe("test column3");
+        expect(response.body[1].columns[0].order).toBe(1);
+        expect(response.body[1].rowCells[0][0].id).toBe("3");
+        expect(response.body[1].rowCells[0][0].rowIndex).toBe(0);
+        expect(response.body[1].rowCells[0][0].value).toBe("test cell3");
+        expect(response.body[1].rowCells[1][0].id).toBe("4");
+        expect(response.body[1].rowCells[1][0].rowIndex).toBe(1);
+        expect(response.body[1].rowCells[1][0].value).toBe("test cell4");
     });
     afterAll(async () => {
         if (hoardserver) {
