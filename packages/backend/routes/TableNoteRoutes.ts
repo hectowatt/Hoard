@@ -139,7 +139,7 @@ router.put('/', authMiddleware,async (req, res) => {
 
             const tableNote = await tableNoteRepository.findOneBy({ id: id });
             if (!tableNote) {
-                return res.status(404).json({ error: "note not found" });
+                return res.status(404).json({ error: "tablenote not found" });
             }
 
             // ノート情報更新
