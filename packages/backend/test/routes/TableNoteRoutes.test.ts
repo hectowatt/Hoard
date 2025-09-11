@@ -345,7 +345,33 @@ describe("TableNoteRoutes", () => {
         expect(response.body.error).toBe("Failed to update TableNote");
     });
 
-    
+    it("DELETE /tablenotes should return 200 and message", async() => {
+        const response = await request(app)
+            .delete("/api/tablenotes/1");
+
+        expect(response.status).toBe(200);
+        expect(response.body.message).toBe("TableNote moved to trash successfully");
+    });
+
+    it("DELETE /tablenotes and cannot find tablenote should return 404 and message", async () => {
+        mockRepoTableNote.findOneBy.mockImplementationOnce(() => Promise.resolve(null));
+        const response = await request(app)
+            .delete("/api/tablenotes/1");
+
+        expect(response.status).toBe(404);
+        expect(response.body.error).toBe("tablenote not found");
+    });
+
+    it("DELETE /tablenotes and error occured should return 500 and message", async() => {
+        mockRepoTableNote.findOneBy.mockImplementationOnce(() => Promise.reject(new Error("DB find error!")));
+        const response = await request(app)
+            .delete("/api/tablenotes/1")
+
+        expect(response.status).toBe(500);
+        expect(response.body.error).toBe("Failed moved to trash");
+    });
+
+
 
     afterAll(async () => {
         if (hoardserver) {

@@ -253,7 +253,7 @@ router.delete('/:id', authMiddleware, async (req, res) => {
         const tableNoteRepository = AppDataSource.getRepository(TableNote);
         const tableNote = await tableNoteRepository.findOneBy({ id: id });
         if (!tableNote) {
-            return res.status(404).json({ error: "Note not found" });
+            return res.status(404).json({ error: "tablenote not found" });
         }
         tableNote.is_deleted = true; // 論理削除のためフラグを立てる
         tableNote.deletedate = new Date(); // 削除日時を設定
