@@ -325,6 +325,28 @@ describe("TableNoteRoutes", () => {
         expect(response.body.tableNote).toHaveProperty("rowCells");
     });
 
+    it("PUT /tablenotes and cannot find tablenote should return 404 and message", async () => {
+        mockRepoTableNote.findOneBy.mockImplementationOnce(() => Promise.resolve(null));
+        const response = await request(app)
+            .put("/api/tablenotes")
+            .send({id: "1", title: "updated title", columns: [mockTableNoteColumns[0]], rowCells: [[]], label: mockLabels[0], is_locked: false});
+
+        expect(response.status).toBe(404);
+        expect(response.body.error).toBe("tablenote not found");
+    });
+
+    it("PUT /tablenotes and error occured should return 500 and message", async() => {
+        mockRepoTableNote.findOneBy.mockImplementationOnce(() => Promise.reject(new Error("DB find error!")));
+        const response = await request(app)
+            .put("/api/tablenotes")
+            .send({id: "1", title: "updated title", columns: [mockTableNoteColumns[0]], rowCells: [[]], label: mockLabels[0], is_locked: false});
+
+        expect(response.status).toBe(500);
+        expect(response.body.error).toBe("Failed to update TableNote");
+    });
+
+    
+
     afterAll(async () => {
         if (hoardserver) {
             await new Promise<void>((resolve, reject) => {
