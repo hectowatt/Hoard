@@ -106,6 +106,7 @@ const mockRepoTableNoteColumn = {
         });
     }),
     remove: jest.fn((tableNoteColumn) => Promise.resolve(tableNoteColumn)),
+    delete: jest.fn((tableNoteColumn) => Promise.resolve(tableNoteColumn))
 };
 // TableNoteCellのリポジトリをモック
 const mockRepoTableNoteCell = {
@@ -139,7 +140,8 @@ const mockRepoTableNoteCell = {
             column: tableNoteCell.column,
         });
     }),
-    remove: jest.fn((tableNoteColumn) => Promise.resolve(tableNoteColumn)),
+    remove: jest.fn((tableNoteCell) => Promise.resolve(tableNoteCell)),
+    delete: jest.fn((tableNoteCell) => Promise.resolve(tableNoteCell))
 };
 const mockGetRepository = jest.fn((entity) => {
     console.log('getRepository called with:', entity?.name);
@@ -175,7 +177,7 @@ describe("TableNoteRoutes", () => {
     beforeEach(() => {
         jest.clearAllMocks();
     });
-    it("POST /trashnotes should return 201 and message", async () => {
+    it("POST /tablenotes should return 201 and message", async () => {
         const response = await request(app)
             .post("/api/tablenotes")
             .send({ title: "test title", columns: mockTableNoteColumns, rowCells: mockTableNoteCells, label_id: mockLabels[0].id, is_locked: false });
@@ -188,7 +190,7 @@ describe("TableNoteRoutes", () => {
         expect(response.body.tableNote).toHaveProperty("createdate");
         expect(response.body.tableNote).toHaveProperty("updatedate");
     });
-    it("POST /trashnotes and error occured should return 500 and message", async () => {
+    it("POST /tablenotes and error occured should return 500 and message", async () => {
         mockRepoTableNote.save.mockImplementationOnce(() => Promise.reject(new Error("DB find error")));
         const response = await request(app)
             .post("/api/tablenotes")
@@ -196,7 +198,14 @@ describe("TableNoteRoutes", () => {
         expect(response.status).toBe(500);
         expect(response.body.error).toBe("Failed to save TableNote");
     });
-    it("GET /trashnotes should return 200 and message", async () => {
+    it("POST /tablenotes with NOT title should return 400 and message", async () => {
+        const response = await request(app)
+            .post("/api/tablenotes")
+            .send({ title: "", columns: mockTableNoteColumns, rowCells: mockTableNoteCells, label_id: mockLabels[0].id, is_locked: false });
+        expect(response.status).toBe(400);
+        expect(response.body.error).toBe("Must set tablenote title, columns, rows");
+    });
+    it("GET /tablenotes should return 200 and message", async () => {
         const response = await request(app)
             .get("/api/tablenotes");
         expect(response.status).toBe(200);
@@ -243,6 +252,35 @@ describe("TableNoteRoutes", () => {
         expect(response.body[1].rowCells[1][0].id).toBe("4");
         expect(response.body[1].rowCells[1][0].rowIndex).toBe(1);
         expect(response.body[1].rowCells[1][0].value).toBe("test cell4");
+    });
+    it("GET /tablenotes and can't find tablenote should return 200 and message", async () => {
+        mockRepoTableNote.find.mockImplementationOnce(() => Promise.resolve(null));
+        const response = await request(app)
+            .get("/api/tablenotes");
+        expect(response.status).toBe(404);
+        expect(response.body.error).toBe("TableNote not found");
+    });
+    it("GET /tablenotes and error ocuured should return 200 and message", async () => {
+        mockRepoTableNote.find.mockImplementationOnce(() => Promise.reject(new Error("DB find error!")));
+        const response = await request(app)
+            .get("/api/tablenotes");
+        expect(response.status).toBe(500);
+        expect(response.body.error).toBe("Failed to fetch TableNote");
+    });
+    it("PUT /tablenotes should return 200 and message", async () => {
+        const response = await request(app)
+            .put("/api/tablenotes")
+            .send({ id: "1", title: "updated title", columns: [mockTableNoteColumns[0]], rowCells: [[]], label: mockLabels[0], is_locked: false });
+        expect(response.status).toBe(200);
+        expect(response.body.tableNote.id).toBe("1");
+        expect(response.body.tableNote.title).toBe("updated title");
+        expect(response.body.tableNote.is_locked).toBe(false);
+        expect(response.body.tableNote).toHaveProperty("createdate");
+        expect(response.body.tableNote).toHaveProperty("updatedate");
+        expect(response.body.tableNote.columns[0].id).toBe("1");
+        expect(response.body.tableNote.columns[0].name).toBe("test column1");
+        expect(response.body.tableNote.columns[0].order).toBe(1);
+        expect(response.body.tableNote).toHaveProperty("rowCells");
     });
     afterAll(async () => {
         if (hoardserver) {

@@ -14,7 +14,7 @@ const router = Router();
 router.post('/',authMiddleware, async (req, res) => {
     const { title, columns, rowCells, label_id, is_locked } = req.body;
 
-    if (!title && !columns && !rowCells) {
+    if (!title || !columns || !rowCells) {
         return res.status(400).json({ error: "Must set tablenote title, columns, rows" });
     }
 
@@ -130,7 +130,7 @@ router.get('/', authMiddleware,async (req, res) => {
 
 // 【UPDATE】テーブルノート更新API
 router.put('/', authMiddleware,async (req, res) => {
-    const { id, title, columns, rowCells, label, is_locked } = req.body;
+    const { id, title, columns, rowCells, label_id, is_locked } = req.body;
     try {
         await AppDataSource.transaction(async (transactionalEntityManager: EntityManager) => {
             const tableNoteRepository = transactionalEntityManager.getRepository(TableNote);
@@ -144,7 +144,7 @@ router.put('/', authMiddleware,async (req, res) => {
 
             // ノート情報更新
             tableNote.title = title;
-            tableNote.label_id = label || null;
+            tableNote.label_id = label_id || null;
             tableNote.is_locked = is_locked || false;
             tableNote.updatedate = new Date();
             await tableNoteRepository.save(tableNote);
