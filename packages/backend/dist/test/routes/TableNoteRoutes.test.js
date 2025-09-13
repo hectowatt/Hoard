@@ -32,7 +32,17 @@ const mockTableNoteCells = [
 ];
 // 削除済みノートのモック
 const mockDeletedTableNotes = [
-    { id: "3", title: "test title3", content: "test content3", label_id: "1", label: mockLabels[0], is_deleted: true, deletedate: new Date(), is_locked: false, createdate: new Date(), updatedate: new Date() }
+    { id: "3", title: "test title3", label_id: "1", label: mockLabels[0], is_deleted: true, deletedate: new Date(), is_locked: false, createdate: new Date(), updatedate: new Date() }
+];
+// 削除済みテーブルノートのカラムのモック
+const mockDeletedTableNoteColumns = [
+    { id: "1", name: "test column1", order: 1, tableNote: mockTableNotes[0] },
+    { id: "2", name: "test column2", order: 2, tableNote: mockTableNotes[0] },
+];
+// 削除済みテーブルノートのセルのモック
+const mockDeletedTableNoteCells = [
+    { id: "1", row_index: 0, value: "test cell1", tableNote: mockTableNotes[0], column: mockTableNoteColumns[0] },
+    { id: "2", row_index: 0, value: "test cell2", tableNote: mockTableNotes[0], column: mockTableNoteColumns[1] },
 ];
 // AuthMiddlewareをモック
 jest.unstable_mockModule('../../dist/middleware/AuthMiddleware', () => ({
@@ -229,14 +239,6 @@ describe("TableNoteRoutes", () => {
         expect(response.body[0].rowCells[0][1].rowIndex).toBe(0);
         expect(response.body[0].rowCells[0][1].value).toBe("test cell2");
         expect(response.body[0].rowCells[0][1]).toHaveProperty("columnId");
-        expect(response.body[0].rowCells[0][0].id).toBe("1");
-        expect(response.body[0].rowCells[0][0].rowIndex).toBe(0);
-        expect(response.body[0].rowCells[0][0].value).toBe("test cell1");
-        expect(response.body[0].rowCells[0][0]).toHaveProperty("columnId");
-        expect(response.body[0].rowCells[0][1].id).toBe("2");
-        expect(response.body[0].rowCells[0][1].rowIndex).toBe(0);
-        expect(response.body[0].rowCells[0][1].value).toBe("test cell2");
-        expect(response.body[0].rowCells[0][1]).toHaveProperty("columnId");
         expect(response.body[1].id).toBe("2");
         expect(response.body[1].title).toBe("test title2");
         expect(response.body[1].label_id).toBe("2");
@@ -317,6 +319,127 @@ describe("TableNoteRoutes", () => {
             .delete("/api/tablenotes/1");
         expect(response.status).toBe(500);
         expect(response.body.error).toBe("Failed moved to trash");
+    });
+    /************ TrashNote ************/
+    it("GET /tablenotes/trash should return 200 and trash tablenotes", async () => {
+        mockRepoTableNote.find.mockImplementationOnce(() => Promise.resolve(mockDeletedTableNotes));
+        const response = await request(app)
+            .get("/api/tablenotes/trash");
+        console.log(response.body);
+        expect(response.status).toBe(200);
+        expect(response.body[0].id).toBe("3");
+        expect(response.body[0].title).toBe("test title3");
+        expect(response.body[0].label_id).toBe("1");
+        expect(response.body[0].is_locked).toBe(false);
+        expect(response.body[0]).toHaveProperty("createdate");
+        expect(response.body[0]).toHaveProperty("updatedate");
+    });
+    it("GET /tablenotes/trash and error occured should return 200 and trash tablenotes", async () => {
+        mockRepoTableNote.find.mockImplementationOnce(() => Promise.reject(new Error("DB find error!")));
+        const response = await request(app)
+            .get("/api/tablenotes/trash");
+        console.log(response.body);
+        expect(response.status).toBe(500);
+        expect(response.body.error).toBe("Failed to fetch trash TableNotes");
+    });
+    it("DELETE /tablenotes/trash should return 200 and message", async () => {
+        mockRepoTableNote.findOneBy.mockImplementationOnce(() => Promise.resolve(mockDeletedTableNotes));
+        const response = await request(app)
+            .delete("/api/tablenotes/trash/3");
+        expect(response.status).toBe(200);
+        expect(response.body.message).toBe("TableNote deleted successfully");
+    });
+    it("DELETE /tablenotes/trash with NOT exists id should return 200 and message", async () => {
+        mockRepoTableNote.findOneBy.mockImplementationOnce(({ id }) => {
+            if (id === 3) {
+                return Promise.resolve(mockDeletedTableNotes);
+            }
+            else {
+                return Promise.resolve(null);
+            }
+        });
+        const response = await request(app)
+            .delete("/api/tablenotes/trash/999");
+        expect(response.status).toBe(404);
+        expect(response.body.error).toBe("TableNotes not found");
+    });
+    it("DELETE /tablenotes/trash and error occured should return 500 and message", async () => {
+        mockRepoTableNote.findOneBy.mockImplementationOnce(() => Promise.reject(new Error("DB find error!")));
+        const response = await request(app)
+            .delete("/api/tablenotes/trash/3");
+        expect(response.status).toBe(500);
+        expect(response.body.error).toBe("Failed to delete TableNote");
+    });
+    it("PUT /tablenotes/trash should return 200 and message", async () => {
+        mockRepoTableNote.findOneBy.mockImplementationOnce(() => Promise.resolve(mockDeletedTableNotes));
+        const response = await request(app)
+            .put("/api/tablenotes/trash")
+            .send({ id: 3 });
+        console.log("response body:", response.body);
+        expect(response.status).toBe(200);
+        expect(response.body.tablenote.is_deleted).toBe(false);
+        expect(response.body.tablenote).toHaveProperty("createdate");
+        expect(response.body.tablenote).toHaveProperty("updatedate");
+        expect(response.body.tablenote.deletedate).toBe(null);
+    });
+    it("PUT /tablenotes/trash with NOT exists id should return 200 and message", async () => {
+        mockRepoTableNote.findOneBy.mockImplementationOnce(({ id }) => {
+            if (id === 3) {
+                return Promise.resolve(mockDeletedTableNotes);
+            }
+            else {
+                return Promise.resolve(null);
+            }
+        });
+        const response = await request(app)
+            .put("/api/tablenotes/trash")
+            .send({ id: 999 });
+        expect(response.status).toBe(404);
+        expect(response.body.error).toBe("Can't find TableNote");
+    });
+    it("PUT /tablenotes/trash and error occured should return 500 and message", async () => {
+        mockRepoTableNote.findOneBy.mockImplementationOnce(() => Promise.reject(new Error("DB find error!")));
+        const response = await request(app)
+            .put("/api/tablenotes/trash")
+            .send({ id: 3 });
+        expect(response.status).toBe(500);
+        expect(response.body.error).toBe("Failed to restore TableNote");
+    });
+    it("PUT /tablenotes/lock should return 200 and message", async () => {
+        mockRepoTableNote.findOneBy.mockImplementationOnce(() => Promise.resolve(mockDeletedTableNotes));
+        const response = await request(app)
+            .put("/api/tablenotes/lock")
+            .send({ id: 3, isLocked: true });
+        console.log("response.body.tablenote:", response.body.tablenote);
+        expect(response.status).toBe(200);
+        expect(response.body.message).toBe("Update lock state success!");
+        expect(response.body.tablenote.is_deleted).toBe(false);
+        expect(response.body.tablenote).toHaveProperty("createdate");
+        expect(response.body.tablenote).toHaveProperty("updatedate");
+        expect(response.body.tablenote.deletedate).toBe(null);
+    });
+    it("PUT /tablenotes/trash with NOT exists id should return 200 and message", async () => {
+        mockRepoTableNote.findOneBy.mockImplementationOnce(({ id }) => {
+            if (id === 3) {
+                return Promise.resolve(mockDeletedTableNotes);
+            }
+            else {
+                return Promise.resolve(null);
+            }
+        });
+        const response = await request(app)
+            .put("/api/tablenotes/trash")
+            .send({ id: 999 });
+        expect(response.status).toBe(404);
+        expect(response.body.error).toBe("Can't find TableNote");
+    });
+    it("PUT /tablenotes/trash and error occured should return 500 and message", async () => {
+        mockRepoTableNote.findOneBy.mockImplementationOnce(() => Promise.reject(new Error("DB find error!")));
+        const response = await request(app)
+            .put("/api/tablenotes/trash")
+            .send({ id: 3 });
+        expect(response.status).toBe(500);
+        expect(response.body.error).toBe("Failed to restore TableNote");
     });
     afterAll(async () => {
         if (hoardserver) {

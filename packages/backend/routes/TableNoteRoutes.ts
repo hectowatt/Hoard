@@ -337,10 +337,10 @@ router.put('/trash', authMiddleware, async (req, res) => {
     tableNote.deletedate = null; // 削除日時をnullに設定
     const restoredNote = await tableNoteRepository.save(tableNote);
     console.log('Note restored: ', restoredNote.updatedate);
-    res.status(200).json({ message: "Restore TableNote success!", note: restoredNote });
+    res.status(200).json({ message: "Restore TableNote success!", tablenote: restoredNote });
   } catch (error) {
     console.error("Error restoring TableNote", error);
-    res.status(500).json({ error: "Failed to restore TableNotea" });
+    res.status(500).json({ error: "Failed to restore TableNote" });
   }
 });
 
@@ -357,7 +357,7 @@ router.put('/lock', authMiddleware, async (req, res) => {
     tableNote.is_locked = isLocked; // ロック状態を更新
     const updatedNote = await tableNoteRepository.save(tableNote);
     console.log('Note lock state updated: ', updatedNote.is_locked);
-    res.status(200).json({ message: "Update lock state success!", note: updatedNote });
+    res.status(200).json({ message: "Update lock state success!", tablenote: updatedNote });
   } catch (error) {
     console.error("Error updating lock state", error);
     res.status(500).json({ error: "Failed to update lock state" });
