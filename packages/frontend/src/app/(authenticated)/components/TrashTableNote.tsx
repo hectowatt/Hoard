@@ -101,7 +101,7 @@ export default function TrashTableNote({ id, title, label_id, is_locked, created
             console.log("Restore success!", result);
 
             if (typeof onRestore === "function") {
-                onRestore(id, editTitle, editLabel, result.note.updatedate);
+                onRestore(id, editTitle, editLabel, result.tablenote.updatedate);
             }
         } catch (error) {
             console.error("Error saving note", error);

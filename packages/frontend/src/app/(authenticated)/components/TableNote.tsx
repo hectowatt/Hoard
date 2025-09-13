@@ -206,7 +206,6 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
 
                 if (responseSelect.ok) {
                     const resultSelect = await responseSelect.json();
-                    console.log("パスワード取得成功", resultSelect);
                     if (resultSelect.password_id !== null && resultSelect.password_id !== "" && resultSelect.password_id !== undefined) {
                         // ロック時の処理
                         const responseLock = await fetch("/api/notes/lock", {
