@@ -42,27 +42,34 @@ const pool = new Pool({
   database: process.env.PG_DATABASE || 'mydatabase',
 });
 
-export const hoardserver = app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
-});
-
-const wss = new WebSocketServer({ server: hoardserver });
-
-// WebSocket接続時の処理
-wss.on('connection', (ws) => {
-  console.log('Client connected');
-
-  ws.on('close', () => {
-    console.log('Client disconnected');
-  });
-});
-
 // TypeORMの初期化
-AppDataSource.initialize().then(() => {
+export async function startServer() {
+  await AppDataSource.initialize();
   console.log("Data Source has been initialized!");
-}).catch((err) => {
-  console.error("Error during Data Source initialization", err);
-});
+
+  const hoardserver = await new Promise((resolve) => {
+    const server = app.listen(port, () => {
+      console.log(`Server running on http://localhost:${port}`);
+      resolve(server);
+    });
+  });
+
+  const wss = new WebSocketServer({ server: hoardserver });
+
+  wss.on('connection', (ws) => {
+    console.log('Client connected');
+    ws.on('close', () => {
+      console.log('Client disconnected');
+    });
+  });
+
+  if (process.env.NODE_ENV !== 'test') {
+    setInterval(deleteOldNotes, 60 * 60 * 1000);
+  }
+
+  return { hoardserver, wss };
+}
+
 
 // ルートにアクセスされたときの処理
 app.get('/', (req, res) => {
@@ -79,20 +86,21 @@ app.use('/api/tablenotes', tableNoteRoutes);
 
 
 // 定期的に古いノートを削除する関数（７日経過したら削除）
-async function deleteOldNotes() {
-  const noteRepository = AppDataSource.getRepository(Note);
-  const tableNoteRepository = AppDataSource.getRepository(TableNote);
-  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-  await noteRepository.delete({
-    is_deleted: true,
-    deletedate: LessThan(sevenDaysAgo)
-  });
-  await tableNoteRepository.delete({
-    is_deleted: true,
-    deletedate: LessThan(sevenDaysAgo)
-  });
-  console.log('Old notes deleted successfully');
+export async function deleteOldNotes() {
+  try {
+    const noteRepository = AppDataSource.getRepository(Note);
+    const tableNoteRepository = AppDataSource.getRepository(TableNote);
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    await noteRepository.delete({
+      is_deleted: true,
+      deletedate: LessThan(sevenDaysAgo)
+    });
+    await tableNoteRepository.delete({
+      is_deleted: true,
+      deletedate: LessThan(sevenDaysAgo)
+    });
+    console.log('Old notes deleted successfully');
+  } catch (error) {
+    console.error('Error deleting old notes:', error);
+  };
 }
-
-// サーバー起動時に定期実行
-if(process.env.NODE_ENV !== 'test'){setInterval(deleteOldNotes, 60 * 60 * 1000);}
