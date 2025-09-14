@@ -33,10 +33,12 @@ jest.unstable_mockModule('../../dist/middleware/AuthMiddleware', () => ({
 // DataSource をモック
 const mockRepo = {
   find: jest.fn(() => Promise.resolve(mockLabels)),
-  findOneBy: jest.fn(({ id }) => {
-    if (id === mockLabels[0].id) {
+  findOneBy: jest.fn(( {id:id} ) => {
+    console.log("mockRepo.findOneBy called with id:", id);
+    const label_id = id as string;
+    if (label_id === mockLabels[0].id) {
       return Promise.resolve(mockLabels[0]);
-    } else if (id === mockLabels[1].id) {
+    } else if (label_id === mockLabels[1].id) {
       return Promise.resolve(mockLabels[1]);
     }
     return Promise.resolve(null);

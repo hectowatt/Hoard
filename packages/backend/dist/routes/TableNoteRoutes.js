@@ -285,7 +285,6 @@ router.delete('/trash/:id', authMiddleware, async (req, res) => {
     try {
         const tableNoteRepository = AppDataSource.getRepository(TableNote);
         const tableNote = await tableNoteRepository.findOneBy({ id: id });
-        console.log("tablenote:", tableNote);
         if (!tableNote) {
             return res.status(404).json({ error: "TableNotes not found" });
         }
