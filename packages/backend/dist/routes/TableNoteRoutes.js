@@ -103,7 +103,6 @@ router.get('/', authMiddleware, async (req, res) => {
                 rowCells: groupedRowCells
             });
         }
-        console.log("tablenotearray:", tableNoteArray);
         res.status(200).json(tableNoteArray);
     }
     catch (error) {
