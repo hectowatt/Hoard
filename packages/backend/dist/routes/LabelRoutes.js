@@ -44,7 +44,6 @@ router.delete('/:id', authMiddleware, async (req, res) => {
     try {
         const labelRepository = AppDataSource.getRepository(Label);
         const label = await labelRepository.findOneBy({ id: id });
-        console.log("label to delete: ", label);
         if (!label) {
             return res.status(404).json({ error: "Label not found" });
         }

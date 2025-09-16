@@ -103,4 +103,11 @@ export async function deleteOldNotes() {
   } catch (error) {
     console.error('Error deleting old notes:', error);
   };
+};
+
+// エントリーポイントでstartServerを呼び出す
+if (process.env.NODE_ENV !== 'test') {
+  startServer().catch((error) => {
+    console.error("Failed to start server:", error);
+  });
 }
