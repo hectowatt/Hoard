@@ -1,12 +1,5 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
-import Note from "./entities/Note.js";
-import Label from "./entities/Label.js";
-import TableNote from "./entities/TableNote.js";
-import TableNoteColumn from "./entities/TableNoteColumn.js";
-import TableNoteCell from "./entities/TableNoteCell.js";
-import Password from "./entities/Password.js";
-import HoardUser from "./entities/HoardUser.js";
 export const AppDataSource = new DataSource({
     type: "postgres",
     host: process.env.PG_HOST || "localhost",
@@ -16,16 +9,8 @@ export const AppDataSource = new DataSource({
     database: process.env.PG_DATABASE || "mydatabase",
     synchronize: true, // 開発環境ではtrue、本番環境ではfalseにする
     logging: false,
-    entities: [
-        Note,
-        Label,
-        TableNote,
-        TableNoteColumn,
-        TableNoteCell,
-        Password,
-        HoardUser
-    ], // エンティティのパス
-    migrations: ["./migrations/*.ts"], // マイグレーションのパス
+    entities: ["dist/entities/*.js"],
+    migrations: ["dist/migrations/*.js"],
     subscribers: [],
 });
 //# sourceMappingURL=DataSource.js.map
