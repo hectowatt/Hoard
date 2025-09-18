@@ -9,8 +9,8 @@ export const AppDataSource = new DataSource({
     database: process.env.PG_DATABASE || "mydatabase",
     synchronize: true, // 開発環境ではtrue、本番環境ではfalseにする
     logging: false,
-    entities: ["dist/entities/*.js"],
-    migrations: ["dist/migrations/*.js"],
+    entities: process.env.NODE_ENV === "development" ? ["./entities/*.ts"] : ["dist/entities/*.js"],
+    migrations: process.env.NODE_ENV === "development" ? ["./migrations/*.ts"] : ["dist/migrations/*.js"],
     subscribers: [],
 });
 //# sourceMappingURL=DataSource.js.map
