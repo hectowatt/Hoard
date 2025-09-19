@@ -6,7 +6,7 @@ import {
     Box,
     DialogContent,
     DialogTitle,
-FormControl,
+    FormControl,
     InputLabel,
     Select,
     MenuItem
@@ -208,7 +208,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                     const resultSelect = await responseSelect.json();
                     if (resultSelect.password_id !== null && resultSelect.password_id !== "" && resultSelect.password_id !== undefined) {
                         // ロック時の処理
-                        const responseLock = await fetch("/api/notes/lock", {
+                        const responseLock = await fetch("/api/tablenotes/lock", {
                             method: "PUT",
                             headers: {
                                 "Content-Type": "application/json",
