@@ -26,7 +26,6 @@ export default function Home() {
 
     if (responseSelect.ok) {
       const result = await responseSelect.json();
-      console.log("パスワード取得成功", result);
       if (result.password_id != null && result.password_id !== "") {
         // すでにパスワードが登録されている場合は更新
         console.log("パスワード登録済みのため更新");
@@ -67,14 +66,14 @@ export default function Home() {
         });
 
         if (response.ok) {
-          console.log("save password success");
+          alert("パスワードを登録しました！");
           setPasswordString(""); // 入力フィールドをクリア
         } else {
-          console.error("failed to save password");
+          alert("パスワードの登録に失敗しました");
         }
       }
     } else {
-      console.error("failed to fetch password");
+      alert("サーバとの通信でエラーが発生しました")
       return;
     }
 
