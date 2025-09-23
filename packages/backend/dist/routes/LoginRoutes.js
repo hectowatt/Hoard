@@ -23,7 +23,7 @@ router.post('/', async (req, res) => {
             const token = jwt.sign({ id: user.id, username: user.username, jti }, SECRET, { expiresIn: '1d' });
             await redis.set(`token:${jti}`, 'valid', 'EX', 60 * 60 * 24);
             res.cookie("token", token, {
-                domain: "localhost",
+                domain: process.env.NODE_ENV === 'production' ? process.env.COOKIE_DOMAIN : "localhost", // 本番はenvファイルの設定を使用,
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production' ? true : false, // 本番のみ secure
                 sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // ローカルは lax

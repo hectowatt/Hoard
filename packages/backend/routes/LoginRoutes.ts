@@ -3,12 +3,12 @@ import { AppDataSource } from '../DataSource.js';
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
 import bcrypt from "bcrypt";
-import { nanoid } from 'nanoid'; 
+import { nanoid } from 'nanoid';
 import { Redis } from 'ioredis';
 
 const router = Router();
 const SECRET = process.env.SECRET || 'hoard_secret';
-const redis = new Redis({host: '192.168.1.103', port: 6379});
+const redis = new Redis({ host: '192.168.1.103', port: 6379 });
 
 // 【SELECT】ログイン認証API
 router.post('/', async (req, res) => {
@@ -25,10 +25,10 @@ router.post('/', async (req, res) => {
             // トークンの作成
             const token = jwt.sign({ id: user.id, username: user.username, jti }, SECRET, { expiresIn: '1d' });
 
-            await redis.set(`token:${jti}`, 'valid', 'EX', 60*60*24);
+            await redis.set(`token:${jti}`, 'valid', 'EX', 60 * 60 * 24);
 
             res.cookie("token", token, {
-                domain: "localhost",
+                domain: process.env.NODE_ENV === 'production' ? process.env.COOKIE_DOMAIN : "localhost", // 本番はenvファイルの設定を使用,
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production' ? true : false, // 本番のみ secure
                 sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // ローカルは lax
