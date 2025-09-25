@@ -6,7 +6,7 @@ import { ThemeProvider, CssBaseline, Container, createTheme } from "@mui/materia
 const theme = createTheme({
     palette: {
         primary: {
-            main: "#e3a838de",
+            main: "#e3a838",
         },
     },
 });
