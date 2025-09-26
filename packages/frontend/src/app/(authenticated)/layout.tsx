@@ -59,18 +59,12 @@ const navBelowItems = [
 	{ text: "設定", icon: belowIcons[1], href: "/settings" }
 ];
 
-
-const metadata: Metadata = {
-	title: "Hoard",
-	description: "A Notes app with table and password lock"
-};
-
 const drawerWidth = 240;
 
 
 
 
-export default function RootLayout({
+export default function AuthenticatedLayout({
 	children
 }: Readonly<{
 	children: React.ReactNode;
@@ -151,110 +145,106 @@ export default function RootLayout({
 
 
 	return (
-		<html lang="en">
-			<body className={inter.className}>
-				<ThemeProvider theme={theme}>
-					<AppRouterCacheProvider>
-						<SearchWordProvider>
-							<NoteProvider>
-								<TableNoteProvider>
-									<LabelProvider>
-										<Box sx={{ display: "flex" }}>
-											<CssBaseline />
-											<AppBar
-												position="fixed"
-												sx={{
-													zIndex: (theme) => theme.zIndex.drawer + 1,
-													backgroundColor: "#e3a838"
-												}}
-												color="primary"
-											>
-												<Toolbar sx={{ display: "flex", justifyContent: "center" }}>
-													<Box sx={{ flexGrow: 1 }}>
-														<img
-															src="/Hoard_logo.png"
-															alt="Hoard Logo"
-															style={{ height: 29, objectFit: "contain" }}
-														/>
-													</Box>
-													<Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>
-														<SearchWordBar mode={mode} />
-													</Box>
-													<Box sx={{ flexGrow: 1 }} />
-													<IconButton
-														sx={{ position: "fixed", top: 12, right: 70, zIndex: 2000 }}
-														onClick={toggleColorMode}
-														color="inherit"
-														data-testid="togglecolormode"
-													>
-														{mode === "dark" ? <Brightness2OutlinedIcon /> : <LightModeOutlinedIcon />}
-													</IconButton>
-													<IconButton
-														sx={{ position: "fixed", top: 12, right: 15, zIndex: 2000 }}
-														onClick={handleLogOut}
-														color="inherit"
-														data-testid="togglecolormode">
-														<LogoutOutlinedIcon></LogoutOutlinedIcon>
-													</IconButton>
-												</Toolbar>
-											</AppBar>
-											<Drawer
-												variant="permanent"
-												sx={{
-													width: drawerWidth,
-													flexShrink: 0,
-													[`& .MuiDrawer-paper`]: {
-														width: drawerWidth,
-														boxSizing: "border-box"
-													}
-												}}
-											>
-												<Toolbar />
-												<Box sx={{ overflow: "auto" }}>
-													<List>
-														{navAboveItems.map(({ text, icon, href, dialog }) => (
-															<ListItem key={text} disablePadding>
-																{dialog ? (
-																	<ListItemButton onClick={() => setLabelDialogOpen(true)}>
-																		<ListItemIcon>{icon}</ListItemIcon>
-																		<ListItemText primary={text} />
-																	</ListItemButton>
-																) : (
-																	<ListItemButton component={Link} href={href!}>
-																		<ListItemIcon>{icon}</ListItemIcon>
-																		<ListItemText primary={text} />
-																	</ListItemButton>
-																)}
-															</ListItem>
-														))}
-													</List>
-													<Divider />
-													<List>
-														{navBelowItems.map(({ text, icon, href }) => (
-															<ListItem key={text} disablePadding>
-																<ListItemButton component={Link} href={href}>
-																	<ListItemIcon>{icon}</ListItemIcon>
-																	<ListItemText primary={text} />
-																</ListItemButton>
-															</ListItem>
-
-														))}
-													</List>
-												</Box>
-											</Drawer>
-											<Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-												<Toolbar />
-												{children}
+		<ThemeProvider theme={theme}>
+			<AppRouterCacheProvider>
+				<SearchWordProvider>
+					<NoteProvider>
+						<TableNoteProvider>
+							<LabelProvider>
+								<Box sx={{ display: "flex" }}>
+									<CssBaseline />
+									<AppBar
+										position="fixed"
+										sx={{
+											zIndex: (theme) => theme.zIndex.drawer + 1,
+											backgroundColor: "#e3a838"
+										}}
+										color="primary"
+									>
+										<Toolbar sx={{ display: "flex", justifyContent: "center" }}>
+											<Box sx={{ flexGrow: 1 }}>
+												<img
+													src="/Hoard_logo.png"
+													alt="Hoard Logo"
+													style={{ height: 29, objectFit: "contain" }}
+												/>
 											</Box>
+											<Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>
+												<SearchWordBar mode={mode} />
+											</Box>
+											<Box sx={{ flexGrow: 1 }} />
+											<IconButton
+												sx={{ position: "fixed", top: 12, right: 70, zIndex: 2000 }}
+												onClick={toggleColorMode}
+												color="inherit"
+												data-testid="togglecolormode"
+											>
+												{mode === "dark" ? <Brightness2OutlinedIcon /> : <LightModeOutlinedIcon />}
+											</IconButton>
+											<IconButton
+												sx={{ position: "fixed", top: 12, right: 15, zIndex: 2000 }}
+												onClick={handleLogOut}
+												color="inherit"
+												data-testid="togglecolormode">
+												<LogoutOutlinedIcon></LogoutOutlinedIcon>
+											</IconButton>
+										</Toolbar>
+									</AppBar>
+									<Drawer
+										variant="permanent"
+										sx={{
+											width: drawerWidth,
+											flexShrink: 0,
+											[`& .MuiDrawer-paper`]: {
+												width: drawerWidth,
+												boxSizing: "border-box"
+											}
+										}}
+									>
+										<Toolbar />
+										<Box sx={{ overflow: "auto" }}>
+											<List>
+												{navAboveItems.map(({ text, icon, href, dialog }) => (
+													<ListItem key={text} disablePadding>
+														{dialog ? (
+															<ListItemButton onClick={() => setLabelDialogOpen(true)}>
+																<ListItemIcon>{icon}</ListItemIcon>
+																<ListItemText primary={text} />
+															</ListItemButton>
+														) : (
+															<ListItemButton component={Link} href={href!}>
+																<ListItemIcon>{icon}</ListItemIcon>
+																<ListItemText primary={text} />
+															</ListItemButton>
+														)}
+													</ListItem>
+												))}
+											</List>
+											<Divider />
+											<List>
+												{navBelowItems.map(({ text, icon, href }) => (
+													<ListItem key={text} disablePadding>
+														<ListItemButton component={Link} href={href}>
+															<ListItemIcon>{icon}</ListItemIcon>
+															<ListItemText primary={text} />
+														</ListItemButton>
+													</ListItem>
+
+												))}
+											</List>
 										</Box>
-										<CreateLabelDialog open={labelDialogOpen} onClose={() => setLabelDialogOpen(false)} />
-									</LabelProvider>
-								</TableNoteProvider>
-							</NoteProvider>
-						</SearchWordProvider>
-					</AppRouterCacheProvider>
-				</ThemeProvider>
-			</body >
-		</html >
+									</Drawer>
+									<Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+										<Toolbar />
+										{children}
+									</Box>
+								</Box>
+								<CreateLabelDialog open={labelDialogOpen} onClose={() => setLabelDialogOpen(false)} />
+							</LabelProvider>
+						</TableNoteProvider>
+					</NoteProvider>
+				</SearchWordProvider>
+			</AppRouterCacheProvider>
+		</ThemeProvider>
 	);
 }
