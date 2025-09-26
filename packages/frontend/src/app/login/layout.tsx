@@ -2,6 +2,7 @@
 
 import React from "react";
 import { ThemeProvider, CssBaseline, Container, createTheme } from "@mui/material";
+import { Metadata } from "next";
 
 const theme = createTheme({
     palette: {
@@ -17,23 +18,20 @@ export default function LoginLayout({
     children: React.ReactNode;
 }) {
     return (
-        <html lang="ja">
-            <body style={{ backgroundColor: "#e3a838" }}>
-                <ThemeProvider theme={theme}>
-                    <CssBaseline />
-                    <Container
-                        maxWidth="sm"
-                        sx={{
-                            display: "flex",
-                            flexDirection: "column",
-                            justifyContent: "center",
-                            minHeight: "100vh",
-                        }}
-                    >
-                        {children}
-                    </Container>
-                </ThemeProvider>
-            </body>
-        </html>
+        <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <Container
+                maxWidth="sm"
+                sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    minHeight: "100vh",
+                    backgroundColor: "#e3a838",
+                }}
+            >
+                {children}
+            </Container>
+        </ThemeProvider>
     );
 }
