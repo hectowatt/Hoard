@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ThemeProvider, CssBaseline, Container, createTheme } from "@mui/material";
+import { ThemeProvider, CssBaseline, Container, createTheme, Box } from "@mui/material";
 import { Metadata } from "next";
 
 const theme = createTheme({
@@ -20,18 +20,18 @@ export default function LoginLayout({
     return (
         <ThemeProvider theme={theme}>
             <CssBaseline />
-            <Container
-                maxWidth="sm"
+            <Box
                 sx={{
+                    minHeight: "100vh",
+                    width: "100%",
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "center",
-                    minHeight: "100vh",
-                    backgroundColor: "#e3a838",
+                    bgcolor: "#e3a838",
                 }}
             >
                 {children}
-            </Container>
+            </Box>
         </ThemeProvider>
     );
 }

@@ -8,7 +8,8 @@ import {
     Paper,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation"
+import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 
 export default function LoginPage() {
@@ -86,46 +87,52 @@ export default function LoginPage() {
     }, []);
 
     return (
-        <>
-            <img src="Hoard_logo.png" width={552} height={135} style={{ marginBottom: "20px" }}></img>
+        <Box sx={{
+            minHeight: "100vh",
+            width: "100%",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            bgcolor: "#e3a838", p: 2,
+        }}>
+            <Image src="/Hoard_logo.png"
+                alt="Logo"
+                width={552}
+                height={135}
+                style={{
+                    maxWidth: "100%", height: "auto",
+                    marginBottom: "20px",
+                }} />
             <Paper elevation={3} sx={{ p: 4 }} style={{ backgroundColor: "#faebd7" }}>
-                <Typography variant="h5" component="h1" gutterBottom>
-                    ログイン
-                </Typography>
-
+                <Typography
+                    variant="h5"
+                    component="h1"
+                    gutterBottom> ログイン </Typography>
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                     <TextField
                         label="ユーザー名"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         fullWidth
-                        data-testid="username"
-                    />
+                        data-testid="username" />
                     <TextField
                         label="パスワード"
                         type="password"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        fullWidth
-                        data-testid="password"
-                    />
+                        onChange={(e) =>
+                            setPassword(e.target.value)} fullWidth data-testid="password" />
                     {isUserExists ? <Button
                         variant="contained"
                         color="primary"
                         onClick={handleLogin}
-                        data-testid="login"
-                    >
-                        ログイン
-                    </Button> : <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleRegistUser}
-                        data-testid="makeuser"
-                    >
-                        ユーザ作成
-                    </Button>}
+                        data-testid="login"> ログイン </Button> :
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleRegistUser}
+                            data-testid="makeuser"> ユーザ作成</Button>}
                 </Box>
             </Paper>
-        </>
-    );
+        </Box>);
 }
