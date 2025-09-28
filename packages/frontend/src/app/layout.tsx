@@ -1,8 +1,6 @@
-"use client";
-
 import type { Metadata } from 'next';
 
-const metadata: Metadata = {
+export const metadata: Metadata = {
     title: "Hoard",
     description: "A Notes app with table and password lock",
     icons: {
