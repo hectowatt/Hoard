@@ -20,13 +20,14 @@ import {
 	ListItemText,
 	Divider,
 	Table,
+	useMediaQuery,
 } from "@mui/material";
 import TextSnippetOutlinedIcon from "@mui/icons-material/TextSnippetOutlined";
 import LabelImportantOutlineRoundedIcon from "@mui/icons-material/LabelImportantOutlineRounded";
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import IconButton from "@mui/material/IconButton";
-import { createTheme } from "@mui/material/styles";
+import { createTheme, useTheme } from "@mui/material/styles";
 import { ThemeProvider } from "@mui/material/styles";
 import CreateLabelDialog from "@/app/(authenticated)/components/CreateLabelDialog";
 import { LabelProvider } from "./context/LabelProvider";
@@ -59,10 +60,8 @@ const navBelowItems = [
 	{ text: "設定", icon: belowIcons[1], href: "/settings" }
 ];
 
-const drawerWidth = 240;
-
-
-
+const drawerWidthOpen = 240;
+const drawerWidthClosed = 60; // アイコンのみの時の幅
 
 export default function AuthenticatedLayout({
 	children
@@ -75,7 +74,14 @@ export default function AuthenticatedLayout({
 
 	const router = useRouter();
 
-	// カスタムテーマの作成
+	// useMediaQueryを使って画面サイズを判定
+	const themeForMediaQuery = useTheme();
+	// md (900px) より小さい画面で isSmallScreen が true になる
+	const isSmallScreen = useMediaQuery(themeForMediaQuery.breakpoints.down("md"));
+
+	// 現在のDrawerの幅をstateとして管理
+	const currentDrawerWidth = isSmallScreen ? drawerWidthClosed : drawerWidthOpen;
+
 	const theme = React.useMemo(
 		() =>
 			createTheme({
@@ -93,8 +99,11 @@ export default function AuthenticatedLayout({
 						}
 						: {}),
 				},
+				transitions: {
+					create: (props, options) => themeForMediaQuery.transitions.create(props, options),
+				}
 			}),
-		[mode]
+		[mode, themeForMediaQuery]
 	);
 
 	// ラベル一覧を取得する
@@ -156,25 +165,36 @@ export default function AuthenticatedLayout({
 									<AppBar
 										position="fixed"
 										sx={{
+											// Drawerの幅に合わせてAppBarの幅と位置を調整
+
 											zIndex: (theme) => theme.zIndex.drawer + 1,
-											backgroundColor: "#e3a838"
+											backgroundColor: "#e3a838",
+											transition: theme.transitions.create(["width", "margin"], {
+												easing: theme.transitions.easing.sharp,
+												duration: theme.transitions.duration.enteringScreen,
+											}),
 										}}
 										color="primary"
 									>
-										<Toolbar sx={{ display: "flex", justifyContent: "center" }}>
-											<Box sx={{ flexGrow: 1 }}>
+										<Toolbar sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+											<Box sx={{
+												flexGrow: { xs: 0, md: 1 },
+												flexShrink: 0, // 縮まないように設定 
+											}}>
 												<img
 													src="/Hoard_logo.png"
 													alt="Hoard Logo"
-													style={{ height: 29, objectFit: "contain" }}
+													style={{ height: 29, objectFit: "contain", display: "block" }}
 												/>
 											</Box>
 											<Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>
 												<SearchWordBar mode={mode} />
 											</Box>
-											<Box sx={{ flexGrow: 1 }} />
+											<Box sx={{
+												flexGrow: { xs: 0, md: 1 }, display: "flex",
+												justifyContent: "flex-end",
+											}} />
 											<IconButton
-												sx={{ position: "fixed", top: 12, right: 70, zIndex: 2000 }}
 												onClick={toggleColorMode}
 												color="inherit"
 												data-testid="togglecolormode"
@@ -182,7 +202,6 @@ export default function AuthenticatedLayout({
 												{mode === "dark" ? <Brightness2OutlinedIcon /> : <LightModeOutlinedIcon />}
 											</IconButton>
 											<IconButton
-												sx={{ position: "fixed", top: 12, right: 15, zIndex: 2000 }}
 												onClick={handleLogOut}
 												color="inherit"
 												data-testid="togglecolormode">
@@ -193,11 +212,17 @@ export default function AuthenticatedLayout({
 									<Drawer
 										variant="permanent"
 										sx={{
-											width: drawerWidth,
+											// Drawerの幅を動的に設定
+											width: currentDrawerWidth,
 											flexShrink: 0,
 											[`& .MuiDrawer-paper`]: {
-												width: drawerWidth,
-												boxSizing: "border-box"
+												width: currentDrawerWidth,
+												boxSizing: "border-box",
+												overflowX: "hidden",
+												transition: theme.transitions.create("width", {
+													easing: theme.transitions.easing.sharp,
+													duration: theme.transitions.duration.enteringScreen,
+												}),
 											}
 										}}
 									>
@@ -209,12 +234,14 @@ export default function AuthenticatedLayout({
 														{dialog ? (
 															<ListItemButton onClick={() => setLabelDialogOpen(true)}>
 																<ListItemIcon>{icon}</ListItemIcon>
-																<ListItemText primary={text} />
+																{/* 小さい画面ではテキストを非表示*/}
+																{!isSmallScreen && <ListItemText primary={text} />}
 															</ListItemButton>
 														) : (
 															<ListItemButton component={Link} href={href!}>
 																<ListItemIcon>{icon}</ListItemIcon>
-																<ListItemText primary={text} />
+																{/* 小さい画面ではテキストを非表示*/}
+																{!isSmallScreen && <ListItemText primary={text} />}
 															</ListItemButton>
 														)}
 													</ListItem>
@@ -226,7 +253,8 @@ export default function AuthenticatedLayout({
 													<ListItem key={text} disablePadding>
 														<ListItemButton component={Link} href={href}>
 															<ListItemIcon>{icon}</ListItemIcon>
-															<ListItemText primary={text} />
+															{/* 小さい画面ではテキストを非表示*/}
+															{!isSmallScreen && <ListItemText primary={text} />}
 														</ListItemButton>
 													</ListItem>
 
