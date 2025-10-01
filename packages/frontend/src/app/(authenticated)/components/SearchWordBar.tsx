@@ -26,9 +26,9 @@ export default function SearchWordBar({ mode }: searchWordBarProps) {
                 onChange={(e) => setSearchWord(e.target.value)}
                 sx={{
                     width: {
-                        xs: "100%",  // 600px未満 (モバイル) では親要素の幅いっぱい
-                        sm: 350,   // 600px以上 (タブレット) では350px
-                        md: 500,   // 900px以上 (PC) では500px
+                        xs: "100%",
+                        sm: 350,
+                        md: 500,
                     },
                     backgroundColor: mode === "dark" ? "#2c2c2c" : "#ffffff",
                     borderRadius: "5px"

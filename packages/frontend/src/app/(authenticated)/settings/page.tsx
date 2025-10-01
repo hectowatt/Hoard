@@ -85,7 +85,6 @@ export default function Home() {
     <Container>
       <h1>設定</h1>
 
-      {/* ここに設定項目を追加 */}
       <h3>パスワード設定</h3>
       <p>ノートにロックをかけるときのパスワードを設定できます</p>
       <form>
@@ -97,7 +96,11 @@ export default function Home() {
           size="small"
           placeholder="パスワードを設定"
           sx={{
-            width: "500px",
+            width: {
+              xs: "100%",
+              sm: 350,
+              md: 500,
+            },
             borderRadius: "5px"
           }}
           data-testid="passwordinput"
