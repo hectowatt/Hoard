@@ -44,6 +44,6 @@ describe("LabelProvider", () => {
       expect(screen.getByText("プライベート")).toBeInTheDocument();
     });
 
-    expect(global.fetch).toHaveBeenCalledWith("/api/labels", expect.any(Object));
+    expect(global.fetch).toHaveBeenCalledWith("/api/labels", { "credentials": "include", "method": "GET" });
   });
 });

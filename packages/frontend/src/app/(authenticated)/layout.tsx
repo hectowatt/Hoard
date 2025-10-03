@@ -199,7 +199,7 @@ export default function AuthenticatedLayout({
 												color="inherit"
 												data-testid="togglecolormode"
 											>
-												{mode === "dark" ? <Brightness2OutlinedIcon /> : <LightModeOutlinedIcon />}
+												{mode === "dark" ? <Brightness2OutlinedIcon data-testid="Brightness2OutlinedIcon" /> : <LightModeOutlinedIcon data-testid="LightModeOutlinedIcon" />}
 											</IconButton>
 											<IconButton
 												onClick={handleLogOut}

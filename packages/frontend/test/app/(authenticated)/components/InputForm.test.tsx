@@ -1,7 +1,7 @@
 import React, { act } from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import InputForm from "../../src/app/(authenticated)/components/InputForm";
+import InputForm from "@/app/(authenticated)/components/InputForm";
 import { LabelProvider } from "@/app/(authenticated)/context/LabelProvider";
 import { NoteProvider } from "@/app/(authenticated)/context/NoteProvider";
 
@@ -11,9 +11,9 @@ const mockLabels = [
     { id: "label2", labelname: "プライベート" },
 ];
 
-jest.mock("@/context/LabelProvider", () => {
+jest.mock("@/app/(authenticated)/context/LabelProvider", () => {
     return {
-        ...jest.requireActual("@/context/LabelProvider"),
+        ...jest.requireActual("@/app/(authenticated)/context/LabelProvider"),
         useLabelContext: () => ({
             labels: mockLabels,
         }),

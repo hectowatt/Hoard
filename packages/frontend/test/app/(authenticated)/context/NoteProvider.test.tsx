@@ -60,6 +60,6 @@ describe("NoteProvider", () => {
             expect(screen.getByText("テストノート2 - 内容2")).toBeInTheDocument();
         });
 
-        expect(global.fetch).toHaveBeenCalledWith("/api/notes");
+        expect(global.fetch).toHaveBeenCalledWith("/api/notes", { "credentials": "include", "method": "GET" });
     });
 });

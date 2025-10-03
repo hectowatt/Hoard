@@ -8,9 +8,9 @@ const mockLabels = [
     { id: "label2", labelname: "プライベート" },
 ];
 
-jest.mock("@/context/LabelProvider", () => {
+jest.mock("@/app/(authenticated)/context/LabelProvider", () => {
     return {
-        ...jest.requireActual("@/context/LabelProvider"),
+        ...jest.requireActual("@/app/(authenticated)/context/LabelProvider"),
         useLabelContext: () => ({
             labels: mockLabels,
         }),

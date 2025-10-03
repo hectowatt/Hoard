@@ -86,6 +86,6 @@ describe("NoteProvider", () => {
             expect(screen.getByText("テストテーブルノート２")).toBeInTheDocument();
         });
 
-        expect(global.fetch).toHaveBeenCalledWith("/api/tablenotes");
+        expect(global.fetch).toHaveBeenCalledWith("/api/tablenotes", { "credentials": "include", "headers": { "Content-Type": "application/json" }, "method": "GET" });
     });
 });

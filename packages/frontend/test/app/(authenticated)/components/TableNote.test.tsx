@@ -1,16 +1,32 @@
 import React, { act } from "react";
 import { render, screen, fireEvent, within, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import Note from "../../src/app/(authenticated)/components/Note";
+import Note from "@/app/(authenticated)/components/Note";
 // ラベルコンテキストのモック
 const mockLabels = [
     { id: "label1", labelname: "仕事" },
     { id: "label2", labelname: "プライベート" },
 ];
 
-jest.mock("@/context/LabelProvider", () => {
+type Column = {
+    id: number;
+    name: string;
+    order?: number;
+}
+
+type RowCell = {
+    id: number;
+    rowIndex: number;
+    value: string;
+    columnId?: number;
+}
+
+const mockColumns: Column[] = [{ id: 1, name: "テストカラム1", order: 1 }];
+const mockRowCells: RowCell[][] = [[{ id: 1, rowIndex: 0, value: "テストセル１", columnId: 1 }], [{ id: 1, rowIndex: 1, value: "テストセル２", columnId: 1 }]];
+
+jest.mock("@/app/(authenticated)/context/LabelProvider", () => {
     return {
-        ...jest.requireActual("@/context/LabelProvider"),
+        ...jest.requireActual("@/app/(authenticated)/context/LabelProvider"),
         useLabelContext: () => ({
             labels: mockLabels,
         }),
@@ -20,9 +36,10 @@ jest.mock("@/context/LabelProvider", () => {
 
 import { LabelProvider } from "@/app/(authenticated)/context/LabelProvider";
 import { NoteProvider } from "@/app/(authenticated)/context/NoteProvider";
+import TableNote from "@/app/(authenticated)/components/TableNote";
 
 
-describe("Note", () => {
+describe("TableNote", () => {
     const mockOnSave = jest.fn();
     const mockOnDelete = jest.fn();
 
@@ -34,17 +51,16 @@ describe("Note", () => {
         }
     });
 
-    it("openがfalseのとき、タイトルとcontent、作成日、更新日が表示される", () => {
+    it("openがfalseのとき、タイトルと作成日、更新日が表示される", () => {
         render(
             <NoteProvider>
                 <LabelProvider>
-                    <Note id={"testid111"} title={"テストノート"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
+                    <TableNote id={"testid111"} title={"テストノート"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} />
                 </LabelProvider>
             </NoteProvider>
         );
 
         expect(screen.getByText("テストノート")).toBeVisible();
-        expect(screen.getByText("テストノートcontent")).toBeVisible();
         expect(screen.getByText("作成日: 2025/07/05")).toBeVisible();
         expect(screen.getByText("更新日: 2025/07/05")).toBeVisible();
     })
@@ -53,7 +69,7 @@ describe("Note", () => {
         render(
             <NoteProvider>
                 <LabelProvider>
-                    <Note id={"testid111"} title={"テストノート"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
+                    <TableNote id={"testid111"} title={"テストノート"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} />
                 </LabelProvider>
             </NoteProvider>
         );
@@ -71,7 +87,7 @@ describe("Note", () => {
         render(
             <NoteProvider>
                 <LabelProvider>
-                    <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
+                    <TableNote id={"testid111"} title={"テストノートタイトル"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} />
                 </LabelProvider>
             </NoteProvider>
         );
@@ -94,11 +110,11 @@ describe("Note", () => {
 
     });
 
-    it("編集モード時、contentを編集できる", async () => {
+    it("編集モード時、columnを編集できる", async () => {
         render(
             <NoteProvider>
                 <LabelProvider>
-                    <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
+                    <TableNote id={"testid111"} title={"テストノートタイトル"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} />
                 </LabelProvider>
             </NoteProvider>
         );
@@ -111,13 +127,67 @@ describe("Note", () => {
             fireEvent.click(screen.getByText("編集"));
         })
 
-        const contentInput = screen.getByDisplayValue("テストノートcontent") as HTMLInputElement;
+        const contentInput = screen.getByDisplayValue("テストカラム1") as HTMLInputElement;
 
         await act(async () => {
-            fireEvent.change(contentInput, { target: { value: "新しいcontent" } });
+            fireEvent.change(contentInput, { target: { value: "新しいカラム" } });
         });
 
-        expect(contentInput.value).toBe("新しいcontent");
+        expect(contentInput.value).toBe("新しいカラム");
+
+    });
+
+    it("カラムの追加ができる", async () => {
+        render(
+            <NoteProvider>
+                <LabelProvider>
+                    <TableNote id={"testid111"} title={"テストノートタイトル"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} />
+                </LabelProvider>
+            </NoteProvider>
+        );
+
+        await act(async () => {
+            fireEvent.click(screen.getByText("テストノートタイトル"));
+        })
+
+        await act(async () => {
+            fireEvent.click(screen.getByText("編集"));
+        })
+        const addColumnButton = screen.getByTestId("addColumnIcon");
+
+        await act(async () => {
+            fireEvent.click(addColumnButton);
+        });
+
+        await waitFor(() => {
+            expect(screen.getByDisplayValue("カラム2")).toBeInTheDocument();
+        });
+    });
+
+    it("編集モード時、rowCellを編集できる", async () => {
+        render(
+            <NoteProvider>
+                <LabelProvider>
+                    <TableNote id={"testid111"} title={"テストノートタイトル"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} />
+                </LabelProvider>
+            </NoteProvider>
+        );
+
+        await act(async () => {
+            fireEvent.click(screen.getByText("テストノートタイトル"));
+        })
+
+        await act(async () => {
+            fireEvent.click(screen.getByText("編集"));
+        })
+
+        const contentInput = screen.getByDisplayValue("テストセル１") as HTMLInputElement;
+
+        await act(async () => {
+            fireEvent.change(contentInput, { target: { value: "新しいセル" } });
+        });
+
+        expect(contentInput.value).toBe("新しいセル");
 
     });
 
@@ -125,7 +195,7 @@ describe("Note", () => {
         render(
             <NoteProvider>
                 <LabelProvider>
-                    <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={"label1"} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
+                    <TableNote id={"testid111"} title={"テストノートタイトル"} label_id={"label1"} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} />
                 </LabelProvider>
             </NoteProvider>
         );
@@ -155,7 +225,7 @@ describe("Note", () => {
             <>
                 <NoteProvider>
                     <LabelProvider>
-                        <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={"label1"} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
+                        <TableNote id={"testid111"} title={"テストノートタイトル"} label_id={"label1"} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} />
                     </LabelProvider>
                 </NoteProvider>
                 <input data-testid="dummy-input" placeholder="ダミー入力" />
@@ -185,7 +255,7 @@ describe("Note", () => {
         render(
             <NoteProvider>
                 <LabelProvider>
-                    <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
+                    <TableNote id={"testid111"} title={"テストノートタイトル"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} />
                 </LabelProvider>
             </NoteProvider>
         );
@@ -219,7 +289,7 @@ describe("Note", () => {
         render(
             <NoteProvider>
                 <LabelProvider>
-                    <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={true} onSave={mockOnSave} onDelete={mockOnDelete} />
+                    <TableNote id={"testid111"} title={"テストノートタイトル"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={true} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} />
                 </LabelProvider>
             </NoteProvider>
         );
