@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { NoteProvider } from "@/app/(authenticated)/context/NoteProvider";
 import { LabelProvider } from "@/app/(authenticated)/context/LabelProvider";
-import Home from "../../src/app/(authenticated)/page";
+import Home from "@/app/(authenticated)/page";
 
 // ラベルコンテキストのモック
 const mockLabels = [
@@ -11,13 +11,13 @@ const mockLabels = [
     { id: "label2", labelname: "プライベート" },
 ];
 
-jest.mock("../../src/components/InputForm", () => () => <div data-testid="inputform">InputForm</div>);
-jest.mock("../../src/components/Note", () => (props: any) => <div data-testid="note">Note: {props.title}</div>);
-jest.mock("../../src/components/TableNote", () => (props: any) => <div data-testid="tablenote">TableNote: {props.title}</div>);
+jest.mock("@/app/(authenticated)/components/InputForm", () => () => <div data-testid="inputform">InputForm</div>);
+jest.mock("@/app/(authenticated)/components/Note", () => (props: any) => <div data-testid="note">Note: {props.title}</div>);
+jest.mock("@/app/(authenticated)/components/TableNote", () => (props: any) => <div data-testid="tablenote">TableNote: {props.title}</div>);
 
-jest.mock("@/context/LabelProvider", () => {
+jest.mock("@/app/(authenticated)/context/LabelProvider", () => {
     return {
-        ...jest.requireActual("@/context/LabelProvider"),
+        ...jest.requireActual("@/app/(authenticated)/context/LabelProvider"),
         useLabelContext: () => ({
             labels: mockLabels,
         }),
@@ -25,13 +25,13 @@ jest.mock("@/context/LabelProvider", () => {
     };
 });
 
-jest.mock("@/context/SearchWordProvider", () => ({
+jest.mock("@/app/(authenticated)/context/SearchWordProvider", () => ({
     useSearchWordContext: () => ({
         searchWord: "",
     }),
 }));
 
-jest.mock("@/context/NoteProvider", () => ({
+jest.mock("@/app/(authenticated)/context/NoteProvider", () => ({
     useNoteContext: () => ({
         notes: [
             { id: "1", title: "Note1", content: "Test note", label_id: "", createdate: "", updatedate: "", is_locked: false },
@@ -41,7 +41,7 @@ jest.mock("@/context/NoteProvider", () => ({
     }),
 }));
 
-jest.mock("@/context/TableNoteProvider", () => ({
+jest.mock("@/app/(authenticated)/context/TableNoteProvider", () => ({
     useTableNoteContext: () => ({
         tableNotes: [
             {

@@ -18,6 +18,5 @@ export default {
     "^@/(.*)$": "<rootDir>/dist/$1",
     "^../../DataSource.js$": "<rootDir>/dist/DataSource.js",
   },
-
-  roots: ["<rootDir>/dist", "<rootDir>/test"],
+  roots: ["<rootDir>/test"],
 };

@@ -1,7 +1,7 @@
 import React, { act } from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import CreateLabelDialog from "../../src/app/(authenticated)/components/CreateLabelDialog";
+import CreateLabelDialog from "@/app/(authenticated)/components/CreateLabelDialog";
 import { LabelProvider } from "@/app/(authenticated)/context/LabelProvider";
 import { NoteProvider } from "@/app/(authenticated)/context/NoteProvider";
 
@@ -12,9 +12,9 @@ const mockLabels = [
 ];
 
 
-jest.mock("@/context/LabelProvider", () => {
+jest.mock("@/app/(authenticated)/context/LabelProvider", () => {
     return {
-        ...jest.requireActual("@/context/LabelProvider"),
+        ...jest.requireActual("@/app/(authenticated)/context/LabelProvider"),
         useLabelContext: () => ({
             labels: mockLabels,
         }),

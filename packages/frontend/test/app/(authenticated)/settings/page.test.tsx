@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import Home from "../../../src/app/(authenticated)/settings/page";
+import Home from "@/app/(authenticated)/settings/page";
 
 // グローバル fetch モック
 beforeEach(() => {

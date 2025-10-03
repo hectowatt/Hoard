@@ -1,18 +1,18 @@
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
-import Home from "../../../src/app/(authenticated)/trash/page";
+import Home from "@/app/(authenticated)/trash/page";
 import "@testing-library/jest-dom";
 
 // モック：TrashNote, TrashTableNote
-jest.mock("../../../src/components/TrashNote", () => (props: any) => (
+jest.mock("@/app/(authenticated)/components/TrashNote", () => (props: any) => (
     <div data-testid="trashnote">{props.title}</div>
 ));
-jest.mock("../../../src/components/TrashTableNote", () => (props: any) => (
+jest.mock("@/app/(authenticated)/components/TrashTableNote", () => (props: any) => (
     <div data-testid="trashtablenote">{props.title}</div>
 ));
 
 // モック：useLabelContext（ラベルは使われていないがエラー回避のため必要）
-jest.mock("@/context/LabelProvider", () => ({
+jest.mock("@/app/(authenticated)/context/LabelProvider", () => ({
     useLabelContext: () => ({
         labels: [],
         fetchLabels: jest.fn(),
