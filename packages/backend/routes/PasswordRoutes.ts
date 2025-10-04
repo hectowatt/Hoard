@@ -7,7 +7,7 @@ import { authMiddleware } from '../middleware/AuthMiddleware.js';
 const router = Router();
 
 // 【INSERT】パスワード登録API
-router.post('/',authMiddleware, async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
     const { passwordString } = req.body;
 
     if (!passwordString) {
@@ -23,7 +23,6 @@ router.post('/',authMiddleware, async (req, res) => {
         });
         const savedPassword = await passwordRepository.save(newPassword);
 
-        console.log('Password inserted with ID: ', savedPassword.password_id);
         res.status(201).json({ message: "Save password success!" });
     } catch (error) {
         console.error("Error saving password:", error);
@@ -50,7 +49,7 @@ router.get('/', authMiddleware, async (req, res) => {
 });
 
 // 【UPDATE】パスワード更新API
-router.put('/',authMiddleware, async (req, res) => {
+router.put('/', authMiddleware, async (req, res) => {
     const { password_id, passwordString } = req.body;
     try {
         const passwordRepository = AppDataSource.getRepository(Password);
@@ -68,8 +67,8 @@ router.put('/',authMiddleware, async (req, res) => {
     }
 });
 
-// 【SELECT】パスワード取得API（リクエスト値とDBのハッシュ化されたパスワードが一致するかを返却）
-router.post('/compare',authMiddleware, async (req, res) => {
+// 【SELECT】パスワード比較API（リクエスト値とDBのハッシュ化されたパスワードが一致するかを返却）
+router.post('/compare', authMiddleware, async (req, res) => {
     try {
         const password_id = req.body.password_id;
         const passwordString = req.body.passwordString;
@@ -80,8 +79,8 @@ router.post('/compare',authMiddleware, async (req, res) => {
         const passwordRepository = AppDataSource.getRepository(Password);
         // passwordを取得する
         const password = await passwordRepository.findOneBy({ password_id: password_id });
-        if(password === null){
-            return res.status(404).json({error: "Password not found"});
+        if (password === null) {
+            return res.status(404).json({ error: "Password not found" });
         }
         const isMatch = await bcrypt.compare(passwordString, password.password_hashed);
         console.log("パスワードの一致:", isMatch);

@@ -17,7 +17,6 @@ router.post('/', authMiddleware, async (req, res) => {
             password_hashed: password_hashed
         });
         const savedPassword = await passwordRepository.save(newPassword);
-        console.log('Password inserted with ID: ', savedPassword.password_id);
         res.status(201).json({ message: "Save password success!" });
     }
     catch (error) {
@@ -62,7 +61,7 @@ router.put('/', authMiddleware, async (req, res) => {
         res.status(500).json({ error: "Failed to update password" });
     }
 });
-// 【SELECT】パスワード取得API（リクエスト値とDBのハッシュ化されたパスワードが一致するかを返却）
+// 【SELECT】パスワード比較API（リクエスト値とDBのハッシュ化されたパスワードが一致するかを返却）
 router.post('/compare', authMiddleware, async (req, res) => {
     try {
         const password_id = req.body.password_id;
