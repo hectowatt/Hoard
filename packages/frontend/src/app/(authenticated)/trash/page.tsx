@@ -42,7 +42,7 @@ export default function Home() {
     fetchTrashNotes();
   }, []);
 
-  // 画面描画時にDBからノートを全件取得して表示する
+  // 画面描画時にDBからテーブルノートを全件取得して表示する
   const fetchTrashTableNotes = async () => {
     try {
       // バックエンドAPIからノート情報を取得
@@ -95,8 +95,8 @@ export default function Home() {
 
   // テーブルノート復元ボタン押下時のコールバック関数
   const handleSaveTableNote = (id: string, newTitle: string, newLabel: string, newUpdateDate: string) => {
-    if (setTrashNotes !== undefined) {
-      setTrashNotes(prevNote => prevNote.filter(note => note.id !== id));
+    if (setTrashTableNotes !== undefined) {
+      setTrashTableNotes(prevNote => prevNote.filter(note => note.id !== id));
     } else {
       console.error("setNotes is undefined");
     };
@@ -104,10 +104,10 @@ export default function Home() {
 
   // テーブルノート削除ボタン押下時のコールバック関数
   const handleDeleteTableNote = (id: string) => {
-    if (setTrashNotes !== undefined) {
-      setTrashNotes(prevNote => prevNote.filter(note => note.id !== id));
+    if (setTrashTableNotes !== undefined) {
+      setTrashTableNotes(prevNote => prevNote.filter(note => note.id !== id));
     } else {
-      console.error("setNotes is undefined");
+      console.error("setTableNotes is undefined");
     };
 
     if (labels === undefined) {
