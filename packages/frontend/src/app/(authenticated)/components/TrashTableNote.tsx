@@ -55,7 +55,7 @@ export default function TrashTableNote({ id, title, label_id, is_locked, created
     // 削除ボタン押下処理
     const handleDelete = async () => {
         try {
-            const response = await fetch(`http://localhost/api/tablenotes/trash/${id}`, {
+            const response = await fetch(`/api/tablenotes/trash/${id}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",

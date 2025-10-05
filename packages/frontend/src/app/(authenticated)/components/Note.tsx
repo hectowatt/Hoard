@@ -78,7 +78,7 @@ export default function Note({
     // 削除ボタン押下処理
     const handleDelete = async () => {
         try {
-            const response = await fetch(`http://localhost/api/notes/${id}`, {
+            const response = await fetch(`/api/notes/${id}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",

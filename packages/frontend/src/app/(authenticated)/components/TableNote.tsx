@@ -335,7 +335,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
     // 削除ボタン押下処理
     const handleDelete = async () => {
         try {
-            const response = await fetch(`http://localhost/api/tablenotes/${id}`, {
+            const response = await fetch(`/api/tablenotes/${id}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
