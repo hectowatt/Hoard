@@ -181,11 +181,16 @@ export default function AuthenticatedLayout({
 												flexGrow: { xs: 0, md: 1 },
 												flexShrink: 0, // 縮まないように設定 
 											}}>
-												<img
-													src="/Hoard_logo.png"
-													alt="Hoard Logo"
+												{isSmallScreen ? <img
+													src="/Hoard_icon.png"
+													alt="Hoard Icon"
 													style={{ height: 29, objectFit: "contain", display: "block" }}
-												/>
+												/> :
+													<img
+														src="/Hoard_logo.png"
+														alt="Hoard Logo"
+														style={{ height: 29, objectFit: "contain", display: "block" }}
+													/>}
 											</Box>
 											<Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>
 												<SearchWordBar mode={mode} />
@@ -233,14 +238,16 @@ export default function AuthenticatedLayout({
 													<ListItem key={text} disablePadding>
 														{dialog ? (
 															<ListItemButton onClick={() => setLabelDialogOpen(true)}>
-																<ListItemIcon>{icon}</ListItemIcon>
-																{/* 小さい画面ではテキストを非表示*/}
+																<ListItemIcon sx={{ minWidth: 0, justifyContent: 'center' }}>
+																	{icon}
+																</ListItemIcon>
 																{!isSmallScreen && <ListItemText primary={text} />}
 															</ListItemButton>
 														) : (
 															<ListItemButton component={Link} href={href!}>
-																<ListItemIcon>{icon}</ListItemIcon>
-																{/* 小さい画面ではテキストを非表示*/}
+																<ListItemIcon sx={{ minWidth: 0, justifyContent: 'center' }}>
+																	{icon}
+																</ListItemIcon>
 																{!isSmallScreen && <ListItemText primary={text} />}
 															</ListItemButton>
 														)}
@@ -252,17 +259,20 @@ export default function AuthenticatedLayout({
 												{navBelowItems.map(({ text, icon, href }) => (
 													<ListItem key={text} disablePadding>
 														<ListItemButton component={Link} href={href}>
-															<ListItemIcon>{icon}</ListItemIcon>
-															{/* 小さい画面ではテキストを非表示*/}
+															<ListItemIcon sx={{ minWidth: 0, justifyContent: 'center' }}>
+																{icon}
+															</ListItemIcon>
 															{!isSmallScreen && <ListItemText primary={text} />}
 														</ListItemButton>
 													</ListItem>
-
 												))}
 											</List>
 										</Box>
 									</Drawer>
-									<Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+									<Box component="main" sx={{
+										flexGrow: 1, p: 3, width: `calc(100% - ${currentDrawerWidth}px)`,
+										overflowX: 'hidden',
+									}}>
 										<Toolbar />
 										{children}
 									</Box>

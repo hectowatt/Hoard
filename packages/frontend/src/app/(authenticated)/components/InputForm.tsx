@@ -229,7 +229,19 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
             {/* 入力フォーム */}
             < Paper
                 elevation={3}
-                sx={{ p: 2, cursor: 'text', mb: 4 }}
+                sx={{
+                    p: 2,
+                    cursor: "text",
+                    mb: 4,
+                    width: "100%",
+                    maxWidth: {
+                        xs: "95%",
+                        sm: "90%",
+                        md: 800,
+                    },
+                    mx: "auto",    // 中央寄せ
+                    overflow: "hidden",
+                }}
                 onClick={handleExpand}
             >
                 <Collapse in={expanded}>
