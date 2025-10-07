@@ -19,7 +19,9 @@ import {
     TableCell,
     TableRow,
     TableHead,
+    useMediaQuery, // Import useMediaQuery
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles'; // Import useTheme
 import { useLabelContext } from "@/app/(authenticated)/context/LabelProvider";
 import NoEncryptionGmailerrorredOutlinedIcon from '@mui/icons-material/NoEncryptionGmailerrorredOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
@@ -79,6 +81,8 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
         setContent("");
     }
 
+    const theme = useTheme();
+    const isXs = useMediaQuery(theme.breakpoints.down('sm'));
 
     // 保存ボタン押下処理
     const saveButtonClick = async () => {
@@ -172,6 +176,8 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
             setTableNoteOpen(false);
             setEditColumns([{ id: 1, name: "カラム1", order: 1 }]);
             setEditRowCells([[{ id: 1, rowIndex: 0, value: "", columnId: 1 }]]);
+            setTitle("");
+            setExpand(false);
             // テーブルノート登録時のコールバック関数を呼び出す
             if (typeof onInsertTableNote === "function") {
                 onInsertTableNote(result.tableNote.id, result.tableNote.title, editLabelId || "", isLocked, editColumns, editRowCells);
@@ -264,10 +270,16 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                     onChange={(e) => setContent(e.target.value)}
                 />
                 <Collapse in={expanded}>
-                    <Box sx={{ display: 'flex', justifyContent: 'flex-start', mt: 1 }}>
-                        <Button onClick={saveButtonClick} variant="contained" sx={{ mr: 1 }}>保存</Button>
-                        <Button onClick={handleCollapse} variant="contained">キャンセル</Button>
-                        <FormControl size="small" sx={{ minWidth: 120, ml: 2 }}>
+                    <Box sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
+                        gap: 1,
+                        mt: 1
+                    }}>
+                        <Button onClick={saveButtonClick} variant="contained" sx={{ fontSize: isXs ? '0.7rem' : '0.875rem' }}>保存</Button>
+                        <Button onClick={handleCollapse} variant="contained" sx={{ fontSize: isXs ? '0.7rem' : '0.875rem' }}>キャンセル</Button>
+                        <FormControl size="small" sx={{ minWidth: 120 }}>
                             <InputLabel id="select-label">ラベル</InputLabel>
                             <Select
                                 labelId="select-label"
@@ -289,8 +301,7 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                             </Select>
                         </FormControl>
                         <IconButton
-                            onClick={() => setIsLocked(!isLocked)}
-                            sx={{ ml: 1 }}>
+                            onClick={() => setIsLocked(!isLocked)}>
                             {isLocked ? <LockOutlinedIcon data-testid="lock" /> : <NoEncryptionGmailerrorredOutlinedIcon data-testid="unlock" />}
                         </IconButton>
                         <IconButton
@@ -357,10 +368,10 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                     <Button onClick={handleAddRow} sx={{ m: 2 }}><AddIcon /></Button>
                 </TableContainer>
                 <Box sx={{ textAlign: 'center', p: 2 }}>
-                    <Button onClick={handleSaveTableNote} variant="contained" sx={{ mr: 2 }}>
+                    <Button onClick={handleSaveTableNote} variant="contained" sx={{ mr: 2, fontSize: isXs ? '0.7rem' : '0.875rem' }}>
                         保存
                     </Button>
-                    <Button onClick={() => setTableNoteOpen(false)} variant="contained" >
+                    <Button onClick={() => setTableNoteOpen(false)} variant="contained" sx={{ fontSize: isXs ? '0.7rem' : '0.875rem' }}>
                         キャンセル
                     </Button>
                     <FormControl size="small" sx={{ minWidth: 120, ml: 2 }}>
