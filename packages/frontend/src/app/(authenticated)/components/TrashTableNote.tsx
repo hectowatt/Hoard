@@ -164,8 +164,8 @@ export default function TrashTableNote({ id, title, label_id, is_locked, created
                     )}
                     <Box sx={{ mt: 2, textAlighn: "right" }}>
                         <>
-                            <Button onClick={handleSave} variant="contained" sx={{ mr: 1 }}>復元</Button>
-                            <Button onClick={handleDelete} variant="contained" sx={{ mr: 1 }}>完全に削除</Button>
+                            <Button onClick={handleSave} variant="contained" sx={{ mr: 1, mb: 1 }}>復元</Button>
+                            <Button onClick={handleDelete} variant="contained" sx={{ mr: 1, mb: 1 }}>完全に削除</Button>
                             <Button onClick={handleCancel} variant="contained">キャンセル</Button>
                         </>
                     </Box>

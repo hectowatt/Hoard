@@ -135,7 +135,8 @@ export default function Home() {
                 sm: 350,
                 md: 500,
               },
-              borderRadius: "5px"
+              borderRadius: "5px",
+              mb: 1
             }}
             data-testid="prevpasswordinput"
           />
@@ -153,7 +154,8 @@ export default function Home() {
                 sm: 350,
                 md: 500,
               },
-              borderRadius: "5px"
+              borderRadius: "5px",
+              mb: 1
             }}
             data-testid="passwordinput"
           />
@@ -174,7 +176,8 @@ export default function Home() {
                 sm: 350,
                 md: 500,
               },
-              borderRadius: "5px"
+              borderRadius: "5px",
+              mb: 1
             }}
             data-testid="passwordinput"
           />
