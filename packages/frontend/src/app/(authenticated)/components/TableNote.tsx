@@ -483,8 +483,8 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                         {isEditing && !isLocked ? (
                             // 編集中でパスワードロックされていない場合
                             <>
-                                <Button onClick={handleSaveTableNote} variant="contained" sx={{ mr: 1 }}>保存</Button>
-                                <Button onClick={() => setIsEditing(false)} variant="contained">キャンセル</Button>
+                                <Button onClick={handleSaveTableNote} variant="contained" sx={{ mr: 1, mb: 1 }}>保存</Button>
+                                <Button onClick={() => setIsEditing(false)} variant="contained" sx={{ mb: 1 }}>キャンセル</Button>
                                 <FormControl size="small" sx={{ minWidth: 120, ml: 2 }} data-testid="label-select">
                                     <InputLabel id="select-label">ラベル</InputLabel>
                                     <Select

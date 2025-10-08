@@ -368,10 +368,10 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                     <Button onClick={handleAddRow} sx={{ m: 2 }}><AddIcon /></Button>
                 </TableContainer>
                 <Box sx={{ textAlign: 'center', p: 2 }}>
-                    <Button onClick={handleSaveTableNote} variant="contained" sx={{ mr: 2, fontSize: isXs ? '0.7rem' : '0.875rem' }}>
+                    <Button onClick={handleSaveTableNote} variant="contained" sx={{ mr: 2, mb: 1, fontSize: isXs ? '0.7rem' : '0.875rem' }}>
                         保存
                     </Button>
-                    <Button onClick={() => setTableNoteOpen(false)} variant="contained" sx={{ fontSize: isXs ? '0.7rem' : '0.875rem' }}>
+                    <Button onClick={() => setTableNoteOpen(false)} variant="contained" sx={{ mb: 1, fontSize: isXs ? '0.7rem' : '0.875rem' }}>
                         キャンセル
                     </Button>
                     <FormControl size="small" sx={{ minWidth: 120, ml: 2 }}>
