@@ -5,9 +5,10 @@
             "type": "node",
             "request": "launch",
             "name": "Debug Backend (ts-node)",
-            "runtimeExecutable": "npx",
+            "runtimeExecutable": "npm",
             "runtimeArgs": [
-                "ts-node"
+                "run",
+                "dev"
             ],
             "program": "${workspaceFolder}/packages/backend/server.ts",
             "skipFiles": [
