@@ -32,6 +32,7 @@ export default function Home() {
 
   const trimmedSearchWord = searchWord ? searchWord.trim().toLowerCase() : "";
   const filterdNotes = searchWord ? notes.filter(note => note.title.toLowerCase().includes(trimmedSearchWord) || note.content.toLowerCase().includes(trimmedSearchWord)) : notes;
+  const filterdTableNotes = searchWord ? tableNotes.filter(tableNote => tableNote.title.toLowerCase().includes(trimmedSearchWord) || tableNote.columns.some(column => column.name.toLowerCase().includes(trimmedSearchWord)) || tableNote.rowCells.some(row => row.some(cell => cell.value.toLowerCase().includes(trimmedSearchWord)))) : tableNotes;
 
   useEffect(() => {
     fetchNotes();
@@ -155,7 +156,7 @@ export default function Home() {
             <Note {...note} onSave={handleSave} onDelete={handleDelete} data-testid="note" />
           </Grid>
         ))}
-        {tableNotes.map((tableNote, index) => (
+        {filterdTableNotes.map((tableNote, index) => (
           <Grid key={index}>
             {/* TableNoteコンポーネントを生成 */}
             <TableNote {...tableNote} onSave={handleSaveTableNote} onDelete={handleDeleteTableNote} data-testid="tablenote" />

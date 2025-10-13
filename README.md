@@ -22,4 +22,29 @@
 <a href="https://www.docker.com/">
 <img src="https://img.shields.io/badge/docker-257bd6?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"/></a>
 
+<a href="https://redis.io/">
+<img src="https://img.shields.io/badge/-Redis-D82C20.svg?logo=redis&style=for-the-badge&logoColor=white" alt="Redis"/></a>
+
 </div>
+
+## Installation
+
+After cloning source, you have to copy `docker-compose_sample.yml` and `.env_sample`.
+```
+cp docker-compose_sample.yml docker-compose.yml
+
+cp .env_sample .env
+```
+
+If you want to customise connection setting, edit those files;
+
+After building docker container with docker compose, you can launch Hoard;
+
+## Development
+To develop Hoard, Devcontainer is usefull.
+
+Copy setting file and build container;
+```
+cp ./.devcontainer/devcontainer_sample.json ./.devcontainer/devcontainer.json
+
+```
