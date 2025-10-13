@@ -218,7 +218,7 @@ const theme = React.useMemo(
 												flexShrink: 0, // 縮まないように設定 
 											}}>
 												{isSmallScreen ? <img
-													src="/Hoard_icon.png"
+													src="/Hoard.png"
 													alt="Hoard Icon"
 													style={{ height: 29, objectFit: "contain", display: "block" }}
 												/> :
