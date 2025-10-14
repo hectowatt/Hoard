@@ -12,6 +12,11 @@ export const metadata: Metadata = {
         { media: '(prefers-color-scheme: light)', color: '#e3a838' },
         { media: '(prefers-color-scheme: dark)', color: '#f2bb3c' },
     ],
+    appleWebApp: {
+        capable: true,
+        statusBarStyle: 'black-translucent', // 'default', 'black', 'black-translucent'から選択
+        title: 'Hoard',
+    },
 };
 
 export default function RootLayout({

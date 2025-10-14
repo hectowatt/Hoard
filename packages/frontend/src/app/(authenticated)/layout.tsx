@@ -212,6 +212,7 @@ export default function AuthenticatedLayout({
 												easing: theme.transitions.easing.sharp,
 												duration: theme.transitions.duration.enteringScreen,
 											}),
+											paddingTop: 'env(safe-area-inset-top)',
 										}}
 										color="primary"
 									>
