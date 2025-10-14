@@ -50,161 +50,164 @@ const belowIcons = [<DeleteOutlineRoundedIcon />, <SettingsOutlinedIcon />];
 
 // サイドバー上部
 const navAboveItems = [
-    { text: "ノート", icon: aboveIcons[0], href: "/" },
-    { text: "ラベル", icon: aboveIcons[1], dialog: true }
+	{ text: "ノート", icon: aboveIcons[0], href: "/" },
+	{ text: "ラベル", icon: aboveIcons[1], dialog: true }
 ];
 
 // サイドバー下部
 const navBelowItems = [
-    { text: "ゴミ箱", icon: belowIcons[0], href: "/trash" },
-    { text: "設定", icon: belowIcons[1], href: "/settings" }
+	{ text: "ゴミ箱", icon: belowIcons[0], href: "/trash" },
+	{ text: "設定", icon: belowIcons[1], href: "/settings" }
 ];
 
 const drawerWidthOpen = 240;
 const drawerWidthClosed = 60; // アイコンのみの時の幅
 
 export default function AuthenticatedLayout({
-    children
+	children
 }: Readonly<{
-    children: React.ReactNode;
+	children: React.ReactNode;
 }>) {
-    const [labelDialogOpen, setLabelDialogOpen] = React.useState(false);
-    const [labels, setLabels] = React.useState<string[]>([]);
+	const [labelDialogOpen, setLabelDialogOpen] = React.useState(false);
+	const [labels, setLabels] = React.useState<string[]>([]);
 
-    const [mode, setMode] = React.useState<"light" | "dark" | null>(null);
+	const [mode, setMode] = React.useState<"light" | "dark" | null>(null);
 
-    const router = useRouter();
+	const router = useRouter();
 
-    // useMediaQueryを使って画面サイズを判定
-    const themeForMediaQuery = useTheme();
-    // md (900px) より小さい画面で isSmallScreen が true になる
-    const isSmallScreen = useMediaQuery(themeForMediaQuery.breakpoints.down("md"));
+	// useMediaQueryを使って画面サイズを判定
+	const themeForMediaQuery = useTheme();
+	// md (900px) より小さい画面で isSmallScreen が true になる
+	const isSmallScreen = useMediaQuery(themeForMediaQuery.breakpoints.down("md"));
 
-    // 現在のDrawerの幅をstateとして管理
-    const currentDrawerWidth = isSmallScreen ? drawerWidthClosed : drawerWidthOpen;
+	// 現在のDrawerの幅をstateとして管理
+	const currentDrawerWidth = isSmallScreen ? drawerWidthClosed : drawerWidthOpen;
 
-    //クライアントサイドでのみテーマを決定する
-    React.useEffect(() => {
-        const THEME_KEY = process.env.THEME_KEY ? process.env.THEME_KEY : "hoard_theme_mode";
-        let determinedMode: "light" | "dark" = "light";
-        
-        const stored = window.localStorage.getItem(THEME_KEY);
-        if (stored === "dark" || stored === "light") {
-            determinedMode = stored;
-        } else {
-            // 未設定なら OS の設定を参照
-            try {
-                determinedMode = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-            } catch {
-                // 何もしない (デフォルトの"light"が使われる)
-            }
-        }
-        setMode(determinedMode);
-    }, []);
+	//クライアントサイドでのみテーマを決定する
+	React.useEffect(() => {
+		const THEME_KEY = process.env.THEME_KEY ? process.env.THEME_KEY : "hoard_theme_mode";
+		let determinedMode: "light" | "dark" = "light";
+
+		const stored = window.localStorage.getItem(THEME_KEY);
+		if (stored === "dark" || stored === "light") {
+			determinedMode = stored;
+		} else {
+			// 未設定なら OS の設定を参照
+			try {
+				determinedMode = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+			} catch {
+				// 何もしない (デフォルトの"light"が使われる)
+			}
+		}
+		setMode(determinedMode);
+	}, []);
 
 	// モードが変わったら localStorage に保存
-    React.useEffect(() => {
-        if (mode) { // modeがnullでない場合のみ保存
-            try {
-                const THEME_KEY = process.env.THEME_KEY ? process.env.THEME_KEY : "hoard_theme_mode";
-                window.localStorage.setItem(THEME_KEY, mode);
-            } catch {
-                // なにもしない
-            }
-        }
-    }, [mode]);
+	React.useEffect(() => {
+		if (mode) { // modeがnullでない場合のみ保存
+			try {
+				const THEME_KEY = process.env.THEME_KEY ? process.env.THEME_KEY : "hoard_theme_mode";
+				window.localStorage.setItem(THEME_KEY, mode);
+			} catch {
+				// なにもしない
+			}
+		}
+	}, [mode]);
 
-const theme = React.useMemo(
-        () =>
-            createTheme({
-                palette: {
-                    primary: {
-                        main: "#e3a838",
-                    },
-                    // modeがnullの場合は'light'をフォールバックとして使用
-                    mode: mode || 'light', 
-                    ...(mode === "dark"
-                        ? {
-                            background: {
-                                default: "#2c2c2c",
-                                paper: "#2c2c2c",
-                            },
-                        }
-                        : {}),
-                },
-                transitions: {
-                    create: (props, options) => themeForMediaQuery.transitions.create(props, options),
-                }
-            }),
-        [mode, themeForMediaQuery]
-    );
+	const theme = React.useMemo(
+		() =>
+			createTheme({
+				palette: {
+					primary: {
+						main: "#e3a838",
+					},
+					// modeがnullの場合は'light'をフォールバックとして使用
+					mode: mode || 'light',
+					...(mode === "dark"
+						? {
+							primary: {
+								main: "#f2bb3c",
+							},
+							background: {
+								default: "#2c2c2c",
+								paper: "#2c2c2c",
+							},
+						}
+						: {}),
+				},
+				transitions: {
+					create: (props, options) => themeForMediaQuery.transitions.create(props, options),
+				}
+			}),
+		[mode, themeForMediaQuery]
+	);
 
-    // ラベル一覧を取得する
-    const fetchLabels = async () => {
-        const response = await fetch("/api/labels", {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            credentials: "include"
-        });
-        if (!response.ok) {
-            throw new Error("Failed to fetch labels");
-        }
-        const data = await response.json();
-        setLabels(data);
-    };
+	// ラベル一覧を取得する
+	const fetchLabels = async () => {
+		const response = await fetch("/api/labels", {
+			method: "GET",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			credentials: "include"
+		});
+		if (!response.ok) {
+			throw new Error("Failed to fetch labels");
+		}
+		const data = await response.json();
+		setLabels(data);
+	};
 
-    React.useEffect(() => {
-        fetchLabels();
-    }
-        , []);
+	React.useEffect(() => {
+		fetchLabels();
+	}
+		, []);
 
-    const toggleColorMode = () => {
-        setMode((prev) => (prev === "light" ? "dark" : "light"));
-    };
+	const toggleColorMode = () => {
+		setMode((prev) => (prev === "light" ? "dark" : "light"));
+	};
 
-    const handleLogOut = async () => {
-        try {
-            const response = await fetch("/api/logout", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                credentials: "include"
-            })
+	const handleLogOut = async () => {
+		try {
+			const response = await fetch("/api/logout", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				credentials: "include"
+			})
 
-            if (response.ok) {
-                alert("ログアウトしました。");
-                // ログアウト後はログインページにリダイレクト
-                router.push("/login");
-            }
-        } catch (error) {
-            console.error("Logout failed:", error);
-            alert("ログアウトに失敗しました。");
-        }
-    }
+			if (response.ok) {
+				alert("ログアウトしました。");
+				// ログアウト後はログインページにリダイレクト
+				router.push("/login");
+			}
+		} catch (error) {
+			console.error("Logout failed:", error);
+			alert("ログアウトに失敗しました。");
+		}
+	}
 
 	if (!mode) {
-        return null; // またはローディングスピナーなどを表示
-    }
+		return null; // またはローディングスピナーなどを表示
+	}
 
-    return (
-        <ThemeProvider theme={theme}>
-            <AppRouterCacheProvider>
-                <SearchWordProvider>
-                    <NoteProvider>
-                        <TableNoteProvider>
-                            <LabelProvider>
-                                <Box sx={{ display: "flex" }}>
-                                    <CssBaseline />
-                                    <AppBar
+	return (
+		<ThemeProvider theme={theme}>
+			<AppRouterCacheProvider>
+				<SearchWordProvider>
+					<NoteProvider>
+						<TableNoteProvider>
+							<LabelProvider>
+								<Box sx={{ display: "flex" }}>
+									<CssBaseline />
+									<AppBar
 										position="fixed"
 										sx={{
 											// Drawerの幅に合わせてAppBarの幅と位置を調整
 
 											zIndex: (theme) => theme.zIndex.drawer + 1,
-											backgroundColor: "#e3a838",
+											backgroundColor: "primary.main",
 											transition: theme.transitions.create(["width", "margin"], {
 												easing: theme.transitions.easing.sharp,
 												duration: theme.transitions.duration.enteringScreen,

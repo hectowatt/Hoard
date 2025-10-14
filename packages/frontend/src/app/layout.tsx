@@ -8,6 +8,10 @@ export const metadata: Metadata = {
         apple: '/apple-touch-icon.png',
     },
     manifest: '/manifest.json',
+    themeColor: [
+        { media: '(prefers-color-scheme: light)', color: '#e3a838' },
+        { media: '(prefers-color-scheme: dark)', color: '#f2bb3c' },
+    ],
 };
 
 export default function RootLayout({
