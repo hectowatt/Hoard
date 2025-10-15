@@ -1,3 +1,4 @@
+import ThemeRegistry from './context/ThemeProvider';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
     ],
     appleWebApp: {
         capable: true,
-        statusBarStyle: 'black-translucent', // 'default', 'black', 'black-translucent'から選択
+        statusBarStyle: 'black-translucent',
         title: 'Hoard',
     },
 };
@@ -27,7 +28,9 @@ export default function RootLayout({
     return (
         <html lang="ja">
             <body>
-                {children}
+                <ThemeRegistry>
+                    {children}
+                </ThemeRegistry>
             </body>
         </html>
     );

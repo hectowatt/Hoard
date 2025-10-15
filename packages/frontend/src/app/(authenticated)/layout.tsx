@@ -189,7 +189,7 @@ export default function AuthenticatedLayout({
 	}
 
 	if (!mode) {
-		return null; // またはローディングスピナーなどを表示
+		return null;
 	}
 
 	return (
@@ -204,8 +204,6 @@ export default function AuthenticatedLayout({
 									<AppBar
 										position="fixed"
 										sx={{
-											// Drawerの幅に合わせてAppBarの幅と位置を調整
-
 											zIndex: (theme) => theme.zIndex.drawer + 1,
 											backgroundColor: "primary.main",
 											transition: theme.transitions.create(["width", "margin"], {
@@ -214,12 +212,11 @@ export default function AuthenticatedLayout({
 											}),
 											paddingTop: 'env(safe-area-inset-top)',
 										}}
-										color="primary"
 									>
 										<Toolbar sx={{ display: "flex", alignItems: "center", gap: 2 }}>
 											<Box sx={{
 												flexGrow: { xs: 0, md: 1 },
-												flexShrink: 0, // 縮まないように設定 
+												flexShrink: 0,
 											}}>
 												{isSmallScreen ? <img
 													src="/Hoard.png"
