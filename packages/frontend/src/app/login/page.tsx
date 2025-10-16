@@ -16,6 +16,7 @@ export default function LoginPage() {
     const [username, setUsername] = React.useState("");
     const [password, setPassword] = React.useState("");
     const [isUserExists, setIsUserExists] = React.useState(false);
+    const [isChecking, setIsChecking] = React.useState(true);
     const router = useRouter();
 
     // ログイン用処理
@@ -67,18 +68,24 @@ export default function LoginPage() {
 
     // 既存ユーザ存在チェック
     const checkUserExists = async () => {
-        const response = await fetch("/api/user/isexist", {
-            method: "GET",
-            credentials: "include"
-        });
-        if (response.ok) {
-            const isExist = await response.json();
-            if (isExist && isExist.exists === true) {
-                setIsUserExists(true);
-            }
-        } else {
+        try {
+            const response = await fetch("/api/user/isexist", {
+                method: "GET",
+                credentials: "include"
+            });
+            if (response.ok) {
+                const isExist = await response.json();
+                if (isExist && isExist.exists === true) {
+                    setIsUserExists(true);
+                }
+            } else {
+                console.error("failed to check user existence");
+            };
+        } catch (error) {
             console.error("failed to check user existence");
-        };
+        } finally {
+            setIsChecking(false);
+        }
 
     };
 
@@ -86,9 +93,31 @@ export default function LoginPage() {
         checkUserExists();
     }, []);
 
+    const renderButton = () => {
+        if (isChecking) {
+            // チェック中はローディングを表示するか、単にnullを返す
+            return <Button variant="contained" disabled data-testid="loading">読み込み中...</Button>;
+        }
+
+        if (isUserExists) {
+            return (
+                <Button variant="contained" color="primary" onClick={handleLogin} data-testid="login">
+                    ログイン
+                </Button>
+            );
+        } else {
+            return (
+                <Button variant="contained" color="primary" onClick={handleRegistUser} data-testid="makeuser">
+                    ユーザ作成
+                </Button>
+            );
+        }
+    };
+
     return (
         <Box sx={{
             minHeight: "100vh",
+            height: "100%",
             width: "100%",
             display: "flex",
             flexDirection: "column",
@@ -122,16 +151,7 @@ export default function LoginPage() {
                         value={password}
                         onChange={(e) =>
                             setPassword(e.target.value)} fullWidth data-testid="password" />
-                    {isUserExists ? <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleLogin}
-                        data-testid="login"> ログイン </Button> :
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={handleRegistUser}
-                            data-testid="makeuser"> ユーザ作成</Button>}
+                    {renderButton()}
                 </Box>
             </Paper>
         </Box>);
