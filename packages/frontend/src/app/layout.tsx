@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
     title: "Hoard",
     description: "A Notes app with table and password lock",
+    viewport: 'minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, viewport-fit=cover',
     icons: {
         icon: '/favicon.ico',
         apple: '/apple-touch-icon.png',
