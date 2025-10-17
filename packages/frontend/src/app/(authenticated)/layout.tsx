@@ -121,6 +121,7 @@ export default function AuthenticatedLayout({
 					primary: {
 						main: "#e3a838",
 					},
+					tonalOffset: 0,
 					// modeがnullの場合は'light'をフォールバックとして使用
 					mode: mode || 'light',
 					...(mode === "dark"

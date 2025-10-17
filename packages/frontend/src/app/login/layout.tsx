@@ -1,3 +1,4 @@
+import { Box } from '@mui/material';
 import React from 'react';
 
 // ログインページの背景色をここで定義
@@ -9,8 +10,20 @@ export default function LoginLayout({
     children: React.ReactNode;
 }) {
     return (
-        <div style={{ backgroundColor: backgroundColor }}>
+        <Box
+            component="main"
+            sx={{
+                minHeight: '100dvh',
+                pt: 'env(safe-area-inset-top)',
+                pb: 'env(safe-area-inset-bottom)',
+                bgcolor: backgroundColor,
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+            }}
+        >
             {children}
-        </div>
+        </Box>
     );
 }
