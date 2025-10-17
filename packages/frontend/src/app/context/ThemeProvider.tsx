@@ -10,6 +10,7 @@ const theme = createTheme({
         primary: {
             main: "#e3a838",
         },
+        tonalOffset: 0,
     },
 });
 
