@@ -130,8 +130,8 @@ export default function AuthenticatedLayout({
 								main: "#e3a838",
 							},
 							background: {
-								default: "#2c2c2c",
-								paper: "#2c2c2c",
+								default: "#000000",
+								paper: "#000000",
 							},
 						}
 						: {}),

@@ -30,7 +30,7 @@ export default function SearchWordBar({ mode }: searchWordBarProps) {
                         sm: 350,
                         md: 500,
                     },
-                    backgroundColor: mode === "dark" ? "#2c2c2c" : "#ffffff",
+                    backgroundColor: mode === "dark" ? "#262626" : "#ffffff",
                     borderRadius: "5px"
                 }}
                 InputProps={{
