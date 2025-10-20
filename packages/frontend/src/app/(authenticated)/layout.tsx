@@ -127,7 +127,7 @@ export default function AuthenticatedLayout({
 					...(mode === "dark"
 						? {
 							primary: {
-								main: "#f2bb3c",
+								main: "#e3a838",
 							},
 							background: {
 								default: "#000000",
@@ -136,9 +136,23 @@ export default function AuthenticatedLayout({
 						}
 						: {}),
 				},
+				components: {
+					MuiAppBar: {
+						styleOverrides: {
+							root: ({ theme }) =>
+								theme.palette.mode === 'dark'
+									? {
+										// elevationによる色の変化（オーバーレイ）を無効化
+										backgroundImage: 'none',
+										backgroundColor: theme.palette.primary.main,
+									}
+									: {},
+						},
+					},
+				},
 				transitions: {
 					create: (props, options) => themeForMediaQuery.transitions.create(props, options),
-				}
+				},
 			}),
 		[mode, themeForMediaQuery]
 	);

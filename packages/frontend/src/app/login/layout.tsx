@@ -1,7 +1,6 @@
 import { Box } from '@mui/material';
 import React from 'react';
 
-// ログインページの背景色をここで定義
 const backgroundColor = '#e3a838';
 
 export default function LoginLayout({
