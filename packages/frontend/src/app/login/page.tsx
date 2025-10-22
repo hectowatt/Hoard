@@ -137,20 +137,43 @@ export default function LoginPage() {
                 <Typography
                     variant="h5"
                     component="h1"
-                    gutterBottom> ログイン </Typography>
+                    gutterBottom
+                    color="#000000"> ログイン </Typography>
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                     <TextField
                         label="ユーザー名"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         fullWidth
-                        data-testid="username" />
+                        data-testid="username"
+                        InputProps={{
+                            sx: {
+                                color: "#000000",
+                                "&::placeholder": {
+                                    color: "#9e9e9e", // プレースホルダーの色を設定
+                                }
+                            },
+                        }}
+                        InputLabelProps={{
+                            sx: {
+                                color: "#000000",
+                                "&::placeholder": {
+                                    color: "#9e9e9e", // プレースホルダーの色を設定
+                                }
+                            }
+                        }} />
                     <TextField
                         label="パスワード"
                         type="password"
                         value={password}
                         onChange={(e) =>
-                            setPassword(e.target.value)} fullWidth data-testid="password" />
+                            setPassword(e.target.value)} fullWidth data-testid="password"
+                        InputProps={{
+                            sx: { color: "#000000" }
+                        }}
+                        InputLabelProps={{
+                            sx: { color: "#000000" }
+                        }} />
                     {renderButton()}
                 </Box>
             </Paper>
