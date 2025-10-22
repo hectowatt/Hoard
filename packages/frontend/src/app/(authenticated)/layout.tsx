@@ -5,6 +5,7 @@ import React from "react";
 import { Inter } from "next/font/google";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v13-appRouter";
 import Link from "next/link";
+import { useThemeMode } from "../context/ThemeProvider";
 
 import {
 	Box,
@@ -71,9 +72,11 @@ export default function AuthenticatedLayout({
 	const [labelDialogOpen, setLabelDialogOpen] = React.useState(false);
 	const [labels, setLabels] = React.useState<string[]>([]);
 
-	const [mode, setMode] = React.useState<"light" | "dark" | null>(null);
+	const { mode, setMode } = useThemeMode();
 
 	const router = useRouter();
+
+	const theme = useTheme();
 
 	// useMediaQueryを使って画面サイズを判定
 	const themeForMediaQuery = useTheme();
@@ -114,49 +117,6 @@ export default function AuthenticatedLayout({
 		}
 	}, [mode]);
 
-	const theme = React.useMemo(
-		() =>
-			createTheme({
-				palette: {
-					primary: {
-						main: "#e3a838",
-					},
-					tonalOffset: 0,
-					// modeがnullの場合は'light'をフォールバックとして使用
-					mode: mode || 'light',
-					...(mode === "dark"
-						? {
-							primary: {
-								main: "#e3a838",
-							},
-							background: {
-								default: "#000000",
-								paper: "#000000",
-							},
-						}
-						: {}),
-				},
-				components: {
-					MuiAppBar: {
-						styleOverrides: {
-							root: ({ theme }) =>
-								theme.palette.mode === 'dark'
-									? {
-										// elevationによる色の変化（オーバーレイ）を無効化
-										backgroundImage: 'none',
-										backgroundColor: theme.palette.primary.main,
-									}
-									: {},
-						},
-					},
-				},
-				transitions: {
-					create: (props, options) => themeForMediaQuery.transitions.create(props, options),
-				},
-			}),
-		[mode, themeForMediaQuery]
-	);
-
 	// ラベル一覧を取得する
 	const fetchLabels = async () => {
 		const response = await fetch("/api/labels", {
@@ -179,7 +139,7 @@ export default function AuthenticatedLayout({
 		, []);
 
 	const toggleColorMode = () => {
-		setMode((prev) => (prev === "light" ? "dark" : "light"));
+		setMode(mode === "light" ? "dark" : "light");
 	};
 
 	const handleLogOut = async () => {

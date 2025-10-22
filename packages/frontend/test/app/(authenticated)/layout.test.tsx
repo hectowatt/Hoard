@@ -19,6 +19,24 @@ jest.mock("next/navigation", () => ({
     useServerInsertedHTML: jest.fn(),
 }));
 
+// ThemeProvider をモック
+const setModeMock = jest.fn();
+jest.mock("@/app/context/ThemeProvider", () => {
+    const originalModule = jest.requireActual("@/app/context/ThemeProvider");
+    return {
+        ...originalModule,
+        useThemeMode: jest.fn(() => ({
+            mode: "light",
+            setMode: setModeMock,
+        })),
+        ThemeModeContext: {
+            Provider: ({ children }: { children: React.ReactNode }) => (
+                <div data-testid="mocked-theme-provider">{children}</div>
+            ),
+        },
+    };
+});
+
 describe("RootLayout", () => {
     it("renders logo, nav, and children", async () => {
         render(
@@ -40,7 +58,6 @@ describe("RootLayout", () => {
         // 子コンテンツ
         expect(screen.getByText("Child Content")).toBeInTheDocument();
     });
-
     it("カラーテーマ切り替え", () => {
         render(
             <AuthenticatedLayout>
@@ -59,8 +76,8 @@ describe("RootLayout", () => {
 
         fireEvent.click(toggleButton);
 
-        // ダークモードのアイコンに変化（Brightness2OutlinedIcon）
-        expect(toggleButton.querySelector("svg[data-testid='Brightness2OutlinedIcon']")).toBeInTheDocument();
+        // setMode が呼ばれていることを確認（状態変更はモック内で直接反映されないため）
+        expect(setModeMock).toHaveBeenCalled();
     });
 
     it("ラベルアイテムがクリックされたとき、ダイアログが表示される", async () => {
