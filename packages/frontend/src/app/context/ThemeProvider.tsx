@@ -93,7 +93,27 @@ export default function ThemeRegistry({ children }: { children: React.ReactNode 
                             }
                             : {},
                 },
-            }
+            },
+            MuiOutlinedInput: {
+                styleOverrides: {
+                    root: {
+                        "& .MuiOutlinedInput-notchedOutline": {
+                            borderColor: "#000000", // 通常時の枠線色
+                        },
+                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                            borderColor: "#e3a838", // フォーカス時の枠線色
+                            borderWidth: "2px",
+                        },
+                        "& input": {
+
+                            "&::placeholder": {
+                                color: "#9e9e9e", // プレースホルダーの色
+                                opacity: 1, // 透過を防ぐ
+                            },
+                        },
+                    },
+                },
+            },
         },
         transitions: {
             create: (props, options) => themeForMediaQuery.transitions.create(props, options),

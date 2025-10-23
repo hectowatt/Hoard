@@ -30,7 +30,7 @@ describe("Setting Page", () => {
         render(<Home />);
 
         expect(screen.getByText("設定")).toBeInTheDocument();
-        expect(screen.getByText("パスワード設定")).toBeInTheDocument();
+        expect(screen.getByText("ノートパスワード設定")).toBeInTheDocument();
         expect(screen.getByText("ノートにロックをかけるときのパスワードを設定できます")).toBeInTheDocument();
 
         await waitFor(() => {

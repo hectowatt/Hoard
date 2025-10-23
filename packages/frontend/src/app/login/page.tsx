@@ -10,6 +10,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import ThemeRegistry from "@/app/context/ThemeProvider";
 
 
 export default function LoginPage() {
@@ -115,67 +116,86 @@ export default function LoginPage() {
     };
 
     return (
-        <Box sx={{
-            minHeight: "100vh",
-            height: "100%",
-            width: "100%",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            bgcolor: "#e3a838", p: 2,
-        }}>
-            <Image src="/Hoard_logo.png"
-                alt="Logo"
-                width={552}
-                height={135}
-                style={{
-                    maxWidth: "100%", height: "auto",
-                    marginBottom: "20px",
-                }} />
-            <Paper elevation={3} sx={{ p: 4 }} style={{ backgroundColor: "#faebd7" }}>
-                <Typography
-                    variant="h5"
-                    component="h1"
-                    gutterBottom
-                    color="#000000"> ログイン </Typography>
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                    <TextField
-                        label="ユーザー名"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        fullWidth
-                        data-testid="username"
-                        InputProps={{
-                            sx: {
-                                color: "#000000",
-                                "&::placeholder": {
-                                    color: "#9e9e9e", // プレースホルダーの色を設定
+        <ThemeRegistry>
+            <Box sx={{
+                minHeight: "100vh",
+                height: "100%",
+                width: "100%",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                bgcolor: "#e3a838", p: 2,
+            }}>
+                <Image src="/Hoard_logo.png"
+                    alt="Logo"
+                    width={552}
+                    height={135}
+                    style={{
+                        maxWidth: "100%", height: "auto",
+                        marginBottom: "20px",
+                    }} />
+                <Paper elevation={3} sx={{ p: 4 }} style={{ backgroundColor: "#faebd7" }}>
+                    <Typography
+                        variant="h5"
+                        component="h1"
+                        gutterBottom
+                        color="#000000"> ログイン </Typography>
+                    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                        <TextField
+                            label="ユーザー名"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            fullWidth
+                            data-testid="username"
+                            variant="outlined"
+                            InputProps={{
+                                sx: {
+                                    color: "#000000",
+                                    "&::placeholder": {
+                                        color: "#9e9e9e",
+                                        opacity: 1, // ブラウザによる自動的な透過を防ぐ
+                                    }
+                                },
+                            }}
+                            InputLabelProps={{
+                                sx: {
+                                    color: "#000000", // 通常時のラベル色
+                                    // ★フォーカスが当たった時もラベル色を黒に固定
+                                    "&.Mui-focused": {
+                                        color: "#000000",
+                                    }
                                 }
-                            },
-                        }}
-                        InputLabelProps={{
-                            sx: {
-                                color: "#000000",
-                                "&::placeholder": {
-                                    color: "#9e9e9e", // プレースホルダーの色を設定
+                            }}
+                        />
+                        <TextField
+                            label="パスワード"
+                            type="password"
+                            value={password}
+                            variant="outlined"
+                            onChange={(e) =>
+                                setPassword(e.target.value)} fullWidth data-testid="password"
+                            InputProps={{
+                                sx: {
+                                    color: "#000000",
+                                    "&::placeholder": {
+                                        color: "#9e9e9e",
+                                        opacity: 1, // ブラウザによる自動的な透過を防ぐ
+                                    }
+                                },
+                            }}
+                            InputLabelProps={{
+                                sx: {
+                                    color: "#000000", // 通常時のラベル色
+                                    // ★フォーカスが当たった時もラベル色を黒に固定
+                                    "&.Mui-focused": {
+                                        color: "#000000",
+                                    }
                                 }
-                            }
-                        }} />
-                    <TextField
-                        label="パスワード"
-                        type="password"
-                        value={password}
-                        onChange={(e) =>
-                            setPassword(e.target.value)} fullWidth data-testid="password"
-                        InputProps={{
-                            sx: { color: "#000000" }
-                        }}
-                        InputLabelProps={{
-                            sx: { color: "#000000" }
-                        }} />
-                    {renderButton()}
-                </Box>
-            </Paper>
-        </Box>);
+                            }} />
+                        {renderButton()}
+                    </Box>
+                </Paper>
+            </Box>
+        </ThemeRegistry>);
 }

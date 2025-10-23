@@ -2,7 +2,9 @@
 
 
 import React, { useEffect, useState } from "react";
-import { Button, Container, TextField } from "@mui/material";
+import { Box, Button, Container, TextField, Typography } from "@mui/material";
+import Person2OutlinedIcon from '@mui/icons-material/Person2Outlined';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 // 設定ページのコンテンツ
 export default function Home() {
@@ -117,8 +119,58 @@ export default function Home() {
 
     <Container>
       <h1>設定</h1>
+      {/* <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <Person2OutlinedIcon />
+        <h3>アカウント設定</h3>
+      </Box>
+      <p>ユーザ名とパスワードを変更できます</p>
+      <form>
+        <TextField
+          id="password-confirm"
+          variant="outlined"
+          value={prevPasswordString}
+          onChange={(e) => setPrevPasswordString(e.target.value)}
+          size="small"
+          placeholder="新しいユーザ名を入力"
+          sx={{
+            width: {
+              xs: "100%",
+              sm: 350,
+              md: 500,
+            },
+            borderRadius: "5px",
+            mb: 1
+          }}
+          data-testid="prevpasswordinput"
+        />
+        <br />
+        <TextField
+          id="password-setting"
+          variant="outlined"
+          value={passwordString}
+          onChange={(e) => setPasswordString(e.target.value)}
+          size="small"
+          placeholder="新しいパスワードを設定"
+          sx={{
+            width: {
+              xs: "100%",
+              sm: 350,
+              md: 500,
+            },
+            borderRadius: "5px",
+            mb: 1
+          }}
+          data-testid="passwordinput"
+        />
+        <Button onClick={handleSavePassword} variant="contained" sx={{ ml: 2 }} data-testid="save">保存</Button>
+      </form> */}
 
-      <h3>パスワード設定</h3>
+
+
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 4 }}>
+        <LockOutlinedIcon></LockOutlinedIcon>
+        <h3>ノートパスワード設定</h3>
+      </Box>
       <p>ノートにロックをかけるときのパスワードを設定できます</p>
       {isPasswordExist ? (
         <form>
@@ -128,7 +180,7 @@ export default function Home() {
             value={prevPasswordString}
             onChange={(e) => setPrevPasswordString(e.target.value)}
             size="small"
-            placeholder="現在のパスワードを入力"
+            placeholder="現在のノートパスワードを入力"
             sx={{
               width: {
                 xs: "100%",
@@ -147,7 +199,7 @@ export default function Home() {
             value={passwordString}
             onChange={(e) => setPasswordString(e.target.value)}
             size="small"
-            placeholder="新しいパスワードを設定"
+            placeholder="新しいノートパスワードを設定"
             sx={{
               width: {
                 xs: "100%",
