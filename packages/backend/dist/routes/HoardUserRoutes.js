@@ -40,9 +40,9 @@ router.post('/', async (req, res) => {
         const savedUser = await userRepository.save(newUser);
         const token = jwt.sign({ id: savedUser.id, username: savedUser.username }, SECRET, { expiresIn: '1d' });
         res.cookie("token", token, {
-            domain: "localhost",
+            domain: process.env.NODE_ENV === 'production' ? process.env.COOKIE_DOMAIN : "localhost", // 本番はenvファイルの設定を使用,
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production' ? 'true' : 'false',
+            secure: process.env.NODE_ENV === 'production' ? true : false,
             sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
             path: "/",
             maxAge: 24 * 60 * 60 * 1000 // 1day
@@ -105,9 +105,9 @@ router.put('/', authMiddleware, async (req, res) => {
         await redis.set(`token:${newJti}`, 'valid', 'EX', 24 * 60 * 60); // 新しいトークンを登録
         console.log("new jti is set.");
         res.cookie("token", newToken, {
-            domain: "localhost",
+            domain: process.env.NODE_ENV === 'production' ? process.env.COOKIE_DOMAIN : "localhost", // 本番はenvファイルの設定を使用,
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production' ? 'true' : 'false',
+            secure: process.env.NODE_ENV === 'production' ? true : false,
             sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
             path: "/",
             maxAge: 24 * 60 * 60 * 1000 // 1day
