@@ -1,7 +1,6 @@
 import jwt from 'jsonwebtoken';
-import { Redis } from 'ioredis';
+import { redis } from '../server.js';
 const SECRET = process.env.SECRET || 'hoard_secret';
-const redis = new Redis({ host: '192.168.1.103', port: 6379 });
 export const authMiddleware = async (req, res, next) => {
     const token = req.cookies.token;
     if (!token)

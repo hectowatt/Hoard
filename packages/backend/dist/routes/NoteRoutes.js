@@ -30,7 +30,7 @@ router.post('/', authMiddleware, async (req, res) => {
             is_locked: isLocked // ロック状態を設定
         });
         const savedNote = await noteRepository.save(newNote);
-        console.log('Message inserted with ID: ', savedNote.id);
+        console.log('Note inserted with ID: ', savedNote.id);
         res.status(201).json({ message: "save note success!", note: savedNote });
     }
     catch (error) {

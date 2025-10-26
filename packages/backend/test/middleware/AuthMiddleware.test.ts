@@ -15,11 +15,16 @@ const mockJwtVerify = jest.fn((token, secret) => {
 // jwt.signのモック関数
 const mockJwtSign = jest.fn(() => 'valid-token');
 
-jest.unstable_mockModule("ioredis", () => ({
-    Redis: jest.fn().mockImplementation(() => ({
-        set: jest.fn<(...args: any[]) => Promise<string>>().mockResolvedValue("OK"),
+// AuthMiddleware が "import { redis } from '../server.js'" するのを傍受
+jest.unstable_mockModule("../../dist/server.js", () => ({
+    redis: {
         get: mockRedisGet,
-    })),
+    },
+    // テストファイル自体が 'hoardserver' を import しているため、それもモック
+    hoardserver: {
+        close: (cb?: (err?: any) => void) => cb?.(), // afterAll のため
+    },
+    app: {},
 }));
 
 jest.unstable_mockModule('jsonwebtoken', () => ({
@@ -51,7 +56,7 @@ describe('AuthMiddleware', () => {
 
     it('should call next() for a valid token that exists in Redis', async () => {
         const payload = { jti: 'valid-jti', id: 'test-user-id', username: 'testuser' };
-        
+
         const token = jwt.sign(payload, SECRET);
 
         mockRedisGet.mockResolvedValueOnce('valid');

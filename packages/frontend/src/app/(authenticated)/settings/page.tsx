@@ -8,10 +8,13 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 // 設定ページのコンテンツ
 export default function Home() {
+  const [prevNotePasswordString, setPrevNotePasswordString] = useState("");
+  const [notePasswordString, setNotePasswordString] = useState("");
+  const [newUsernameString, setNewUsernameString] = useState("");
   const [prevPasswordString, setPrevPasswordString] = useState("");
-  const [passwordString, setPasswordString] = useState("");
+  const [newPasswordString, setNewPasswordString] = useState("");
   const [isPasswordExist, setIsPasswordExist] = useState(false);
-  const [passwordId, setPasswordId] = useState("");
+  const [notePasswordId, setNotePasswordId] = useState("");
 
   const fetchPasswordStatus = async () => {
     const responseSelect = await fetch("/api/password", {
@@ -26,7 +29,7 @@ export default function Home() {
       const result = await responseSelect.json();
       if (result.password_id != null && result.password_id !== "") {
         setIsPasswordExist(true);
-        setPasswordId(result.password_id);
+        setNotePasswordId(result.password_id);
       } else {
         setIsPasswordExist(false);
       }
@@ -39,13 +42,13 @@ export default function Home() {
 
   // パスワードの保存処理
   const handleSavePassword = async () => {
-    if (passwordString.trim() === "") {
+    if (notePasswordString.trim() === "") {
       alert("新しいパスワードを入力してください");
       return;
     }
 
     if (isPasswordExist) {
-      if (prevPasswordString.trim() === "") {
+      if (prevNotePasswordString.trim() === "") {
         alert("現在のパスワードを入力してください");
         return;
       }
@@ -56,8 +59,8 @@ export default function Home() {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          password_id: passwordId,
-          passwordString: prevPasswordString
+          password_id: notePasswordId,
+          passwordString: prevNotePasswordString
         }),
         credentials: "include"
       });
@@ -74,16 +77,16 @@ export default function Home() {
               "Content-Type": "application/json"
             },
             body: JSON.stringify({
-              password_id: passwordId,
-              passwordString: passwordString
+              password_id: notePasswordId,
+              passwordString: notePasswordString
             }),
             credentials: "include"
           });
 
           if (response.ok) {
             alert("パスワードを更新しました！");
-            setPasswordString(""); // 入力フィールドをクリア
-            setPrevPasswordString("");
+            setNotePasswordString(""); // 入力フィールドをクリア
+            setPrevNotePasswordString("");
           } else {
             alert("パスワードの更新に失敗しました");
           }
@@ -101,37 +104,131 @@ export default function Home() {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ passwordString: passwordString }),
+        body: JSON.stringify({ passwordString: notePasswordString }),
         credentials: "include"
       });
 
       if (response.ok) {
         alert("パスワードを登録しました！");
-        setPasswordString(""); // 入力フィールドをクリア
+        setNotePasswordString(""); // 入力フィールドをクリア
       } else {
         alert("パスワードの登録に失敗しました");
       }
     }
 
+  };
+
+  // アカウント情報の更新処理
+  const handleSaveAccountInfo = async () => {
+    if (!newUsernameString && !newPasswordString) {
+      alert("ユーザ名かパスワードのいずれかを入力してください");
+      return;
+    }
+
+    if (newPasswordString && !prevPasswordString) {
+      alert("パスワードを変更する場合、現在のパスワードを入力してください");
+      return;
+    }
+
+    if (newPasswordString) {
+      const responseCompare = await fetch("/api/user/compare", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          passwordString: prevPasswordString
+        }),
+        credentials: "include"
+      });
+
+      if (responseCompare.ok) {
+        const result = await responseCompare.json();
+        const isMatch = result.isMatch;
+        if (isMatch) {
+
+          const response = await fetch("/api/user", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              username: newUsernameString,
+              password: newPasswordString
+            }),
+            credentials: "include"
+          });
+          if (response.ok) {
+            alert("アカウント情報を更新しました！");
+            setNewUsernameString("");
+            setPrevPasswordString("");
+            setNewPasswordString("");
+          } else {
+            alert("アカウント情報の更新に失敗しました");
+          }
+        } else {
+          alert("現在のパスワードが間違っています");
+        }
+      }
+    } else {
+      const response = await fetch("/api/user", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          username: newUsernameString,
+          password: newPasswordString
+        }),
+        credentials: "include"
+      });
+      if (response.ok) {
+        alert("アカウント情報を更新しました！");
+        setNewUsernameString("");
+        setPrevPasswordString("");
+        setNewPasswordString("");
+      } else {
+        alert("アカウント情報の更新に失敗しました");
+      }
+    }
   }
 
   return (
 
     <Container>
       <h1>設定</h1>
-      {/* <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
         <Person2OutlinedIcon />
-        <h3>アカウント設定</h3>
+        <h3>ユーザ設定</h3>
       </Box>
-      <p>ユーザ名とパスワードを変更できます</p>
+      <p>ユーザ名とパスワードを変更できます。</p>
       <form>
         <TextField
-          id="password-confirm"
+          id="new-username"
+          variant="outlined"
+          value={newUsernameString}
+          onChange={(e) => setNewUsernameString(e.target.value)}
+          size="small"
+          placeholder="新しいユーザ名を入力"
+          sx={{
+            width: {
+              xs: "100%",
+              sm: 350,
+              md: 500,
+            },
+            borderRadius: "5px",
+            mb: 1
+          }}
+          data-testid="usernameinput"
+        />
+        <br />
+        <TextField
+          id="new-password"
           variant="outlined"
           value={prevPasswordString}
           onChange={(e) => setPrevPasswordString(e.target.value)}
           size="small"
-          placeholder="新しいユーザ名を入力"
+          placeholder="現在のパスワードを設定"
           sx={{
             width: {
               xs: "100%",
@@ -145,10 +242,10 @@ export default function Home() {
         />
         <br />
         <TextField
-          id="password-setting"
+          id="new-password"
           variant="outlined"
-          value={passwordString}
-          onChange={(e) => setPasswordString(e.target.value)}
+          value={newPasswordString}
+          onChange={(e) => setNewPasswordString(e.target.value)}
           size="small"
           placeholder="新しいパスワードを設定"
           sx={{
@@ -162,8 +259,8 @@ export default function Home() {
           }}
           data-testid="passwordinput"
         />
-        <Button onClick={handleSavePassword} variant="contained" sx={{ ml: 2 }} data-testid="save">保存</Button>
-      </form> */}
+        <Button onClick={handleSaveAccountInfo} variant="contained" sx={{ ml: 2 }} data-testid="userinfosave">保存</Button>
+      </form>
 
 
 
@@ -177,8 +274,8 @@ export default function Home() {
           <TextField
             id="password-confirm"
             variant="outlined"
-            value={prevPasswordString}
-            onChange={(e) => setPrevPasswordString(e.target.value)}
+            value={prevNotePasswordString}
+            onChange={(e) => setPrevNotePasswordString(e.target.value)}
             size="small"
             placeholder="現在のノートパスワードを入力"
             sx={{
@@ -190,14 +287,14 @@ export default function Home() {
               borderRadius: "5px",
               mb: 1
             }}
-            data-testid="prevpasswordinput"
+            data-testid="prevnotepasswordinput"
           />
           <br />
           <TextField
             id="password-setting"
             variant="outlined"
-            value={passwordString}
-            onChange={(e) => setPasswordString(e.target.value)}
+            value={notePasswordString}
+            onChange={(e) => setNotePasswordString(e.target.value)}
             size="small"
             placeholder="新しいノートパスワードを設定"
             sx={{
@@ -209,19 +306,19 @@ export default function Home() {
               borderRadius: "5px",
               mb: 1
             }}
-            data-testid="passwordinput"
+            data-testid="notepasswordinput"
           />
-          <Button onClick={handleSavePassword} variant="contained" sx={{ ml: 2 }} data-testid="save">保存</Button>
+          <Button onClick={handleSavePassword} variant="contained" sx={{ ml: 2 }} data-testid="notepasswordsave">保存</Button>
         </form>
       ) : (
         <form>
           <TextField
             id="password-setting"
             variant="outlined"
-            value={passwordString}
-            onChange={(e) => setPasswordString(e.target.value)}
+            value={notePasswordString}
+            onChange={(e) => setNotePasswordString(e.target.value)}
             size="small"
-            placeholder="新しいパスワードを設定"
+            placeholder="新しいノートパスワードを設定"
             sx={{
               width: {
                 xs: "100%",
@@ -231,9 +328,9 @@ export default function Home() {
               borderRadius: "5px",
               mb: 1
             }}
-            data-testid="passwordinput"
+            data-testid="notepasswordinput"
           />
-          <Button onClick={handleSavePassword} variant="contained" sx={{ ml: 2 }} data-testid="save">保存</Button>
+          <Button onClick={handleSavePassword} variant="contained" sx={{ ml: 2 }} data-testid="notepasswordsave">保存</Button>
         </form>
       )}
 
@@ -243,4 +340,4 @@ export default function Home() {
     </Container >
 
   );
-}
+};
