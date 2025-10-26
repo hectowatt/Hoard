@@ -36,7 +36,7 @@ cp docker-compose_sample.yml docker-compose.yml
 cp .env_sample .env
 ```
 
-If you want to customise connection setting, edit those files;
+If you want to customise connection setting, edit these files;
 
 After building docker container with docker compose, you can launch Hoard;
 
@@ -48,3 +48,8 @@ Copy setting file and build container;
 cp ./.devcontainer/devcontainer_sample.json ./.devcontainer/devcontainer.json
 
 ```
+
+## Mobile
+Hoard supports PWA.
+
+If you use Hoard in Mobile, PWA is usefull for you.

@@ -98,7 +98,7 @@ export default function ThemeRegistry({ children }: { children: React.ReactNode 
                 styleOverrides: {
                     root: {
                         "& .MuiOutlinedInput-notchedOutline": {
-                            borderColor: "#000000", // 通常時の枠線色
+                            borderColor: "#9e9e9e", // 通常時の枠線色
                         },
                         "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
                             borderColor: "#e3a838", // フォーカス時の枠線色

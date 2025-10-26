@@ -9,11 +9,16 @@ const mockJwtVerify = jest.fn((token, secret) => {
 });
 // jwt.signのモック関数
 const mockJwtSign = jest.fn(() => 'valid-token');
-jest.unstable_mockModule("ioredis", () => ({
-    Redis: jest.fn().mockImplementation(() => ({
-        set: jest.fn().mockResolvedValue("OK"),
+// AuthMiddleware が "import { redis } from '../server.js'" するのを傍受
+jest.unstable_mockModule("../../dist/server.js", () => ({
+    redis: {
         get: mockRedisGet,
-    })),
+    },
+    // テストファイル自体が 'hoardserver' を import しているため、それもモック
+    hoardserver: {
+        close: (cb) => cb?.(), // afterAll のため
+    },
+    app: {},
 }));
 jest.unstable_mockModule('jsonwebtoken', () => ({
     __esModule: true,

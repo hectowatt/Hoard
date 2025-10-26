@@ -15,6 +15,7 @@ import { LessThan } from 'typeorm';
 import Note from './entities/Note.js';
 import cookieParser from 'cookie-parser';
 import TableNote from './entities/TableNote.js';
+import { Redis } from 'ioredis';
 
 const { Pool } = pg;
 export const app = express();
@@ -110,4 +111,6 @@ if (process.env.NODE_ENV !== 'test') {
   startServer().catch((error) => {
     console.error("Failed to start server:", error);
   });
-}
+};
+
+export const redis = new Redis({ host: '192.168.1.103', port: 6379 });

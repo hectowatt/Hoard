@@ -3,12 +3,12 @@ import jwt from 'jsonwebtoken';
 import 'dotenv/config';
 import { Redis } from 'ioredis';
 import { authMiddleware } from '../middleware/AuthMiddleware.js';
+import { redis } from '../server.js';
 
 const router = Router();
 const SECRET = process.env.SECRET || 'hoard_secret';
-const redis = new Redis({host: '192.168.1.103', port: 6379});
 
-router.post('/',authMiddleware, async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
     const token = req.cookies.token;
     if (token) {
         try {

@@ -13,7 +13,7 @@ beforeEach(() => {
                 ok: true,
                 json: () =>
                     Promise.resolve({
-                        password_id: "12345", // ← 配列ではなくオブジェクト！
+                        password_id: "12345",
                         password_hashed: "$2b$10$EIX",
                     }),
             });
@@ -30,29 +30,50 @@ describe("Setting Page", () => {
         render(<Home />);
 
         expect(screen.getByText("設定")).toBeInTheDocument();
+        expect(screen.getByText("ユーザ設定")).toBeInTheDocument();
+        expect(screen.getByText("ユーザ名とパスワードを変更できます。")).toBeInTheDocument();
         expect(screen.getByText("ノートパスワード設定")).toBeInTheDocument();
         expect(screen.getByText("ノートにロックをかけるときのパスワードを設定できます")).toBeInTheDocument();
 
         await waitFor(() => {
-            expect(screen.getByTestId("prevpasswordinput")).toBeInTheDocument();
+            expect(screen.getByTestId("prevnotepasswordinput")).toBeInTheDocument();
         });
 
+        expect(screen.getByTestId("prevpasswordinput")).toBeInTheDocument();
         expect(screen.getByTestId("passwordinput")).toBeInTheDocument();
-        expect(screen.getByTestId("save")).toBeInTheDocument();
+        expect(screen.getByTestId("notepasswordinput")).toBeInTheDocument();
+        expect(screen.getByTestId("userinfosave")).toBeInTheDocument();
+        expect(screen.getByTestId("notepasswordsave")).toBeInTheDocument();
     });
 
-
-    it("保存ボタンをクリックしたとき、/api/passwordにGETリクエストが送信される", async () => {
+    it("ユーザ情報保存ボタンをクリックしたとき、/api/userにリクエストが送信される", async () => {
         render(
             <Home />
         );
 
-        const passwordInput = await screen.getByTestId("passwordinput");
-        fireEvent.change(passwordInput.querySelector("input")!, {
+        const userNameInput = await screen.getByTestId("usernameinput");
+        fireEvent.change(userNameInput.querySelector("input")!, {
+            target: { value: "testusername" },
+        });
+
+        const saveButton = await screen.getByTestId("userinfosave");
+        fireEvent.click(saveButton);
+
+        expect(fetch).toHaveBeenCalledWith("/api/user", expect.any(Object));
+    });
+
+
+    it("ノートパスワード保存ボタンをクリックしたとき、/api/passwordにリクエストが送信される", async () => {
+        render(
+            <Home />
+        );
+
+        const notePasswordInput = await screen.getByTestId("notepasswordinput");
+        fireEvent.change(notePasswordInput.querySelector("input")!, {
             target: { value: "testpassword" },
         });
 
-        const saveButton = await screen.getByTestId("save");
+        const saveButton = await screen.getByTestId("notepasswordsave");
         fireEvent.click(saveButton);
 
         expect(fetch).toHaveBeenCalledWith("/api/password", expect.any(Object));
