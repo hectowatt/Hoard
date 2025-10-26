@@ -10,6 +10,10 @@ export async function middleware(req: NextRequest) {
 
     try {
         const secret = new TextEncoder().encode(process.env.SECRET!);
+        if (!secret) {
+            console.error("SECRET is not set in environment variables");
+            return NextResponse.redirect(new URL("/login", req.url));
+        }
         const { payload } = await jwtVerify(token, secret);
         return NextResponse.next();
     } catch (err) {
