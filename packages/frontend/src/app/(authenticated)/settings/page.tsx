@@ -109,8 +109,13 @@ export default function Home() {
       });
 
       if (response.ok) {
+        const result = await response.json();
         alert("パスワードを登録しました！");
         setNotePasswordString(""); // 入力フィールドをクリア
+        setIsPasswordExist(true);
+        if (result?.password_id) {
+          setNotePasswordId(result.password_id); // 新しいIDをセット
+        }
       } else {
         alert("パスワードの登録に失敗しました");
       }

@@ -379,7 +379,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                         WebkitLineClamp: 4,
                         WebkitBoxOrient: "vertical",
                     }}
-                >{is_locked ? "このノートはロックされています" : <TableChartOutlinedIcon />}
+                >{isLocked ? "このノートはロックされています" : <TableChartOutlinedIcon />}
                 </Typography>
                 <Typography variant="caption" color="textSecondary" sx={{ display: "block" }}>
                     作成日: {formatDate(createdate)}

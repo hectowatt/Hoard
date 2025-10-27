@@ -4,7 +4,7 @@ import Password from '../entities/Password.js';
 import bcrypt from "bcrypt";
 import { authMiddleware } from '../middleware/AuthMiddleware.js';
 const router = Router();
-// 【INSERT】パスワード登録API
+// 【INSERT】ノートパスワード登録API
 router.post('/', authMiddleware, async (req, res) => {
     const { passwordString } = req.body;
     if (!passwordString) {
@@ -17,14 +17,14 @@ router.post('/', authMiddleware, async (req, res) => {
             password_hashed: password_hashed
         });
         const savedPassword = await passwordRepository.save(newPassword);
-        res.status(201).json({ message: "Save password success!" });
+        res.status(201).json({ message: "Save password success!", password_id: savedPassword.password_id });
     }
     catch (error) {
         console.error("Error saving password:", error);
         res.status(500).json({ error: "Failed to save password" });
     }
 });
-// 【SELECT】パスワードid取得API
+// 【SELECT】ノートパスワードid取得API
 router.get('/', authMiddleware, async (req, res) => {
     try {
         const passwordRepository = AppDataSource.getRepository(Password);
@@ -43,7 +43,7 @@ router.get('/', authMiddleware, async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch password' });
     }
 });
-// 【UPDATE】パスワード更新API
+// 【UPDATE】ノートパスワード更新API
 router.put('/', authMiddleware, async (req, res) => {
     const { password_id, passwordString } = req.body;
     try {
@@ -61,7 +61,7 @@ router.put('/', authMiddleware, async (req, res) => {
         res.status(500).json({ error: "Failed to update password" });
     }
 });
-// 【SELECT】パスワード比較API（リクエスト値とDBのハッシュ化されたパスワードが一致するかを返却）
+// 【SELECT】ノートパスワード比較API（リクエスト値とDBのハッシュ化されたパスワードが一致するかを返却）
 router.post('/compare', authMiddleware, async (req, res) => {
     try {
         const password_id = req.body.password_id;
