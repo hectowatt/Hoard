@@ -264,7 +264,8 @@ export default function Home() {
           }}
           data-testid="passwordinput"
         />
-        <Button onClick={handleSaveAccountInfo} variant="contained" sx={{ ml: 2 }} data-testid="userinfosave">保存</Button>
+        <br />
+        <Button onClick={handleSaveAccountInfo} variant="contained" data-testid="userinfosave">保存</Button>
       </form>
 
 
@@ -313,7 +314,8 @@ export default function Home() {
             }}
             data-testid="notepasswordinput"
           />
-          <Button onClick={handleSavePassword} variant="contained" sx={{ ml: 2 }} data-testid="notepasswordsave">保存</Button>
+          <br />
+          <Button onClick={handleSavePassword} variant="contained" data-testid="notepasswordsave">保存</Button>
         </form>
       ) : (
         <form>
@@ -335,7 +337,8 @@ export default function Home() {
             }}
             data-testid="notepasswordinput"
           />
-          <Button onClick={handleSavePassword} variant="contained" sx={{ ml: 2 }} data-testid="notepasswordsave">保存</Button>
+          <br />
+          <Button onClick={handleSavePassword} variant="contained" data-testid="notepasswordsave">保存</Button>
         </form>
       )}
 
