@@ -363,9 +363,8 @@ export default function Note({
                         {isEditing && !isLocked ? (
                             // 編集中でパスワードロックされておらず、通常ノートの場合
                             <>
-                                <Button onClick={handleSave} variant="contained" sx={{ mr: 1, mb: 1 }}>保存</Button>
-                                <Button onClick={() => setIsEditing(false)} variant="contained" sx={{ mb: 1 }}>キャンセル</Button>
-                                <FormControl size="small" sx={{ minWidth: 120, ml: 2 }} data-testid="label-select">
+
+                                <FormControl size="small" sx={{ minWidth: 120 }} data-testid="label-select">
                                     <InputLabel id="select-label">ラベル</InputLabel>
                                     <Select
                                         labelId="select-label"
@@ -386,6 +385,9 @@ export default function Note({
                                         ))}
                                     </Select>
                                 </FormControl>
+                                <br />
+                                <Button onClick={handleSave} variant="contained" sx={{ mr: 1, mt: 2 }}>保存</Button>
+                                <Button onClick={() => setIsEditing(false)} variant="contained" sx={{ mt: 2 }}>キャンセル</Button>
 
                             </>
                         ) : !isLocked ? (
