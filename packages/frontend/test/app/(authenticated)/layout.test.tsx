@@ -50,10 +50,10 @@ describe("RootLayout", () => {
         expect(logo).toBeInTheDocument();
 
         // ナビゲーション項目
-        expect(screen.getByText("ノート")).toBeInTheDocument();
-        expect(screen.getByText("ラベル")).toBeInTheDocument();
-        expect(screen.getByText("ゴミ箱")).toBeInTheDocument();
-        expect(screen.getByText("設定")).toBeInTheDocument();
+        expect(screen.getByTestId("noteicon")).toBeInTheDocument();
+        expect(screen.getByTestId("labelicon")).toBeInTheDocument();
+        expect(screen.getByTestId("trashicon")).toBeInTheDocument();
+        expect(screen.getByTestId("settingicon")).toBeInTheDocument();
 
         // 子コンテンツ
         expect(screen.getByText("Child Content")).toBeInTheDocument();
@@ -87,7 +87,7 @@ describe("RootLayout", () => {
             </AuthenticatedLayout>
         );
 
-        const labelButton = screen.getByText("ラベル");
+        const labelButton = screen.getByTestId("labelicon");
         fireEvent.click(labelButton);
 
         await waitFor(() => {

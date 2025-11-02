@@ -41,13 +41,14 @@ import SearchWordBar from "@/app/(authenticated)/components/SearchWordBar";
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { Router } from "next/router";
 import { useRouter } from "next/navigation";
+import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 
 const inter = Inter({ subsets: ["latin"] });
 
 // サイドバー上部のアイコン
-const aboveIcons = [<TextSnippetOutlinedIcon />, <LabelImportantOutlineRoundedIcon />];
+const aboveIcons = [<TextSnippetOutlinedIcon data-testid="noteicon" />, <LabelImportantOutlineRoundedIcon data-testid="labelicon" />];
 // サイドバー下部のアイコン
-const belowIcons = [<DeleteOutlineRoundedIcon />, <SettingsOutlinedIcon />];
+const belowIcons = [<DeleteOutlineRoundedIcon data-testid="trashicon" />, <SettingsOutlinedIcon data-testid="settingicon" />];
 
 // サイドバー上部
 const navAboveItems = [
@@ -71,12 +72,10 @@ export default function AuthenticatedLayout({
 }>) {
 	const [labelDialogOpen, setLabelDialogOpen] = React.useState(false);
 	const [labels, setLabels] = React.useState<string[]>([]);
-
 	const { mode, setMode } = useThemeMode();
-
 	const router = useRouter();
-
 	const theme = useTheme();
+	const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
 
 	// useMediaQueryを使って画面サイズを判定
 	const themeForMediaQuery = useTheme();
@@ -84,7 +83,7 @@ export default function AuthenticatedLayout({
 	const isSmallScreen = useMediaQuery(themeForMediaQuery.breakpoints.down("md"));
 
 	// 現在のDrawerの幅をstateとして管理
-	const currentDrawerWidth = isSmallScreen ? drawerWidthClosed : drawerWidthOpen;
+	const currentDrawerWidth = isDrawerOpen ? drawerWidthOpen : drawerWidthClosed;
 
 	//クライアントサイドでのみテーマを決定する
 	React.useEffect(() => {
@@ -228,6 +227,7 @@ export default function AuthenticatedLayout({
 									</AppBar>
 									<Drawer
 										variant="permanent"
+										open={isDrawerOpen}
 										sx={{
 											// Drawerの幅を動的に設定
 											width: currentDrawerWidth,
@@ -244,8 +244,13 @@ export default function AuthenticatedLayout({
 										}}
 									>
 										<Toolbar />
-										<Box sx={{ overflow: "auto" }}>
+										<Box sx={{ overflowY: "auto", overflowX: "hidden" }}>
 											<List>
+												<ListItemButton onClick={() => setIsDrawerOpen(!isDrawerOpen)}>
+													<ListItemIcon sx={{ minWidth: 0, justifyContent: 'center' }}>
+														<MenuOutlinedIcon />
+													</ListItemIcon>
+												</ListItemButton>
 												{navAboveItems.map(({ text, icon, href, dialog }) => (
 													<ListItem key={text} disablePadding>
 														{dialog ? (
@@ -253,14 +258,26 @@ export default function AuthenticatedLayout({
 																<ListItemIcon sx={{ minWidth: 0, justifyContent: 'center' }}>
 																	{icon}
 																</ListItemIcon>
-																{!isSmallScreen && <ListItemText primary={text} />}
+																{isDrawerOpen && <ListItemText primary={text} sx={{
+																	opacity: isDrawerOpen ? 1 : 0,
+																	whiteSpace: 'nowrap',
+																	transition: (theme) => theme.transitions.create('opacity', {
+																		duration: theme.transitions.duration.enteringScreen,
+																	})
+																}} />}
 															</ListItemButton>
 														) : (
 															<ListItemButton component={Link} href={href!}>
 																<ListItemIcon sx={{ minWidth: 0, justifyContent: 'center' }}>
 																	{icon}
 																</ListItemIcon>
-																{!isSmallScreen && <ListItemText primary={text} />}
+																{isDrawerOpen && <ListItemText primary={text} sx={{
+																	opacity: isDrawerOpen ? 1 : 0,
+																	whiteSpace: 'nowrap',
+																	transition: (theme) => theme.transitions.create('opacity', {
+																		duration: theme.transitions.duration.enteringScreen,
+																	})
+																}} />}
 															</ListItemButton>
 														)}
 													</ListItem>
@@ -274,7 +291,13 @@ export default function AuthenticatedLayout({
 															<ListItemIcon sx={{ minWidth: 0, justifyContent: 'center' }}>
 																{icon}
 															</ListItemIcon>
-															{!isSmallScreen && <ListItemText primary={text} />}
+															{isDrawerOpen && <ListItemText primary={text} sx={{
+																opacity: isDrawerOpen ? 1 : 0,
+																whiteSpace: 'nowrap',
+																transition: (theme) => theme.transitions.create('opacity', {
+																	duration: theme.transitions.duration.enteringScreen,
+																})
+															}} />}
 														</ListItemButton>
 													</ListItem>
 												))}
