@@ -7,9 +7,10 @@ export default class Label {
     @PrimaryGeneratedColumn("uuid")
     id: string;
 
-    // title
-    @Column({ name: "labelname", type: "text", nullable: false, unique: true })
+    // labelname
+    @Column({ name: "labelname", type: "varchar", length: 8, nullable: false, unique: true })
     labelname: string;
+
 
     // createdate
     @CreateDateColumn({ name: "createdate", type: "timestamp" })

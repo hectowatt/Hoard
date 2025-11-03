@@ -62,7 +62,7 @@ const navBelowItems = [
 	{ text: "設定", icon: belowIcons[1], href: "/settings" }
 ];
 
-const drawerWidthOpen = 240;
+const drawerWidthOpen = 180;
 const drawerWidthClosed = 60; // アイコンのみの時の幅
 
 export default function AuthenticatedLayout({

@@ -16,7 +16,7 @@ __decorate([
     __metadata("design:type", String)
 ], Label.prototype, "id", void 0);
 __decorate([
-    Column({ name: "labelname", type: "text", nullable: false, unique: true }),
+    Column({ name: "labelname", type: "varchar", length: 8, nullable: false, unique: true }),
     __metadata("design:type", String)
 ], Label.prototype, "labelname", void 0);
 __decorate([
