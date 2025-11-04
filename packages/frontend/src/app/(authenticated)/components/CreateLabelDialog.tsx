@@ -23,7 +23,7 @@ export default function CreateLabelDialog({ open, onClose }: LabelDialogProps) {
     // 保存ボタン押下処理
     const handleAdd = async () => {
         if (!input.trim()) {
-            console.log("ラベル名は必須です");
+            alert("ラベル名は必須です");
             return
         }
         try {
@@ -40,6 +40,15 @@ export default function CreateLabelDialog({ open, onClose }: LabelDialogProps) {
             })
 
             if (!response.ok) {
+                if (response.status === 400) {
+                    const errorData = await response.json();
+                    if (errorData.error === "Label name must be unique") {
+                        alert("ラベル名は一意である必要があります。別のラベル名を指定してください。");
+                    } else if (errorData.error === "Label name is too long") {
+                        alert("ラベル名が長すぎます。８文字以内で指定してください。");
+                    }
+                    return;
+                }
                 throw new Error("Failed to save label");
             }
 

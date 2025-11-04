@@ -3,6 +3,22 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import AuthenticatedLayout from "@/app/(authenticated)/layout";
 import "@testing-library/jest-dom";
 
+// ラベルコンテキストのモック
+const mockLabels = [
+    { id: "label1", labelname: "仕事" },
+    { id: "label2", labelname: "プライベート" },
+];
+
+jest.mock("@/app/(authenticated)/context/LabelProvider", () => {
+    return {
+        ...jest.requireActual("@/app/(authenticated)/context/LabelProvider"),
+        useLabelContext: () => ({
+            labels: mockLabels,
+        }),
+        LabelProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+    };
+});
+
 // fetch モック
 global.fetch = jest.fn(() =>
     Promise.resolve({
@@ -36,6 +52,8 @@ jest.mock("@/app/context/ThemeProvider", () => {
         },
     };
 });
+
+import { LabelProvider } from "@/app/(authenticated)/context/LabelProvider";
 
 describe("RootLayout", () => {
     it("renders logo, nav, and children", async () => {
@@ -94,4 +112,18 @@ describe("RootLayout", () => {
             expect(screen.getByRole("dialog")).toBeInTheDocument();
         });
     });
+
+    it("登録済みラベルがあるときにラベルリストが表示される", async () => {
+        render(
+            <AuthenticatedLayout>
+                <div>Label List Test</div>
+            </AuthenticatedLayout>
+        );
+
+        await waitFor(() => {
+            expect(screen.getByTestId("addedlabelicon-label1")).toBeInTheDocument();
+            expect(screen.getByTestId("addedlabelicon-label2")).toBeInTheDocument();
+        });
+    });
+
 });

@@ -30,9 +30,15 @@ export default function Home() {
   const { tableNotes, setTableNotes, fetchTableNotes } = useTableNoteContext();
   const { searchWord } = useSearchWordContext();
 
+  // label_idに紐づくlabelnameを取得する
+  const getLabelNameById = (label_id: string) => {
+    const label = labels.find(label => label.id === label_id);
+    return label ? label.labelname : "";
+  };
+
   const trimmedSearchWord = searchWord ? searchWord.trim().toLowerCase() : "";
-  const filterdNotes = searchWord ? notes.filter(note => note.title.toLowerCase().includes(trimmedSearchWord) || note.content.toLowerCase().includes(trimmedSearchWord)) : notes;
-  const filterdTableNotes = searchWord ? tableNotes.filter(tableNote => tableNote.title.toLowerCase().includes(trimmedSearchWord) || tableNote.columns.some(column => column.name.toLowerCase().includes(trimmedSearchWord)) || tableNote.rowCells.some(row => row.some(cell => cell.value.toLowerCase().includes(trimmedSearchWord)))) : tableNotes;
+  const filterdNotes = searchWord ? notes.filter(note => note.title.toLowerCase().includes(trimmedSearchWord) || note.content.toLowerCase().includes(trimmedSearchWord) || getLabelNameById(note.label_id).toLowerCase().includes(trimmedSearchWord)) : notes;
+  const filterdTableNotes = searchWord ? tableNotes.filter(tableNote => tableNote.title.toLowerCase().includes(trimmedSearchWord) || tableNote.columns.some(column => column.name.toLowerCase().includes(trimmedSearchWord)) || tableNote.rowCells.some(row => row.some(cell => cell.value.toLowerCase().includes(trimmedSearchWord))) || getLabelNameById(tableNote.label_id).toLowerCase().includes(trimmedSearchWord)) : tableNotes;
 
   useEffect(() => {
     fetchNotes();
@@ -42,10 +48,6 @@ export default function Home() {
     fetchTableNotes();
   }, []);
 
-  // 未ログインの場合はログインページにリダイレクト
-  if (!notes) {
-    redirect("/login");
-  }
 
   // ノート初期登録時のコールバック関数
   const handleInsert = (newId: string, newTitle: string, newContent: string, LabelId: string, is_locked: boolean) => {
