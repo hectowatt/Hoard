@@ -2,7 +2,8 @@
 
 import { useSearchWordContext } from "@/app/(authenticated)/context/SearchWordProvider";
 import { IconButton, InputAdornment, TextField } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
+import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
+import React from "react";
 
 type searchWordBarProps = {
     mode: "light" | "dark";
@@ -11,7 +12,9 @@ type searchWordBarProps = {
 export default function SearchWordBar({ mode }: searchWordBarProps) {
     // 検索バー
 
-    const { searchWord, setSearchWord } = useSearchWordContext();
+    const { setSearchWord } = useSearchWordContext();
+    const [word, setWord] = React.useState<string>("");
+
     return (
         <form
             onSubmit={(e => {
@@ -22,8 +25,8 @@ export default function SearchWordBar({ mode }: searchWordBarProps) {
                 variant="outlined"
                 size="medium"
                 placeholder="検索"
-                value={searchWord}
-                onChange={(e) => setSearchWord(e.target.value)}
+                value={word}
+                onChange={(e) => setWord(e.target.value)}
                 sx={{
                     width: {
                         xs: "100%",
@@ -34,6 +37,13 @@ export default function SearchWordBar({ mode }: searchWordBarProps) {
                     borderRadius: "5px"
                 }}
                 InputProps={{
+                    endAdornment: (
+                        <InputAdornment position="end">
+                            <IconButton type="submit" edge="end" aria-label="search" onClick={() => setSearchWord(word)}>
+                                <SearchOutlinedIcon />
+                            </IconButton>
+                        </InputAdornment>
+                    ),
                     sx: {
                         "&::placeholder": {
                             color: "#9e9e9e", // プレースホルダーの色を設定

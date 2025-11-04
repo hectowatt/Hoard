@@ -21,7 +21,15 @@ router.post('/', authMiddleware, async (req, res) => {
     }
     catch (error) {
         console.error("Error saving label:", error);
-        res.status(500).json({ error: "Failed to save label" });
+        if (error.code === '22001') {
+            res.status(400).json({ error: "Label name is too long" });
+        }
+        else if (error.code === '23505') {
+            res.status(400).json({ error: "Label name must be unique" });
+        }
+        else {
+            res.status(500).json({ error: "Failed to save label" });
+        }
     }
 });
 // 【SELECT】label全件取得API

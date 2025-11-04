@@ -37,11 +37,19 @@ const mockRepo = {
         return { id: 3, ...data };
     }),
     save: jest.fn((label) => {
-        return Promise.resolve({
-            id: 3,
-            labelname: label.labelname,
-            createdate: new Date(),
-        });
+        if (label.labelname === "work" || label.labelname === "study") {
+            const error = new Error("Label name must be unique");
+            // PostgreSQLの一意制約違反コードを付与
+            error.code = '23505';
+            return Promise.reject(error);
+        }
+        else {
+            return Promise.resolve({
+                id: 3,
+                labelname: label.labelname,
+                createdate: new Date(),
+            });
+        }
     }),
     remove: jest.fn((label) => Promise.resolve(label)),
 };
@@ -77,6 +85,13 @@ describe("/labels", () => {
             .send({ labelName: "test" });
         expect(res.status).toBe(500);
         expect(res.body.error).toBe("Failed to save label");
+    });
+    it("POST /labels with duplicate labelname should return 400 and message", async () => {
+        const res = await request(app)
+            .post("/api/labels")
+            .send({ labelName: "work" });
+        expect(res.status).toBe(400);
+        expect(res.body.error).toBe("Label name must be unique");
     });
     it("GET /labels should return 200 and all labels", async () => {
         const res = await request(app)

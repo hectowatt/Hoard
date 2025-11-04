@@ -6,7 +6,7 @@ import { authMiddleware } from '../middleware/AuthMiddleware.js';
 const router = Router();
 
 // 【INSERT】ラベル登録API
-router.post('/', authMiddleware,async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
   const { labelName } = req.body;
 
   if (!labelName) {
@@ -25,12 +25,18 @@ router.post('/', authMiddleware,async (req, res) => {
     res.status(201).json({ message: "Save label success!", label: savedLabel });
   } catch (error) {
     console.error("Error saving label:", error);
-    res.status(500).json({ error: "Failed to save label" });
+    if (error.code === '22001') {
+      res.status(400).json({ error: "Label name is too long" });
+    } else if (error.code === '23505') {
+      res.status(400).json({ error: "Label name must be unique" });
+    } else {
+      res.status(500).json({ error: "Failed to save label" });
+    }
   }
 });
 
 // 【SELECT】label全件取得API
-router.get('/', authMiddleware,async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
   try {
     const labelRepository = AppDataSource.getRepository(Label);
     // labelを全件取得する
@@ -43,7 +49,7 @@ router.get('/', authMiddleware,async (req, res) => {
 });
 
 // 【DELETE】ラベル削除API
-router.delete('/:id',authMiddleware, async (req, res) => {
+router.delete('/:id', authMiddleware, async (req, res) => {
   const id: string = req.params?.id ?? req.body?.id;
   console.log("delete label id: ", id);
   try {

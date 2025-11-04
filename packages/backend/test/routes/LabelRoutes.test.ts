@@ -33,7 +33,7 @@ jest.unstable_mockModule('../../dist/middleware/AuthMiddleware', () => ({
 // DataSource をモック
 const mockRepo = {
   find: jest.fn(() => Promise.resolve(mockLabels)),
-  findOneBy: jest.fn(( {id:id} ) => {
+  findOneBy: jest.fn(({ id: id }) => {
     console.log("mockRepo.findOneBy called with id:", id);
     const label_id = id as string;
     if (label_id === mockLabels[0].id) {
@@ -47,11 +47,18 @@ const mockRepo = {
     return { id: 3, ...data };
   }),
   save: jest.fn((label: Label) => {
-    return Promise.resolve({
-      id: 3,
-      labelname: label.labelname,
-      createdate: new Date(),
-    });
+    if (label.labelname === "work" || label.labelname === "study") {
+      const error = new Error("Label name must be unique");
+      // PostgreSQLの一意制約違反コードを付与
+      (error as any).code = '23505';
+      return Promise.reject(error);
+    } else {
+      return Promise.resolve({
+        id: 3,
+        labelname: label.labelname,
+        createdate: new Date(),
+      });
+    }
   }),
   remove: jest.fn((label: Label) => Promise.resolve(label)),
 };
@@ -100,6 +107,15 @@ describe("/labels", () => {
     expect(res.body.error).toBe("Failed to save label");
   });
 
+  it("POST /labels with duplicate labelname should return 400 and message", async () => {
+    const res = await request(app)
+      .post("/api/labels")
+      .send({ labelName: "work" });
+
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe("Label name must be unique");
+  });
+
   it("GET /labels should return 200 and all labels", async () => {
     const res = await request(app)
       .get("/api/labels");
@@ -111,11 +127,11 @@ describe("/labels", () => {
     expect(res.body[1].labelname).toBe("study");
   });
 
-  it("GET /labels and Error occured should return 500 and message", async() => {
+  it("GET /labels and Error occured should return 500 and message", async () => {
     mockRepo.find.mockImplementationOnce(() => Promise.reject(new Error("DB find error")));
 
     const res = await request(app)
-    .get("/api/labels");
+      .get("/api/labels");
 
     expect(res.status).toBe(500);
     expect(res.body.error).toBe("Failed to fetch labels");
@@ -137,11 +153,11 @@ describe("/labels", () => {
     expect(res.body.error).toBe("Label not found");
   });
 
-  it("DELETE /labels and Error occured should return 500 and message", async() => {
+  it("DELETE /labels and Error occured should return 500 and message", async () => {
     mockRepo.findOneBy.mockImplementationOnce(() => Promise.reject(new Error("DB findOneBy error")));
 
     const res = await request(app)
-    .delete("/api/labels/1");
+      .delete("/api/labels/1");
 
     expect(res.status).toBe(500);
     expect(res.body.error).toBe("Failed to delete label");

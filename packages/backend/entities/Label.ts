@@ -11,7 +11,6 @@ export default class Label {
     @Column({ name: "labelname", type: "varchar", length: 8, nullable: false, unique: true })
     labelname: string;
 
-
     // createdate
     @CreateDateColumn({ name: "createdate", type: "timestamp" })
     createdate: Date;
