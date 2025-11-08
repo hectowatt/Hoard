@@ -293,7 +293,7 @@ export default function Note({
 
     return (
         <>
-            <Paper elevation={3} sx={{ p: 2, maxWidth: 300, maxHeight: 200, wordWrap: "break-word", cursor: "pointer" }} onClick={handleOpen}>
+            <Paper elevation={3} sx={{ p: 2, maxWidth: 300, maxHeight: 250, wordWrap: "break-word", cursor: "pointer" }} onClick={handleOpen}>
                 <Typography variant="h6" sx={title && title.trim() !== "" ? { mb: 1 } : { mb: 1, fontStyle: "italic", color: "#b0b0b0", fontWeight: "normal" }}>
                     {title && title.trim() !== "" ? title : "タイトルなし"}
                 </Typography>
