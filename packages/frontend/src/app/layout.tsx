@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     manifest: '/manifest.json',
 
     appleWebApp: {
-        statusBarStyle: 'default',
+        // statusBarStyle: 'default',
         title: 'Hoard',
     },
 };
