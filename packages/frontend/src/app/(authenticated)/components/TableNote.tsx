@@ -226,7 +226,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                         setIsLocked(true);
                     } else {
                         // パスワードが未登録の場合はロックできない
-                        alert("パスワード未登録のためロックできません");
+                        alert("パスワード未登録のためロックできません。\n設定画面でパスワードを設定してください。");
                     }
                 } else {
                     // パスワード取得に失敗した場合の処理
@@ -242,7 +242,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
     // ロック解除処理
     const hubdlePasswordSubmit = async () => {
         if (!inputPassword || inputPassword.trim() === "") {
-            console.error("パスワードが入力されませんでした");
+            alert("パスワードを入力してください");
             return;
         }
 
@@ -288,6 +288,8 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                     console.error("Error unlocking note", error);
                     return;
                 }
+            } else {
+                alert("パスワードが違います。再度入力してください。");
             }
         } else {
             console.error("failed to compare password");

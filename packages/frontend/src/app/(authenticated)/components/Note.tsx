@@ -201,7 +201,6 @@ export default function Note({
 
                 if (responseSelect.ok) {
                     const resultSelect = await responseSelect.json();
-                    console.log("パスワード取得成功", resultSelect);
                     if (resultSelect.password_id !== null && resultSelect.password_id !== "" && resultSelect.password_id !== undefined) {
                         // ロック時の処理
                         const responseLock = await fetch("/api/notes/lock", {
@@ -222,7 +221,7 @@ export default function Note({
                         setIsLocked(true);
                     } else {
                         // パスワードが未登録の場合はロックできない
-                        alert("パスワード未登録のためロックできません");
+                        alert("パスワード未登録のためロックできません。\n設定画面でパスワードを設定してください。");
                     }
                 } else {
                     // パスワード取得に失敗した場合の処理
@@ -238,7 +237,7 @@ export default function Note({
     // ロック解除処理
     const hubdlePasswordSubmit = async () => {
         if (!inputPassword || inputPassword.trim() === "") {
-            console.error("パスワードが入力されませんでした");
+            alert("パスワードを入力してください");
             return;
         }
 
@@ -284,6 +283,8 @@ export default function Note({
                     console.error("Error unlocking note", error);
                     return;
                 }
+            } else {
+                alert("パスワードが違います。再度入力してください。");
             }
         } else {
             console.error("failed to compare password");
