@@ -65,8 +65,6 @@ export default function Home() {
         credentials: "include"
       });
 
-      console.log(responseCompare);
-
       if (responseCompare.ok) {
         const result = await responseCompare.json();
         const isMatch = result.isMatch;
