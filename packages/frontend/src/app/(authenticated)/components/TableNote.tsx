@@ -92,7 +92,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
     const handleAddColumn = () => {
         const addColumnId = Date.now();
         if (editColumns.length >= 5) return;
-        setEditColumns([...editColumns, { id: addColumnId, name: `カラム${editColumns.length + 1}` }]);
+        setEditColumns([...editColumns, { id: addColumnId, name: "" }]);
         setEditRowCells(editRowCells.map(rowCell => [...rowCell, { id: Date.now(), rowIndex: rowCell.length, value: "", columnId: addColumnId }]));
     };
 
@@ -421,7 +421,13 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                                                         newColumns[idx] = { ...newColumns[idx], name: e.target.value };
                                                         setEditColumns(newColumns);
                                                     }}
-                                                    sx={{ width: 200 }}
+                                                    placeholder={`カラム${idx + 1}`}
+                                                    sx={{
+                                                        minWidth: 80,
+                                                        width: { xs: '35vw', sm: 200 },
+                                                        maxWidth: '100%'
+                                                    }}
+                                                    data-testid="column-input"
                                                 />
                                                 <IconButton size="small" onClick={() => handleDeleteColumn(idx)} disabled={editColumns.length <= 1}>
                                                     <DeleteIcon fontSize="small" data-testid="deletecolumnicon" />
@@ -444,7 +450,11 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                                                         value={cell.value}
                                                         onChange={e => handleCellChange(rowIdx, colIdx, e.target.value)}
                                                         variant="outlined"
-                                                        sx={{ width: 200 }}
+                                                        sx={{
+                                                            minWidth: 80,
+                                                            width: { xs: '35vw', sm: 200 },
+                                                            maxWidth: '100%'
+                                                        }}
                                                     />
                                                 </TableCell>
                                             ))}

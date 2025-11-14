@@ -160,7 +160,7 @@ describe("TableNote", () => {
         });
 
         await waitFor(() => {
-            expect(screen.getByDisplayValue("カラム2")).toBeInTheDocument();
+            expect(screen.getAllByTestId("column-input").length).toBeGreaterThan(mockColumns.length);
         });
     });
 
