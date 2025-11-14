@@ -63,7 +63,7 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
 
     // テーブルノート用
     const [editColumns, setEditColumns] = useState<Column[]>([
-        { id: 1, name: "カラム1", order: 1 }
+        { id: 1, name: "", order: 1 }
     ]);
     const [editRowCells, setEditRowCells] = useState<RowCell[][]>([[{
         id: 1,
@@ -73,6 +73,11 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
     }]]);
 
     const blurTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+    // 行削除
+    const handleDeleteRow = (rowIdx: number) => {
+        if (editRowCells.length <= 1) return;
+        setEditRowCells(editRowCells.filter((_, idx) => idx !== rowIdx));
+    };
 
     const handleExpand = () => { setExpand(true) };
     const handleCollapse = () => {
@@ -193,7 +198,7 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
     const handleAddColumn = () => {
         const addColumnId = Date.now();
         if (editColumns.length >= 5) return;
-        setEditColumns([...editColumns, { id: addColumnId, name: `カラム${editColumns.length + 1}` }]);
+        setEditColumns([...editColumns, { id: addColumnId, name: "" }]);
         setEditRowCells(editRowCells.map(editRowCell => [...editRowCell, { id: Date.now(), rowIndex: editRowCell.length, value: "", columnId: addColumnId }]));
     };
 
@@ -334,16 +339,22 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                                                 newColumns[idx] = { ...newColumns[idx], name: e.target.value };
                                                 setEditColumns(newColumns);
                                             }}
-                                            sx={{ width: 200 }}
+                                            placeholder={`カラム${idx + 1}`}
+                                            sx={{
+                                                minWidth: 80,
+                                                width: { xs: '35vw', sm: 200 },
+                                                maxWidth: '100%'
+                                            }}
+                                            data-testid="column-input"
                                         />
                                         <IconButton size="small" onClick={() => handleDeleteColumn(idx)} disabled={editColumns.length <= 1}>
-                                            <DeleteIcon fontSize="small" />
+                                            <DeleteIcon fontSize="small" data-testid="deletecolumnicon" />
                                         </IconButton>
                                     </TableCell>
                                 ))}
                                 <TableCell>
                                     <IconButton onClick={handleAddColumn} disabled={editColumns.length >= 5}>
-                                        <AddIcon />
+                                        <AddIcon data-testid="addColumnIcon" />
                                     </IconButton>
                                 </TableCell>
                             </TableRow>
@@ -357,10 +368,24 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                                                 value={cell.value}
                                                 onChange={e => handleCellChange(rowIdx, colIdx, e.target.value)}
                                                 variant="outlined"
-                                                sx={{ width: 200 }}
+                                                sx={{
+                                                    minWidth: 80,
+                                                    width: { xs: '35vw', sm: 200 },
+                                                    maxWidth: '100%'
+                                                }}
                                             />
                                         </TableCell>
                                     ))}
+                                    <TableCell>
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => handleDeleteRow(rowIdx)}
+                                            disabled={editRowCells.length <= 1}
+                                            data-testid="deleterowicon"
+                                        >
+                                            <DeleteIcon fontSize="small" />
+                                        </IconButton>
+                                    </TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>

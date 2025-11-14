@@ -226,7 +226,7 @@ describe("InputForm", () => {
             fireEvent.click(tableNoteIcon);
         });
 
-        const column1 = await screen.getByDisplayValue("カラム1");
+        const column1 = await screen.getByTestId("column-input");
 
         await waitFor(() => {
             expect(column1).toBeVisible();
