@@ -412,21 +412,21 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                                 <TableHead>
                                     <TableRow>
                                         {editColumns.map((col, idx) => (
-                                            <TableCell key={col.id}>
+                                            <TableCell key={col.id} sx={{ minWidth: 20 }}>
                                                 <TextField
                                                     value={col.name}
-                                                    variant="outlined"
+                                                    variant="standard"
                                                     onChange={e => {
                                                         const newColumns = [...editColumns];
                                                         newColumns[idx] = { ...newColumns[idx], name: e.target.value };
                                                         setEditColumns(newColumns);
                                                     }}
                                                     placeholder={`カラム${idx + 1}`}
-                                                    sx={{
-                                                        minWidth: 80,
-                                                        width: { xs: '35vw', sm: 200 },
-                                                        maxWidth: '100%'
+                                                    sx={{ minWidth: 20 }}
+                                                    InputProps={{
+                                                        sx: { minWidth: 20 }
                                                     }}
+
                                                     data-testid="column-input"
                                                 />
                                                 <IconButton size="small" onClick={() => handleDeleteColumn(idx)} disabled={editColumns.length <= 1}>
@@ -445,15 +445,14 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                                     {editRowCells.map((row, rowIdx) => (
                                         <TableRow key={rowIdx}>
                                             {row.map((cell, colIdx) => (
-                                                <TableCell key={colIdx}>
+                                                <TableCell key={colIdx} sx={{ minWidth: 20 }}>
                                                     <TextField
                                                         value={cell.value}
                                                         onChange={e => handleCellChange(rowIdx, colIdx, e.target.value)}
-                                                        variant="outlined"
-                                                        sx={{
-                                                            minWidth: 80,
-                                                            width: { xs: '35vw', sm: 200 },
-                                                            maxWidth: '100%'
+                                                        variant="standard"
+                                                        sx={{ minWidth: 20 }}
+                                                        InputProps={{
+                                                            sx: { minWidth: 20 }
                                                         }}
                                                     />
                                                 </TableCell>

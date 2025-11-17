@@ -81,6 +81,39 @@ export default function ThemeRegistry({ children }: { children: React.ReactNode 
                 }
                 : {}),
         },
+        typography: {
+            fontSize: 14,
+            h1: {
+                fontSize: '2rem',
+            },
+            h2: {
+                fontSize: '1.5rem',
+            },
+            h3: {
+                fontSize: '1.25rem',
+            },
+            h4: {
+                fontSize: '1.1rem',
+            },
+            h5: {
+                fontSize: '1rem',
+            },
+            h6: {
+                fontSize: '0.875rem',
+            },
+            body1: {
+                fontSize: '0.875rem',
+            },
+            body2: {
+                fontSize: '0.8125rem',
+            },
+            button: {
+                fontSize: '0.875rem',
+            },
+            caption: {
+                fontSize: '0.75rem',
+            },
+        },
         components: {
             MuiAppBar: {
                 styleOverrides: {
