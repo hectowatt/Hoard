@@ -321,7 +321,7 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                 <TableContainer component={Paper}>
                     <TextField
                         label="タイトル"
-                        variant="outlined"
+                        variant="standard"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         fullWidth
@@ -330,20 +330,18 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                         <TableHead>
                             <TableRow>
                                 {editColumns.map((col, idx) => (
-                                    <TableCell key={col.id}>
+                                    <TableCell key={col.id} sx={{ minWidth: 20, padding: '4px 6px' }} size="small">
                                         <TextField
                                             value={col.name}
-                                            variant="outlined"
+                                            variant="standard"
                                             onChange={e => {
                                                 const newColumns = [...editColumns];
                                                 newColumns[idx] = { ...newColumns[idx], name: e.target.value };
                                                 setEditColumns(newColumns);
                                             }}
                                             placeholder={`カラム${idx + 1}`}
-                                            sx={{
-                                                minWidth: 80,
-                                                width: { xs: '35vw', sm: 200 },
-                                                maxWidth: '100%'
+                                            inputProps={{
+                                                size: Math.max(col.name.length, `カラム${idx + 1}`.length, 8)
                                             }}
                                             data-testid="column-input"
                                         />
@@ -363,15 +361,13 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                             {editRowCells.map((row, rowIdx) => (
                                 <TableRow key={rowIdx}>
                                     {row.map((cell, colIdx) => (
-                                        <TableCell key={colIdx}>
+                                        <TableCell key={colIdx} sx={{ minWidth: 20, padding: '4px 6px' }} size="small">
                                             <TextField
                                                 value={cell.value}
                                                 onChange={e => handleCellChange(rowIdx, colIdx, e.target.value)}
-                                                variant="outlined"
-                                                sx={{
-                                                    minWidth: 80,
-                                                    width: { xs: '35vw', sm: 200 },
-                                                    maxWidth: '100%'
+                                                variant="standard"
+                                                inputProps={{
+                                                    size: Math.max(cell.value.length, 8)
                                                 }}
                                             />
                                         </TableCell>
