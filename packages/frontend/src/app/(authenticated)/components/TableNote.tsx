@@ -92,14 +92,23 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
     const handleAddColumn = () => {
         const addColumnId = Date.now();
         if (editColumns.length >= 5) return;
-        setEditColumns([...editColumns, { id: addColumnId, name: "" }]);
+        const newOrder = editColumns.length;
+        setEditColumns([...editColumns, { id: addColumnId, name: "", order: newOrder }]);
         setEditRowCells(editRowCells.map(rowCell => [...rowCell, { id: Date.now(), rowIndex: rowCell.length, value: "", columnId: addColumnId }]));
     };
 
     // カラム削除
     const handleDeleteColumn = (colIdx: number) => {
         if (editColumns.length <= 1) return;
-        setEditColumns(editColumns.filter((_, idx) => idx !== colIdx));
+        // カラムを削除
+        const newColumns = editColumns.filter((_, idx) => idx !== colIdx);
+
+        // 残りのカラムのorderを0から振り直す
+        const columnsWithReorderedOrder = newColumns.map((col, idx) => ({
+            ...col,
+            order: idx
+        }));
+        setEditColumns(columnsWithReorderedOrder);
         setEditRowCells(editRowCells.map(row => row.filter((_, idx) => idx !== colIdx)));
     };
 
@@ -114,7 +123,15 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
     // 行削除
     const handleDeleteRow = (rowIdx: number) => {
         if (editRowCells.length <= 1) return;
-        setEditRowCells(editRowCells.filter((_, idx) => idx !== rowIdx));
+        const newRowCells = editRowCells.filter((_, idx) => idx !== rowIdx);
+        // 残りの行のrowIndexを0から振り直す
+        const newRowCellsWithReorderdIndex = newRowCells.map((row, idx) =>
+            row.map(cell => ({
+                ...cell,
+                rowIndex: idx  // 各セルのrowIndexを更新
+            }))
+        );
+        setEditRowCells(newRowCellsWithReorderdIndex);
     };
 
     // 行追加
@@ -142,6 +159,14 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
     useEffect(() => {
         setIsLocked(is_locked);
     }, [is_locked]);
+
+    useEffect(() => {
+        // バックエンドから受け取ったカラムを order でソート
+        const sortedColumns = [...columns].sort((a, b) =>
+            (a.order ?? 0) - (b.order ?? 0)
+        );
+        setEditColumns(sortedColumns);
+    }, [columns]);
 
     const handleOpen = () => {
         setEditTitle(title);

@@ -63,7 +63,7 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
 
     // テーブルノート用
     const [editColumns, setEditColumns] = useState<Column[]>([
-        { id: 1, name: "", order: 1 }
+        { id: 1, name: "", order: 0 }
     ]);
     const [editRowCells, setEditRowCells] = useState<RowCell[][]>([[{
         id: 1,
@@ -73,11 +73,7 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
     }]]);
 
     const blurTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
-    // 行削除
-    const handleDeleteRow = (rowIdx: number) => {
-        if (editRowCells.length <= 1) return;
-        setEditRowCells(editRowCells.filter((_, idx) => idx !== rowIdx));
-    };
+
 
     const handleExpand = () => { setExpand(true) };
     const handleCollapse = () => {
@@ -179,7 +175,7 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
             const result = await response.json();
             console.log("Table note saved successfully!", result);
             setTableNoteOpen(false);
-            setEditColumns([{ id: 1, name: "カラム1", order: 1 }]);
+            setEditColumns([{ id: 1, name: "カラム1", order: 0 }]);
             setEditRowCells([[{ id: 1, rowIndex: 0, value: "", columnId: 1 }]]);
             setTitle("");
             setExpand(false);
@@ -198,14 +194,23 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
     const handleAddColumn = () => {
         const addColumnId = Date.now();
         if (editColumns.length >= 5) return;
-        setEditColumns([...editColumns, { id: addColumnId, name: "" }]);
-        setEditRowCells(editRowCells.map(editRowCell => [...editRowCell, { id: Date.now(), rowIndex: editRowCell.length, value: "", columnId: addColumnId }]));
+        const newOrder = editColumns.length;
+        setEditColumns([...editColumns, { id: addColumnId, name: "", order: newOrder }]);
+        setEditRowCells(editRowCells.map((editRowCell, rowIdx) => [...editRowCell, { id: Date.now(), rowIndex: rowIdx, value: "", columnId: addColumnId }]));
     };
 
     // カラム削除
     const handleDeleteColumn = (colIdx: number) => {
         if (editColumns.length <= 1) return;
-        setEditColumns(editColumns.filter((_, idx) => idx !== colIdx));
+        // カラムを削除
+        const newColumns = editColumns.filter((_, idx) => idx !== colIdx);
+
+        // 残りのカラムのorderを0から振り直す
+        const columnsWithReorderedOrder = newColumns.map((col, idx) => ({
+            ...col,
+            order: idx
+        }));
+        setEditColumns(columnsWithReorderedOrder);
         setEditRowCells(editRowCells.map(row => row.filter((_, idx) => idx !== colIdx)));
     };
 
@@ -225,11 +230,25 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
             ...editRowCells,
             editColumns.map((col, idx) => ({
                 id: Date.now() + idx,
-                rowIndex: editRowCells.length,
+                rowIndex: editRowCells.length + 1,
                 value: "",
                 columnId: col.id,
             }))
         ]);
+    };
+
+    // 行削除
+    const handleDeleteRow = (rowIdx: number) => {
+        if (editRowCells.length <= 1) return;
+        const newRowCells = editRowCells.filter((_, idx) => idx !== rowIdx);
+        // 残りの行のrowIndexを0から振り直す
+        const newRowCellsWithReorderdIndex = newRowCells.map((row, idx) =>
+            row.map(cell => ({
+                ...cell,
+                rowIndex: idx  // 各セルのrowIndexを更新
+            }))
+        );
+        setEditRowCells(newRowCellsWithReorderdIndex);
     };
 
     return (
