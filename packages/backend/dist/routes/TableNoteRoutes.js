@@ -66,7 +66,7 @@ router.post('/', authMiddleware, async (req, res) => {
 router.get('/', authMiddleware, async (req, res) => {
     try {
         const tableNoteRepository = AppDataSource.getRepository(TableNote);
-        const tableNotes = await tableNoteRepository.find({ where: { is_deleted: false }, order: { createdate: 'DESC' } });
+        const tableNotes = await tableNoteRepository.find({ where: { is_deleted: false }, order: { updatedate: 'DESC' } });
         if (!tableNotes) {
             return res.status(404).json({ error: "TableNote not found" });
         }

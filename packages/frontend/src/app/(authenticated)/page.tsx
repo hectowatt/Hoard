@@ -52,18 +52,21 @@ export default function Home() {
   // ノート初期登録時のコールバック関数
   const handleInsert = (newId: string, newTitle: string, newContent: string, LabelId: string, is_locked: boolean) => {
     if (setNotes !== undefined) {
-      setNotes(prevNote => [
-        ...prevNote,
-        {
-          id: newId,
-          title: newTitle,
-          content: newContent,
-          label_id: LabelId,
-          createdate: new Date().toISOString(),
-          updatedate: new Date().toISOString(),
-          is_locked: is_locked
-        },
-      ]);
+      setNotes(prevNote => {
+        const newNotes = [
+          ...prevNote,
+          {
+            id: newId,
+            title: newTitle,
+            content: newContent,
+            label_id: LabelId,
+            createdate: new Date().toISOString(),
+            updatedate: new Date().toISOString(),
+            is_locked: is_locked
+          },
+        ];
+        return newNotes.sort((a, b) => new Date(b.updatedate).getTime() - new Date(a.updatedate).getTime());
+      });
     } else {
       console.error("setNotes is undefined");
     };
@@ -72,19 +75,23 @@ export default function Home() {
   // テーブルノート初期登録時のコールバック関数
   const handleInsertTableNote = (newId: string, newTitle: string, newLabel: string, is_locked: boolean, newColumn: Column[], newRowCells: RowCell[][]) => {
     if (setTableNotes !== undefined) {
-      setTableNotes(prevTableNotes => [
-        ...prevTableNotes,
-        {
-          id: newId,
-          title: newTitle,
-          label_id: newLabel,
-          createdate: new Date().toISOString(),
-          updatedate: new Date().toISOString(),
-          is_locked: is_locked,
-          columns: newColumn,
-          rowCells: newRowCells
-        },
-      ]);
+      setTableNotes(prevTableNotes => {
+        const newTableNotes = [
+          ...prevTableNotes,
+          {
+            id: newId,
+            title: newTitle,
+            label_id: newLabel,
+            createdate: new Date().toISOString(),
+            updatedate: new Date().toISOString(),
+            is_locked: is_locked,
+            columns: newColumn,
+            rowCells: newRowCells
+          },
+        ];
+        return newTableNotes.sort((a, b) => new Date(b.updatedate).getTime() - new Date(a.updatedate).getTime()
+        );
+      });
     } else {
       console.error("setNotes is undefined");
     };
@@ -93,16 +100,21 @@ export default function Home() {
   // ノート保存ボタン押下時のコールバック関数
   const handleSave = (id: string, newTitle: string, newContent: string, newLabel: string, newUpdateDate: string) => {
     if (setNotes !== undefined) {
-      setNotes(prevNote =>
-        prevNote.map(
+      setNotes(prevNote => {
+        const updatedNotes = prevNote.map(
           note => note.id === id ? {
             ...note, title: newTitle, content: newContent, label_id: newLabel, updatedate: newUpdateDate
           }
-            : note)
-      );
+            : note
+        );
+        // updatedateの降順でソート
+        return updatedNotes.sort((a, b) =>
+          new Date(b.updatedate).getTime() - new Date(a.updatedate).getTime()
+        );
+      });
     } else {
       console.error("error in handleSave: setNotes is undefined");
-    };
+    }
   }
 
 
@@ -122,12 +134,14 @@ export default function Home() {
   // テーブルノート保存ボタン押下時のコールバック関数
   const handleSaveTableNote = (id: string, newTitle: string, newLabel: string, is_Locked: boolean, newUpdateDate: string, newColumn: Column[], newRowCells: RowCell[][]) => {
     if (setTableNotes !== undefined) {
-      setTableNotes(prevTableNote =>
-        prevTableNote.map(
+      setTableNotes(prevTableNote => {
+        const newTableNotes = prevTableNote.map(
           tableNote => tableNote.id === id ? {
             ...tableNote, title: newTitle, label_id: newLabel, is_Locked: is_Locked, updatedate: newUpdateDate, columns: newColumn, rowCells: newRowCells
           }
-            : tableNote)
+            : tableNote);
+        return newTableNotes.sort((a, b) => new Date(b.updatedate).getTime() - new Date(a.updatedate).getTime())
+      }
       );
     } else {
       console.error("error in handleSave: setNotes is undefined");

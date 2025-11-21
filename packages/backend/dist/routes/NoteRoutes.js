@@ -8,7 +8,7 @@ router.get('/', authMiddleware, async (req, res) => {
     try {
         const noteRepository = AppDataSource.getRepository(Note);
         // Notesを全件取得する
-        const notes = await noteRepository.find({ where: { is_deleted: false }, order: { createdate: 'DESC' } });
+        const notes = await noteRepository.find({ where: { is_deleted: false }, order: { updatedate: 'DESC' } });
         res.status(200).json(notes);
     }
     catch (error) {
