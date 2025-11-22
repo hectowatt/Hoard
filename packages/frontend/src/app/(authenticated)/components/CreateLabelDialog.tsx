@@ -1,8 +1,12 @@
+"use client"
+
 import React, { useEffect, useState } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, List, ListItem, ListItemText, IconButton, DialogContentText } from "../../../../node_modules/@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useLabelContext } from "@/app/(authenticated)/context/LabelProvider";
 import { useNoteContext } from "@/app/(authenticated)/context/NoteProvider";
+import { useTranslation } from "react-i18next";
+
 
 interface LabelDialogProps {
     open: boolean;
@@ -17,13 +21,14 @@ export default function CreateLabelDialog({ open, onClose }: LabelDialogProps) {
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [targetLabelId, setTargetLabelId] = useState<string | null>(null);
     const { notes } = useNoteContext();
+    const { t } = useTranslation();
 
     const isLabelUsed = (labelId: string) => !!notes && notes.some(note => note.label_id === labelId);
 
     // 保存ボタン押下処理
     const handleAdd = async () => {
         if (!input.trim()) {
-            alert("ラベル名は必須です");
+            alert(t("message_label_must_not_be_empty"));
             return
         }
         try {
@@ -43,9 +48,9 @@ export default function CreateLabelDialog({ open, onClose }: LabelDialogProps) {
                 if (response.status === 400) {
                     const errorData = await response.json();
                     if (errorData.error === "Label name must be unique") {
-                        alert("ラベル名は一意である必要があります。別のラベル名を指定してください。");
+                        alert(t("message_label_must_be_unique"));
                     } else if (errorData.error === "Label name is too long") {
-                        alert("ラベル名が長すぎます。８文字以内で指定してください。");
+                        alert(t("message_labelname_is_too_long"));
                     }
                     return;
                 }
@@ -105,15 +110,16 @@ export default function CreateLabelDialog({ open, onClose }: LabelDialogProps) {
     return (
         <>
             <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-                <DialogTitle>ラベルを編集</DialogTitle>
+                <DialogTitle data-testid="label_input_labels">{t("label_input_labels")}</DialogTitle>
                 <DialogContent>
                     <TextField
-                        label="新しいラベルを作成"
+                        label={t("placeholder_input_label")}
                         value={input}
                         onChange={e => setInput(e.target.value)}
                         onKeyDown={e => { if (e.key === "Enter") handleAdd(); }}
                         fullWidth
                         margin="dense"
+                        inputProps={{ 'data-testid': 'label-input' }}
                     />
                     <List>
                         {labels && labels.map(label => (
@@ -139,21 +145,21 @@ export default function CreateLabelDialog({ open, onClose }: LabelDialogProps) {
                     </List>
                 </DialogContent >
                 <DialogActions>
-                    <Button onClick={handleAdd} variant="contained">追加</Button>
-                    <Button onClick={onClose} variant="contained">閉じる</Button>
+                    <Button onClick={handleAdd} variant="contained">{t("button_add")}</Button>
+                    <Button onClick={onClose} variant="contained" data-testid="button_close">{t("button_close")}</Button>
                 </DialogActions>
             </Dialog >
             {/* 確認ダイアログ */}
             < Dialog open={confirmOpen} onClose={handleCancel} >
-                <DialogTitle>ラベル削除の確認</DialogTitle>
+                <DialogTitle>{t("label_delete_label_confirm")}</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        このラベルはノートに付与されています。本当に削除しますか？
+                        {t("label_delete_label_confirm_desc")}
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleConfirmDelete} color="error" variant="contained">はい</Button>
-                    <Button onClick={handleCancel}>いいえ</Button>
+                    <Button onClick={handleConfirmDelete} color="error" variant="contained">{t("button_yes")}</Button>
+                    <Button onClick={handleCancel}>{t("button_no")}</Button>
                 </DialogActions>
             </Dialog >
         </>

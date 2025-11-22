@@ -1,3 +1,4 @@
+import { LocaleProvider } from './context/LocaleProvider';
 import ThemeRegistry from './context/ThemeProvider';
 import type { Metadata, Viewport } from 'next';
 
@@ -37,7 +38,9 @@ export default function RootLayout({
         <html lang="ja">
             <body style={{ margin: 0 }}>
                 <ThemeRegistry>
-                    {children}
+                    <LocaleProvider>
+                        {children}
+                    </LocaleProvider>
                 </ThemeRegistry>
             </body>
         </html>

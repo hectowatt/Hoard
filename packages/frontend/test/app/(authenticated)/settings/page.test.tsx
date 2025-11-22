@@ -2,6 +2,7 @@ import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import Home from "@/app/(authenticated)/settings/page";
+import i18n from "@/app/lib/i18n";
 
 
 
@@ -27,18 +28,24 @@ beforeEach(() => {
 
 describe("Setting Page", () => {
     it("説明文と入力欄、ボタンが表示される", async () => {
+        const label_settings = i18n.t("label_settings");
+        const label_user_settings = i18n.t("label_user_settings");
+        const label_user_settings_desc = i18n.t("label_user_settings_desc");
+        const label_note_password_settings = i18n.t("label_note_password_settings");
+        const label_note_password_settings_desc = i18n.t("label_note_password_settings_desc");
         render(<Home />);
 
-        expect(screen.getByText("設定")).toBeInTheDocument();
-        expect(screen.getByText("ユーザ設定")).toBeInTheDocument();
-        expect(screen.getByText("ユーザ名とパスワードを変更できます。")).toBeInTheDocument();
-        expect(screen.getByText("ノートパスワード設定")).toBeInTheDocument();
-        expect(screen.getByText("ノートにロックをかけるときのパスワードを設定できます")).toBeInTheDocument();
+        expect(screen.getByText(label_settings)).toBeInTheDocument();
+        expect(screen.getByText(label_user_settings)).toBeInTheDocument();
+        expect(screen.getByText(label_user_settings_desc)).toBeInTheDocument();
+        expect(screen.getByText(label_note_password_settings)).toBeInTheDocument();
+        expect(screen.getByText(label_note_password_settings_desc)).toBeInTheDocument();
 
         await waitFor(() => {
             expect(screen.getByTestId("prevnotepasswordinput")).toBeInTheDocument();
         });
 
+        expect(screen.getByTestId("lang_select")).toBeInTheDocument();
         expect(screen.getByTestId("prevpasswordinput")).toBeInTheDocument();
         expect(screen.getByTestId("passwordinput")).toBeInTheDocument();
         expect(screen.getByTestId("notepasswordinput")).toBeInTheDocument();

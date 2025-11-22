@@ -43,6 +43,7 @@ import { Router } from "next/router";
 import { useRouter } from "next/navigation";
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 import NewLabelOutlinedIcon from '@mui/icons-material/NewLabelOutlined';
+import { useTranslation } from "react-i18next";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -127,6 +128,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 	const theme = useTheme();
 	const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
 	const { searchWord, setSearchWord } = useSearchWordContext();
+	const { t } = useTranslation();
 
 
 	// サイドバー上部のアイコン
@@ -136,14 +138,14 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 
 	// サイドバー上部
 	const navAboveItems = [
-		{ text: "ノート", icon: aboveIcons[0], href: "/", onClick: () => { setSearchWord("") } },
-		{ text: "ラベル", icon: aboveIcons[1], dialog: true }
+		{ text: t("nav_note"), icon: aboveIcons[0], href: "/", onClick: () => { setSearchWord("") } },
+		{ text: t("nav_label"), icon: aboveIcons[1], dialog: true }
 	];
 
 	// サイドバー下部
 	const navBelowItems = [
-		{ text: "ゴミ箱", icon: belowIcons[0], href: "/trash" },
-		{ text: "設定", icon: belowIcons[1], href: "/settings" }
+		{ text: t("nav_trash"), icon: belowIcons[0], href: "/trash" },
+		{ text: t("nav_settings"), icon: belowIcons[1], href: "/settings" }
 	];
 
 	// useMediaQueryを使って画面サイズを判定
@@ -200,13 +202,13 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 			})
 
 			if (response.ok) {
-				alert("ログアウトしました。");
+				alert(t("message_logouted"));
 				// ログアウト後はログインページにリダイレクト
 				router.push("/login");
 			}
 		} catch (error) {
 			console.error("Logout failed:", error);
-			alert("ログアウトに失敗しました。");
+			alert(t("message_failed_to_logout"));
 		}
 	}
 

@@ -5,6 +5,7 @@ import { Container, Grid } from "@mui/material";
 import { useLabelContext } from "@/app/(authenticated)/context/LabelProvider";
 import TrashNote from "@/app/(authenticated)/components/TrashNote";
 import TrashTableNote from "@/app/(authenticated)/components/TrashTableNote";
+import { useTranslation } from "react-i18next";
 
 
 // 削除されたNoteを表示するページコンテンツ
@@ -12,6 +13,7 @@ export default function Home() {
   const [trashNotes, setTrashNotes] = useState<{ id: string, title: string; content: string; label_id: string, is_locked: boolean, createdate: string; updatedate: string }[]>([]);
   const [trashTableNotes, setTrashTableNotes] = useState<{ id: string, title: string; label_id: string, is_locked: boolean, createdate: string; updatedate: string }[]>([]);
   const { labels, fetchLabels } = useLabelContext();
+  const { t } = useTranslation();
 
   // 画面描画時にDBからノートを全件取得して表示する
   const fetchTrashNotes = async () => {
@@ -117,7 +119,7 @@ export default function Home() {
 
   return (
     <Container>
-      <p data-testid="description">ゴミ箱内のノートは７日後に削除されます</p>
+      <p data-testid="description">{t("label_trash_desc")}</p>
       <Grid container spacing={2}>
         {trashNotes.map(note => (
           <Grid key={note.id}>

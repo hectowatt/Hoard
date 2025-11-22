@@ -4,6 +4,7 @@ import '@testing-library/jest-dom';
 import TrashNote from "@/app/(authenticated)/components/TrashNote";
 import { LabelProvider } from "@/app/(authenticated)/context/LabelProvider";
 import { NoteProvider } from "@/app/(authenticated)/context/NoteProvider";
+import i18n from "@/app/lib/i18n";
 
 jest.mock("@/app/(authenticated)/context/LabelProvider", () => {
     return {
@@ -50,6 +51,17 @@ const mockLabels = [
 beforeEach(() => {
     fetchMock.resetMocks();
     fetchMock.mockResponse(JSON.stringify({}));
+
+    // i18nの初期化（まだ初期化されていない場合）
+    if (!i18n.isInitialized) {
+        i18n.init({
+            lng: 'ja',
+            fallbackLng: 'ja',
+            ns: ['translation'],
+            defaultNS: 'translation',
+            interpolation: { escapeValue: false },
+        });
+    }
 });
 
 
@@ -64,8 +76,8 @@ describe("TrashNote", () => {
         );
         expect(screen.getByText("テストノート")).toBeVisible();
         expect(screen.getByText("これはテストノートです。")).toBeVisible();
-        expect(screen.getByText(/作成日:/)).toBeVisible();
-        expect(screen.getByText(/更新日:/)).toBeVisible();
+        expect(screen.getByText(/2024\/07\/01/)).toBeVisible();
+        expect(screen.getByText(/2024\/07\/02/)).toBeVisible();
         expect(screen.getByText("仕事")).toBeVisible();
     });
 
@@ -81,9 +93,9 @@ describe("TrashNote", () => {
             fireEvent.click(screen.getByText("テストノート"));
         });
         expect(screen.getByRole("dialog")).toBeVisible();
-        expect(screen.getByText("復元")).toBeVisible();
-        expect(screen.getByText("完全に削除")).toBeVisible();
-        expect(screen.getByText("キャンセル")).toBeVisible();
+        expect(screen.getByTestId("button_restore")).toBeVisible();
+        expect(screen.getByTestId("button_permanently_delete")).toBeVisible();
+        expect(screen.getByTestId("button_cancel")).toBeVisible();
     });
 
     it("復元ボタン・削除ボタンが表示される", async () => {
@@ -97,11 +109,12 @@ describe("TrashNote", () => {
         await act(async () => {
             fireEvent.click(screen.getByText("テストノート"));
         });
-        expect(screen.getByText("復元")).toBeVisible();
-        expect(screen.getByText("完全に削除")).toBeVisible();
+        expect(screen.getByTestId("button_restore")).toBeVisible();
+        expect(screen.getByTestId("button_permanently_delete")).toBeVisible();
     });
 
     it("ロックされているノートはロックされている旨がcontentに表示される", async () => {
+        const lockedText = i18n.t("label_lockednote");
         render(
             <NoteProvider>
                 <LabelProvider>
@@ -110,6 +123,6 @@ describe("TrashNote", () => {
             </NoteProvider>
         );
 
-        expect(screen.getByText("このノートはロックされています")).toBeVisible();
+        expect(screen.getByText(lockedText)).toBeVisible();
     });
 });

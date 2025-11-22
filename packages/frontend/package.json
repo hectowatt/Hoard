@@ -19,10 +19,15 @@
     "@mui/material": "^7.0.2",
     "@mui/material-nextjs": "^7.0.2",
     "dotenv": "^17.2.1",
+    "i18next": "^25.6.1",
+    "i18next-browser-languagedetector": "^8.2.0",
     "jose": "^6.0.12",
+    "js-yaml": "^4.1.0",
     "next": "15.1.7",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-i18next": "^16.2.4",
+    "yaml-loader": "^0.8.1"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.28.0",
@@ -32,7 +37,9 @@
     "@eslint/js": "^9.25.1",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@types/jest": "^30.0.0",
+    "@types/js-yaml": "^4.0.9",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",
     "@types/react": "^19",

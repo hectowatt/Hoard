@@ -2,6 +2,7 @@ import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import Home from "@/app/(authenticated)/trash/page";
 import "@testing-library/jest-dom";
+import i18n from "@/app/lib/i18n";
 
 // モック：TrashNote, TrashTableNote
 jest.mock("@/app/(authenticated)/components/TrashNote", () => (props: any) => (
@@ -63,10 +64,11 @@ beforeEach(() => {
 
 describe("Trash Page", () => {
     it("renders trash notes and table notes", async () => {
+        const label_trash_desc = i18n.t("label_trash_desc");
         render(<Home />);
 
         // 最初のテキスト
-        expect(screen.getByTestId("description")).toHaveTextContent("ゴミ箱内のノート");
+        expect(screen.getByText(label_trash_desc)).toBeInTheDocument();
 
         // 非同期描画を待つ
         await waitFor(() => {

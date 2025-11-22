@@ -37,6 +37,7 @@ jest.mock("@/app/(authenticated)/context/LabelProvider", () => {
 import { LabelProvider } from "@/app/(authenticated)/context/LabelProvider";
 import { NoteProvider } from "@/app/(authenticated)/context/NoteProvider";
 import TableNote from "@/app/(authenticated)/components/TableNote";
+import i18n from "@/app/lib/i18n";
 
 
 describe("TableNote", () => {
@@ -55,14 +56,14 @@ describe("TableNote", () => {
         render(
             <NoteProvider>
                 <LabelProvider>
-                    <TableNote id={"testid111"} title={"テストノート"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} />
+                    <TableNote id={"testid111"} title={"テストノート"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} />
                 </LabelProvider>
             </NoteProvider>
         );
 
         expect(screen.getByText("テストノート")).toBeVisible();
-        expect(screen.getByText("作成日: 2025/07/05")).toBeVisible();
-        expect(screen.getByText("更新日: 2025/07/05")).toBeVisible();
+        expect(screen.getByText(/2025\/07\/05/)).toBeVisible();
+        expect(screen.getByText(/2025\/07\/06/)).toBeVisible();
     })
 
     it("クリックした時、編集、削除、ロックアイコンボタンが表示される", async () => {
@@ -78,8 +79,8 @@ describe("TableNote", () => {
             fireEvent.click(screen.getByText("テストノート"));
         })
 
-        expect(screen.getByText("編集")).toBeVisible();
-        expect(screen.getByText("削除")).toBeVisible();
+        expect(screen.getByTestId("button_edit")).toBeVisible();
+        expect(screen.getByTestId("button_delete")).toBeVisible();
         expect(screen.getByTestId("unlock")).toBeVisible();
     })
 
@@ -97,7 +98,7 @@ describe("TableNote", () => {
         })
 
         await act(async () => {
-            fireEvent.click(screen.getByText("編集"));
+            fireEvent.click(screen.getByTestId("button_edit"));
         })
 
         const titleInput = screen.getByDisplayValue("テストノートタイトル") as HTMLInputElement;
@@ -124,7 +125,7 @@ describe("TableNote", () => {
         })
 
         await act(async () => {
-            fireEvent.click(screen.getByText("編集"));
+            fireEvent.click(screen.getByTestId("button_edit"));
         })
 
         const contentInput = screen.getByDisplayValue("テストカラム1") as HTMLInputElement;
@@ -151,7 +152,7 @@ describe("TableNote", () => {
         })
 
         await act(async () => {
-            fireEvent.click(screen.getByText("編集"));
+            fireEvent.click(screen.getByTestId("button_edit"));
         })
         const addColumnButton = screen.getByTestId("addColumnIcon");
 
@@ -178,7 +179,7 @@ describe("TableNote", () => {
         })
 
         await act(async () => {
-            fireEvent.click(screen.getByText("編集"));
+            fireEvent.click(screen.getByTestId("button_edit"));
         })
 
         const contentInput = screen.getByDisplayValue("テストセル１") as HTMLInputElement;
@@ -205,7 +206,7 @@ describe("TableNote", () => {
         });
 
         await act(async () => {
-            fireEvent.click(screen.getByText("編集"));
+            fireEvent.click(screen.getByTestId("button_edit"));
         });
 
 
@@ -252,6 +253,7 @@ describe("TableNote", () => {
     });
 
     it("ロックボタンをクリックするとロックされる", async () => {
+        const lockedText = i18n.t("label_lockednote");
         render(
             <NoteProvider>
                 <LabelProvider>
@@ -279,13 +281,14 @@ describe("TableNote", () => {
         });
 
         await waitFor(() => {
-            const texts = screen.getAllByText("このノートはロックされています");
+            const texts = screen.getAllByText(lockedText);
             expect(texts.length).toBeGreaterThan(0);
             expect(texts[0]).toBeVisible();
         });
     });
 
     it("ロックされているノートはロックされている旨がcontentに表示される", async () => {
+        const lockedText = i18n.t("label_lockednote");
         render(
             <NoteProvider>
                 <LabelProvider>
@@ -294,7 +297,7 @@ describe("TableNote", () => {
             </NoteProvider>
         );
 
-        expect(screen.getByText("このノートはロックされています")).toBeVisible();
+        expect(screen.getByText(lockedText)).toBeVisible();
     });
 
 });

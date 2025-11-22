@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { Box, Paper, Typography, Dialog, DialogTitle, DialogContent, TextField, Button, FormControl, Select, MenuItem, InputLabel } from "../../../../node_modules/@mui/material";
 import { useLabelContext } from "@/app/(authenticated)/context/LabelProvider";
+import { useTranslation } from "react-i18next";
 
 interface trashNoteProps {
     id: string;
@@ -35,7 +36,7 @@ export default function TrashNote({ id, title, content, label_id, is_locked, cre
     const [isEditing, setIsEditing] = React.useState(false);
     const [updateDateAfterSaving, setUpdateDateAfterSaving] = React.useState(updatedate);
     const [editLabel, setEditLabel] = React.useState(label_id ?? "");
-    const [isLocked, setIsLocked] = React.useState(false);
+    const { t } = useTranslation();
 
     const { labels } = useLabelContext();
 
@@ -122,16 +123,16 @@ export default function TrashNote({ id, title, content, label_id, is_locked, cre
         <>
             <Paper elevation={3} sx={{ p: 2, maxWidth: 400, wordWrap: "break-word", cursor: "pointer" }} onClick={handleOpen}>
                 <Typography variant="h6" sx={{ mb: 1 }}>
-                    {title}
+                    {title && title.trim() !== "" ? title : t("label_no_title")}
                 </Typography>
                 <Typography variant="body1" sx={{ mb: 1, whiteSpace: "pre-line" }}>
-                    {is_locked ? "このノートはロックされています" : content}
+                    {is_locked ? t("label_lockednote") : content}
                 </Typography>
                 <Typography variant="caption" color="textSecondary" sx={{ display: "block" }}>
-                    作成日: {formatDate(createdate)}
+                    {t("label_createdate")}: {formatDate(createdate)}
                 </Typography>
                 <Typography variant="caption" color="textSecondary" sx={{ display: "block" }}>
-                    更新日: {formatDate(updatedate)}
+                    {t("label_updatedate")}: {formatDate(updatedate)}
                 </Typography>
                 {label_id && label_id.trim() !== "" && getLabelName(label_id) && (
                     <Typography variant="caption" color="textSecondary" sx={{ mb: 1, border: "1px solid #ccc", p: 0.5, borderRadius: 1 }}>
@@ -147,13 +148,13 @@ export default function TrashNote({ id, title, content, label_id, is_locked, cre
                 </DialogTitle>
                 <DialogContent>
                     <Typography variant="body1" sx={{ mb: 1, whiteSpace: "pre-line" }}>
-                        {is_locked ? "このノートはロックされています" : content}
+                        {is_locked ? t("label_lockednote") : content}
                     </Typography>
                     <Typography variant="caption" color="textSecondary" sx={{ display: "block" }}>
-                        作成日: {formatDate(createdate)}
+                        {t("label_createdate")}: {formatDate(createdate)}
                     </Typography>
                     <Typography variant="caption" color="textSecondary" sx={{ display: "block" }}>
-                        更新日: {formatDate(updatedate)}
+                        {t("label_updatedate")}: {formatDate(updatedate)}
                     </Typography>
                     {label_id && label_id.trim() !== "" && getLabelName(label_id) && (
                         <Typography variant="caption" color="textSecondary" sx={{ mb: 1, border: "1px solid #ccc", p: 0.5, borderRadius: 1 }}>
@@ -162,9 +163,9 @@ export default function TrashNote({ id, title, content, label_id, is_locked, cre
                     )}
                     <Box sx={{ mt: 2, textAlighn: "right" }}>
                         <>
-                            <Button onClick={handleSave} variant="contained" sx={{ mr: 1, mb: 1 }}>復元</Button>
-                            <Button onClick={handleDelete} variant="contained" sx={{ mr: 1, mb: 1 }}>完全に削除</Button>
-                            <Button onClick={() => setIsEditing(false)} variant="contained">キャンセル</Button>
+                            <Button onClick={handleSave} variant="contained" sx={{ mr: 1, mb: 1 }} data-testid="button_restore">{t("button_restore")}</Button>
+                            <Button onClick={handleDelete} variant="contained" sx={{ mr: 1, mb: 1 }} data-testid="button_permanently_delete">{t("button_permanently_delete")}</Button>
+                            <Button onClick={() => setIsEditing(false)} variant="contained" sx={{ mb: 1 }} data-testid="button_cancel">{t("button_cancel")}</Button>
                         </>
                     </Box>
                 </DialogContent>
