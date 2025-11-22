@@ -11,6 +11,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import ThemeRegistry from "@/app/context/ThemeProvider";
+import { useTranslation } from "react-i18next";
 
 
 export default function LoginPage() {
@@ -19,10 +20,10 @@ export default function LoginPage() {
     const [isUserExists, setIsUserExists] = React.useState(false);
     const [isChecking, setIsChecking] = React.useState(true);
     const router = useRouter();
+    const { t } = useTranslation();
 
     // ログイン用処理
     const handleLogin = async () => {
-        console.log("ログイン:", { username, password });
         const response = await fetch("/api/login", {
             method: "POST",
             headers: {
@@ -103,13 +104,13 @@ export default function LoginPage() {
         if (isUserExists) {
             return (
                 <Button variant="contained" color="primary" onClick={handleLogin} data-testid="login">
-                    ログイン
+                    {t("button_login")}
                 </Button>
             );
         } else {
             return (
                 <Button variant="contained" color="primary" onClick={handleRegistUser} data-testid="makeuser">
-                    ユーザ作成
+                    {t("button_create_user")}
                 </Button>
             );
         }
@@ -136,14 +137,9 @@ export default function LoginPage() {
                         marginBottom: "20px",
                     }} />
                 <Paper elevation={3} sx={{ p: 4 }} style={{ backgroundColor: "#faebd7" }}>
-                    <Typography
-                        variant="h5"
-                        component="h1"
-                        gutterBottom
-                        color="#000000"> ログイン </Typography>
                     <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
                         <TextField
-                            label="ユーザー名"
+                            label={t("placeholder_username")}
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             fullWidth
@@ -169,7 +165,7 @@ export default function LoginPage() {
                             }}
                         />
                         <TextField
-                            label="パスワード"
+                            label={t("placeholder_password")}
                             type="password"
                             value={password}
                             variant="outlined"

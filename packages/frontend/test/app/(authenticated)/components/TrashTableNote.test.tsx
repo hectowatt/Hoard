@@ -22,6 +22,7 @@ import { LabelProvider } from "@/app/(authenticated)/context/LabelProvider";
 import { NoteProvider } from "@/app/(authenticated)/context/NoteProvider";
 import TableNote from "@/app/(authenticated)/components/TableNote";
 import TrashTableNote from "@/app/(authenticated)/components/TrashTableNote";
+import i18n from "@/app/lib/i18n";
 
 
 describe("TrashTableNote", () => {
@@ -40,13 +41,13 @@ describe("TrashTableNote", () => {
         render(
             <NoteProvider>
                 <LabelProvider>
-                    <TrashTableNote id={"testid111"} title={"テストノート"} label_id={"label1"} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} onRestore={mockOnRestore} onDelete={mockOnDelete} />
+                    <TrashTableNote id={"testid111"} title={"テストノート"} label_id={"label1"} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} onRestore={mockOnRestore} onDelete={mockOnDelete} />
                 </LabelProvider>
             </NoteProvider>
         );
         expect(screen.getByText("テストノート")).toBeVisible();
-        expect(screen.getByText(/作成日:/)).toBeVisible();
-        expect(screen.getByText(/更新日:/)).toBeVisible();
+        expect(screen.getByText(/2025\/07\/05/)).toBeVisible();
+        expect(screen.getByText(/2025\/07\/06/)).toBeVisible();
         expect(screen.getByText("仕事")).toBeVisible();
     });
 
@@ -54,21 +55,21 @@ describe("TrashTableNote", () => {
         render(
             <NoteProvider>
                 <LabelProvider>
-                    <TrashTableNote id={"testid111"} title={"テストノート"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} onRestore={mockOnRestore} onDelete={mockOnDelete} />
+                    <TrashTableNote id={"testid111"} title={"テストノート"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} onRestore={mockOnRestore} onDelete={mockOnDelete} />
                 </LabelProvider>
             </NoteProvider>
         );
 
         expect(screen.getByText("テストノート")).toBeVisible();
-        expect(screen.getByText("作成日: 2025/07/05")).toBeVisible();
-        expect(screen.getByText("更新日: 2025/07/05")).toBeVisible();
+        expect(screen.getByText(/2025\/07\/05/)).toBeVisible();
+        expect(screen.getByText(/2025\/07\/06/)).toBeVisible();
     })
 
     it("クリックした時、復元、完全に削除、キャンセルボタンが表示される", async () => {
         render(
             <NoteProvider>
                 <LabelProvider>
-                    <TrashTableNote id={"testid111"} title={"テストノート"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} onRestore={mockOnRestore} onDelete={mockOnDelete} />
+                    <TrashTableNote id={"testid111"} title={"テストノート"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} onRestore={mockOnRestore} onDelete={mockOnDelete} />
                 </LabelProvider>
             </NoteProvider>
         );
@@ -78,9 +79,9 @@ describe("TrashTableNote", () => {
         })
 
         expect(screen.getByRole("dialog")).toBeVisible();
-        expect(screen.getByText("復元")).toBeVisible();
-        expect(screen.getByText("完全に削除")).toBeVisible();
-        expect(screen.getByText("キャンセル")).toBeVisible();
+        expect(screen.getByTestId("button_restore")).toBeVisible();
+        expect(screen.getByTestId("button_permanently_delete")).toBeVisible();
+        expect(screen.getByTestId("button_cancel")).toBeVisible();
     })
 
 
@@ -90,7 +91,7 @@ describe("TrashTableNote", () => {
             <>
                 <NoteProvider>
                     <LabelProvider>
-                        <TrashTableNote id={"testid111"} title={"テストノートタイトル"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} onRestore={mockOnRestore} onDelete={mockOnDelete} />
+                        <TrashTableNote id={"testid111"} title={"テストノートタイトル"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} onRestore={mockOnRestore} onDelete={mockOnDelete} />
                     </LabelProvider>
                 </NoteProvider>
                 <input data-testid="dummy-input" placeholder="ダミー入力" />
@@ -117,15 +118,16 @@ describe("TrashTableNote", () => {
     });
 
     it("ロックされているノートはロックされている旨がcontentに表示される", async () => {
+        const lockedText = i18n.t("label_lockednote");
         render(
             <NoteProvider>
                 <LabelProvider>
-                    <TrashTableNote id={"testid111"} title={"テストノート"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={true} onRestore={mockOnRestore} onDelete={mockOnDelete} />
+                    <TrashTableNote id={"testid111"} title={"テストノート"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={true} onRestore={mockOnRestore} onDelete={mockOnDelete} />
                 </LabelProvider>
             </NoteProvider>
         );
 
-        expect(screen.getByText("このノートはロックされています")).toBeVisible();
+        expect(screen.getByText(lockedText)).toBeVisible();
     });
 
 });

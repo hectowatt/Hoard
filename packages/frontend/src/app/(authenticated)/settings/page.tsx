@@ -2,9 +2,12 @@
 
 
 import React, { useEffect, useState } from "react";
-import { Box, Button, Container, TextField, Typography } from "@mui/material";
+import { Box, Button, Container, TextField, Typography, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 import Person2OutlinedIcon from '@mui/icons-material/Person2Outlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import { useTranslation } from "react-i18next";
+import LanguageOutlinedIcon from '@mui/icons-material/LanguageOutlined';
+import i18n from "@/app/lib/i18n";
 
 // 設定ページのコンテンツ
 export default function Home() {
@@ -15,6 +18,13 @@ export default function Home() {
   const [newPasswordString, setNewPasswordString] = useState("");
   const [isPasswordExist, setIsPasswordExist] = useState(false);
   const [notePasswordId, setNotePasswordId] = useState("");
+  const { t } = useTranslation();
+  const availableLangs = Object.keys(i18n.options.resources || {});
+  const langNames: Record<string, string> = {
+    ja: "日本語",
+    en: "English",
+    // 必要なら他言語を追加
+  };
 
   const fetchPasswordStatus = async () => {
     const responseSelect = await fetch("/api/password", {
@@ -40,16 +50,16 @@ export default function Home() {
     fetchPasswordStatus();
   }, []);
 
-  // パスワードの保存処理
+  // ノートパスワードの保存処理
   const handleSavePassword = async () => {
     if (notePasswordString.trim() === "") {
-      alert("新しいパスワードを入力してください");
+      alert(t("message_new_notepassword_must_be_set"));
       return;
     }
 
     if (isPasswordExist) {
       if (prevNotePasswordString.trim() === "") {
-        alert("現在のパスワードを入力してください");
+        alert(t("message_current_notepassword_must_be_set"));
         return;
       }
 
@@ -82,17 +92,17 @@ export default function Home() {
           });
 
           if (response.ok) {
-            alert("パスワードを更新しました！");
+            alert(t("message_notepassword_saved"));
             setNotePasswordString(""); // 入力フィールドをクリア
             setPrevNotePasswordString("");
           } else {
-            alert("パスワードの更新に失敗しました");
+            alert(t("message_failed_to_save_notepassword"));
           }
         } else {
-          alert("現在のパスワードが間違っています");
+          alert(t("message_incorrect_current_notepassword"));
         }
       } else {
-        alert("エラーが発生しました");
+        alert(t("message_error_occured"));
         return;
       }
     } else {
@@ -108,14 +118,14 @@ export default function Home() {
 
       if (response.ok) {
         const result = await response.json();
-        alert("パスワードを登録しました！");
+        alert(t("message_notepassword_regist"));
         setNotePasswordString(""); // 入力フィールドをクリア
         setIsPasswordExist(true);
         if (result?.password_id) {
           setNotePasswordId(result.password_id); // 新しいIDをセット
         }
       } else {
-        alert("パスワードの登録に失敗しました");
+        alert(t("message_failed_to_regist_notepassword"));
       }
     }
 
@@ -124,12 +134,12 @@ export default function Home() {
   // アカウント情報の更新処理
   const handleSaveAccountInfo = async () => {
     if (!newUsernameString && !newPasswordString) {
-      alert("ユーザ名かパスワードのいずれかを入力してください");
+      alert(t("message_username_or_password_must_be_set"));
       return;
     }
 
     if (newPasswordString && !prevPasswordString) {
-      alert("パスワードを変更する場合、現在のパスワードを入力してください");
+      alert(t("message_new_password_must_be_set_when_change"));
       return;
     }
 
@@ -162,15 +172,15 @@ export default function Home() {
             credentials: "include"
           });
           if (response.ok) {
-            alert("アカウント情報を更新しました！");
+            alert(t("message_user_settings_saved"));
             setNewUsernameString("");
             setPrevPasswordString("");
             setNewPasswordString("");
           } else {
-            alert("アカウント情報の更新に失敗しました");
+            alert(t("message_failed_to_save_user_info"));
           }
         } else {
-          alert("現在のパスワードが間違っています");
+          alert(t("message_incorrect_current_password"));
         }
       }
     } else {
@@ -186,25 +196,59 @@ export default function Home() {
         credentials: "include"
       });
       if (response.ok) {
-        alert("アカウント情報を更新しました！");
+        alert(t("message_user_info_saved"));
         setNewUsernameString("");
         setPrevPasswordString("");
         setNewPasswordString("");
       } else {
-        alert("アカウント情報の更新に失敗しました");
+        alert(t("message_failed_to_save_user_info"));
       }
     }
   }
 
+  // 言語切り替え処理
+  const chageLanguage = (lang: string) => {
+    i18n.changeLanguage(lang);
+    localStorage.setItem("i18nextLng", lang);
+  };
+
   return (
 
     <Container>
-      <h1>設定</h1>
+      <h1>{t("label_settings")}</h1>
+
+      {/* 言語設定 */}
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 4 }}>
+        <LanguageOutlinedIcon></LanguageOutlinedIcon>
+        <h3>{t("label_language_settings")}</h3>
+      </Box>
+      <p>{t("label_language_settings_desc")}</p>
+      <FormControl size="small" sx={{ minWidth: 120 }} data-testid="lang_select">
+        <InputLabel id="select-lang">{t("label_select_language")}</InputLabel>
+        <Select
+          labelId="select-lang"
+          value={i18n.language || ""}
+          onChange={(e) => chageLanguage(String(e.target.value))}
+          label={t("label_select_language")}
+          renderValue={(selected: string) => {
+            if (!selected) return <em>{t("dropdown_no_languages")}</em>;
+            return langNames[selected] ?? selected;
+          }}
+        >
+          {availableLangs.map((lng) => (
+            <MenuItem key={lng} value={lng}>
+              {langNames[lng] ?? lng}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+
+      {/* ユーザ設定 */}
       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
         <Person2OutlinedIcon />
-        <h3>ユーザ設定</h3>
+        <h3>{t("label_user_settings")}</h3>
       </Box>
-      <p>ユーザ名とパスワードを変更できます。</p>
+      <p>{t("label_user_settings_desc")}</p>
       <form>
         <TextField
           id="new-username"
@@ -212,7 +256,7 @@ export default function Home() {
           value={newUsernameString}
           onChange={(e) => setNewUsernameString(e.target.value)}
           size="small"
-          placeholder="新しいユーザ名を入力"
+          placeholder={t("placeholder_new_username")}
           sx={{
             width: {
               xs: "100%",
@@ -231,7 +275,7 @@ export default function Home() {
           value={prevPasswordString}
           onChange={(e) => setPrevPasswordString(e.target.value)}
           size="small"
-          placeholder="現在のパスワードを設定"
+          placeholder={t("placeholder_current_password")}
           sx={{
             width: {
               xs: "100%",
@@ -250,7 +294,7 @@ export default function Home() {
           value={newPasswordString}
           onChange={(e) => setNewPasswordString(e.target.value)}
           size="small"
-          placeholder="新しいパスワードを設定"
+          placeholder={t("placeholder_new_password")}
           sx={{
             width: {
               xs: "100%",
@@ -263,16 +307,15 @@ export default function Home() {
           data-testid="passwordinput"
         />
         <br />
-        <Button onClick={handleSaveAccountInfo} variant="contained" data-testid="userinfosave">保存</Button>
+        <Button onClick={handleSaveAccountInfo} variant="contained" data-testid="userinfosave">{t("button_save")}</Button>
       </form>
 
-
-
+      {/* ノートパスワード設定 */}
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 4 }}>
         <LockOutlinedIcon></LockOutlinedIcon>
-        <h3>ノートパスワード設定</h3>
+        <h3>{t("label_note_password_settings")}</h3>
       </Box>
-      <p>ノートにロックをかけるときのパスワードを設定できます</p>
+      <p>{t("label_note_password_settings_desc")}</p>
       {isPasswordExist ? (
         <form>
           <TextField
@@ -281,7 +324,7 @@ export default function Home() {
             value={prevNotePasswordString}
             onChange={(e) => setPrevNotePasswordString(e.target.value)}
             size="small"
-            placeholder="現在のノートパスワードを入力"
+            placeholder={t("placeholder_current_note_password")}
             sx={{
               width: {
                 xs: "100%",
@@ -300,7 +343,7 @@ export default function Home() {
             value={notePasswordString}
             onChange={(e) => setNotePasswordString(e.target.value)}
             size="small"
-            placeholder="新しいノートパスワードを設定"
+            placeholder={t("placeholder_new_note_password")}
             sx={{
               width: {
                 xs: "100%",
@@ -313,7 +356,7 @@ export default function Home() {
             data-testid="notepasswordinput"
           />
           <br />
-          <Button onClick={handleSavePassword} variant="contained" data-testid="notepasswordsave">保存</Button>
+          <Button onClick={handleSavePassword} variant="contained" data-testid="notepasswordsave">{t("button_save")}</Button>
         </form>
       ) : (
         <form>
@@ -323,7 +366,7 @@ export default function Home() {
             value={notePasswordString}
             onChange={(e) => setNotePasswordString(e.target.value)}
             size="small"
-            placeholder="新しいノートパスワードを設定"
+            placeholder={t("placeholder_new_note_password")}
             sx={{
               width: {
                 xs: "100%",
@@ -336,7 +379,7 @@ export default function Home() {
             data-testid="notepasswordinput"
           />
           <br />
-          <Button onClick={handleSavePassword} variant="contained" data-testid="notepasswordsave">保存</Button>
+          <Button onClick={handleSavePassword} variant="contained" data-testid="notepasswordsave">{t("button_save")}</Button>
         </form>
       )}
 

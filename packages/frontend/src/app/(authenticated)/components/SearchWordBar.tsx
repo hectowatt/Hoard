@@ -4,6 +4,7 @@ import { useSearchWordContext } from "@/app/(authenticated)/context/SearchWordPr
 import { IconButton, InputAdornment, TextField } from "@mui/material";
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 type searchWordBarProps = {
     mode: "light" | "dark";
@@ -14,6 +15,7 @@ export default function SearchWordBar({ mode }: searchWordBarProps) {
 
     const { setSearchWord } = useSearchWordContext();
     const [word, setWord] = React.useState<string>("");
+    const { t } = useTranslation();
 
     return (
         <form
@@ -24,7 +26,7 @@ export default function SearchWordBar({ mode }: searchWordBarProps) {
                 id="outlined-search-bar"
                 variant="outlined"
                 size="medium"
-                placeholder="検索"
+                placeholder={t("placeholder_search")}
                 value={word}
                 onChange={(e) => setWord(e.target.value)}
                 sx={{

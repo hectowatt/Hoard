@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useEffect, useState } from "react";
 import {
     Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, IconButton, TextField,
@@ -17,6 +19,7 @@ import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
 import { useLabelContext } from "@/app/(authenticated)/context/LabelProvider";
 import NoEncryptionGmailerrorredOutlinedIcon from '@mui/icons-material/NoEncryptionGmailerrorredOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import { useTranslation } from "react-i18next";
 
 interface Column {
     id: number;
@@ -68,6 +71,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
     const [passwordId, setPasswordId] = React.useState<string | null>(null);
     const [editColumns, setEditColumns] = useState<Column[]>(columns);
     const [editRowCells, setEditRowCells] = useState<RowCell[][]>(rowCells);
+    const { t } = useTranslation();
 
 
     // 初期状態でのタイトル設定
@@ -183,7 +187,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                         setPasswordDialogOpen(true);
                     } else {
                         // パスワードが未登録の場合はロック解除できない
-                        alert("パスワード未登録のためロックできません");
+                        alert(t("message_cannot_lock_note_without_notepassword"));
                     }
 
                 } else {
@@ -226,11 +230,11 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                         setIsLocked(true);
                     } else {
                         // パスワードが未登録の場合はロックできない
-                        alert("パスワード未登録のためロックできません。\n設定画面でパスワードを設定してください。");
+                        alert(t("message_cannot_lock_note_without_notepassword"));
                     }
                 } else {
                     // パスワード取得に失敗した場合の処理
-                    alert("パスワード取得に失敗しました。");
+                    alert(t("message_cannot_get_notepassword"));
                 }
             } catch (error) {
                 console.error("Error locking note", error);
@@ -242,7 +246,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
     // ロック解除処理
     const hubdlePasswordSubmit = async () => {
         if (!inputPassword || inputPassword.trim() === "") {
-            alert("パスワードを入力してください");
+            alert(t("message_notepassword_must_be_set_to_unlock"));
             return;
         }
 
@@ -265,7 +269,6 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
             if (isMatch) {
                 try {
                     // パスワードが一致した場合、ロックを解除するAPIを呼び出す
-                    console.log("パスワードが一致しました。ロックを解除します。");
                     const responseUnlock = await fetch("/api/tablenotes/lock", {
                         method: "PUT",
                         headers: {
@@ -367,7 +370,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
         <>
             <Paper elevation={3} sx={{ p: 2, maxWidth: 300, maxHeight: 200, wordWrap: "break-word", cursor: "pointer" }} onClick={handleOpen}>
                 <Typography variant="h6" sx={title && title.trim() !== "" ? { mb: 1 } : { mb: 1, fontStyle: "italic", color: "#b0b0b0", fontWeight: "normal" }}>
-                    {title && title.trim() !== "" ? title : "タイトルなし"}
+                    {title && title.trim() !== "" ? title : t("label_no_title")}
                 </Typography>
                 <Typography
                     variant="body1"
@@ -381,13 +384,13 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                         WebkitLineClamp: 4,
                         WebkitBoxOrient: "vertical",
                     }}
-                >{isLocked ? "このノートはロックされています" : <TableChartOutlinedIcon />}
+                >{isLocked ? t("label_lockednote") : <TableChartOutlinedIcon />}
                 </Typography>
                 <Typography variant="caption" color="textSecondary" sx={{ display: "block" }}>
-                    作成日: {formatDate(createdate)}
+                    {t("label_createdate")}: {formatDate(createdate)}
                 </Typography>
                 <Typography variant="caption" color="textSecondary" sx={{ display: "block" }}>
-                    更新日: {formatDate(updatedate)}
+                    {t("label_updatedate")}: {formatDate(updatedate)}
                 </Typography>
                 {label_id && label_id.trim() !== "" && getLabelName(label_id) && (
                     <Typography variant="caption" color="textSecondary" sx={{ mb: 1, border: "1px solid #ccc", p: 0.5, borderRadius: 1 }}>
@@ -421,7 +424,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                                                         newColumns[idx] = { ...newColumns[idx], name: e.target.value };
                                                         setEditColumns(newColumns);
                                                     }}
-                                                    placeholder={`カラム${idx + 1}`}
+                                                    placeholder={`${t("placeholder_column")}${idx + 1}`}
                                                     sx={{
                                                         minWidth: 80,
                                                         width: { xs: '35vw', sm: 200 },
@@ -476,15 +479,15 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                         </TableContainer>
                     ) : (
                         <Typography variant="body1" sx={{ whiteSpace: "pre-line", mb: 2 }}>
-                            {isLocked ? "このノートはロックされています" : < TableChartOutlinedIcon />}
+                            {isLocked ? t("label_lockednote") : < TableChartOutlinedIcon />}
                         </Typography>
                     )
                     }
                     <Typography variant="caption" color="textSecondary" sx={{ display: "block" }}>
-                        作成日: {formatDate(createdate)}
+                        {t("label_createdate")}: {formatDate(createdate)}
                     </Typography>
                     <Typography variant="caption" color="textSecondary" sx={{ display: "block" }}>
-                        更新日: {formatDate(updatedate)}
+                        {t("label_updatedate")}: {formatDate(updatedate)}
                     </Typography>
                     {label_id && label_id.trim() !== "" && getLabelName(label_id) && (
                         <Typography variant="caption" color="textSecondary" sx={{ mb: 1, border: "1px solid #ccc", p: 0.5, borderRadius: 1 }}>
@@ -501,15 +504,15 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                                         labelId="select-label"
                                         value={editLabel ?? ""}
                                         onChange={e => setEditLabel(e.target.value === "" ? null : e.target.value)}
-                                        label="ラベル"
+                                        label={t("dropdown_labels")}
                                         renderValue={(selected: string) => {
-                                            if (!selected) return <em>ラベルなし</em>;
+                                            if (!selected) return <em>{t("dropdown_no_labels")}</em>;
                                             const found = labels?.find(l => l.id === selected);
                                             return found ? found.labelname : "";
                                         }}
                                     >
                                         <MenuItem value="">
-                                            <em>ラベルなし</em>
+                                            <em>{t("dropdown_no_labels")}</em>
                                         </MenuItem>
                                         {labels && labels.map(option => (
                                             <MenuItem key={option.id} value={option.id}>{option.labelname}</MenuItem>
@@ -517,15 +520,15 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                                     </Select>
                                 </FormControl>
                                 <br />
-                                <Button onClick={handleSaveTableNote} variant="contained" sx={{ mr: 1, mt: 2 }}>保存</Button>
-                                <Button onClick={() => setIsEditing(false)} variant="contained" sx={{ mt: 2 }}>キャンセル</Button>
+                                <Button onClick={handleSaveTableNote} variant="contained" sx={{ mr: 1, mt: 2 }}>{t("button_save")}</Button>
+                                <Button onClick={() => setIsEditing(false)} variant="contained" sx={{ mt: 2 }}>{t("button_cancel")}</Button>
 
                             </>
                         ) : !isLocked ? (
                             // 編集中でなく、パスワードロックされていない場合
                             <>
-                                <Button onClick={handleEdit} variant="contained">編集</Button>
-                                <Button onClick={handleDelete} variant="contained" sx={{ ml: 1 }}>削除</Button>
+                                <Button onClick={handleEdit} variant="contained" data-testid="button_edit">{t("button_edit")}</Button>
+                                <Button onClick={handleDelete} variant="contained" sx={{ ml: 1 }} data-testid="button_delete">{t("button_delete")}</Button>
                                 <IconButton
                                     onClick={handleLock}
                                     sx={{ ml: 1, color: isLocked ? "primary.main" : "text.secondary" }}>
@@ -536,7 +539,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                         ) : (
                             // パスワードロックされている場合
                             <>
-                                <Button onClick={handleDelete} variant="contained" sx={{ ml: 1 }}>削除</Button>
+                                <Button onClick={handleDelete} variant="contained" sx={{ ml: 1 }}>{t("button_delete")}</Button>
                                 <IconButton
                                     onClick={handleLock}
                                     sx={{ ml: 1, color: isLocked ? "primary.main" : "text.secondary" }}>
@@ -549,11 +552,11 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
             </Dialog >
 
             <Dialog open={passwordDialogOpen} onClose={() => setPasswordDialogOpen(false)}>
-                <DialogTitle>パスワード入力</DialogTitle>
+                <DialogTitle>{t("label_input_password")}</DialogTitle>
                 <DialogContent>
                     <TextField
                         type="password"
-                        label="パスワード"
+                        label={t("label_password")}
                         autoComplete="new-password"
                         value={inputPassword}
                         onChange={(e) => setInputPassword(e.target.value)}
@@ -565,10 +568,10 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                         variant="contained"
                         sx={{ mt: 2 }}
                     >
-                        ロック解除
+                        {t("button_unlock")}
                     </Button>
                     <Button onClick={() => setPasswordDialogOpen(false)} variant="contained" sx={{ mt: 2, ml: 1 }}>
-                        キャンセル
+                        {t("button_cancel")}
                     </Button>
                 </DialogContent>
             </Dialog>

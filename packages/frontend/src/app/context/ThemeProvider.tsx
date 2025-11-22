@@ -44,9 +44,26 @@ export default function ThemeRegistry({ children }: { children: React.ReactNode 
         setMode(determinedMode);
     }, []);
 
+    // meta[name="theme-color"] をモードに応じて同期
+    React.useEffect(() => {
+        if (!mode) return;
+
+        const color = mode === "dark" ? "#e3a838" : "#e3a838";
+        let meta = document.querySelector('meta[name="theme-color"]');
+
+        if (!meta) {
+            meta = document.createElement("meta");
+            meta.setAttribute("name", "theme-color");
+            document.head.appendChild(meta);
+        }
+
+        meta.setAttribute("content", color);
+    }, [mode]);
+
     const setModeHandler = useCallback(async (newMode: "light" | "dark") => {
         try {
             setMode(newMode);
+            localStorage.setItem(THEME_KEY, newMode);
         } catch (error) {
             console.error("Failed to set theme mode in localStorage", error);
         }

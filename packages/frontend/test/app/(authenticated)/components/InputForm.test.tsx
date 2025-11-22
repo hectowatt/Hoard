@@ -4,6 +4,7 @@ import "@testing-library/jest-dom";
 import InputForm from "@/app/(authenticated)/components/InputForm";
 import { LabelProvider } from "@/app/(authenticated)/context/LabelProvider";
 import { NoteProvider } from "@/app/(authenticated)/context/NoteProvider";
+import userEvent from '@testing-library/user-event';
 
 // ラベルコンテキストのモック
 const mockLabels = [
@@ -42,10 +43,11 @@ describe("InputForm", () => {
             </NoteProvider>
         )
 
-        expect(screen.getByPlaceholderText("ノートを入力...")).toBeVisible();
+        expect(screen.getByTestId("input_content")).toBeVisible();
     });
 
     it("openがtrueのとき、タイトル入力フィールドが表示される", async () => {
+        const user = userEvent.setup();
         render(
             <NoteProvider>
                 <LabelProvider>
@@ -53,12 +55,13 @@ describe("InputForm", () => {
                 </LabelProvider>
             </NoteProvider>
         );
+        const input = screen.getByTestId("input_content");
 
         await act(async () => {
-            fireEvent.click(screen.getByPlaceholderText("ノートを入力..."));
+            fireEvent.click(input);
         });
 
-        const titleInput = await screen.findByPlaceholderText("タイトル");
+        const titleInput = await screen.findByTestId("input_title");
         expect(titleInput).toBeVisible();
     });
 
@@ -71,12 +74,15 @@ describe("InputForm", () => {
             </NoteProvider>
         );
 
+        const input = screen.getByTestId("input_content");
+
         await act(async () => {
-            fireEvent.click(screen.getByPlaceholderText("ノートを入力..."));
+            fireEvent.click(input);
         });
 
-        const input = await screen.getByText("保存");
-        expect(input).toBeVisible();
+
+        const saveButton = await screen.getByTestId("button_save");
+        expect(saveButton).toBeVisible();
     });
 
     it("openがtrueのとき、キャンセルボタンが表示される", async () => {
@@ -88,12 +94,14 @@ describe("InputForm", () => {
             </NoteProvider>
         );
 
+        const input = screen.getByTestId("input_content");
+
         await act(async () => {
-            fireEvent.click(screen.getByPlaceholderText("ノートを入力..."));
+            fireEvent.click(input);
         });
 
-        const input = await screen.getByText("キャンセル");
-        expect(input).toBeVisible();
+        const buttonCancel = await screen.getByTestId("button_cancel");
+        expect(buttonCancel).toBeVisible();
     });
 
     it("openがtrueのとき、ラベルのドロップダウンが表示される", async () => {
@@ -105,12 +113,14 @@ describe("InputForm", () => {
             </NoteProvider>
         );
 
+        const input = screen.getByTestId("input_content");
+
         await act(async () => {
-            fireEvent.click(screen.getByPlaceholderText("ノートを入力..."));
+            fireEvent.click(input);
         });
 
-        const input = await screen.getByLabelText("ラベル");
-        expect(input).toBeVisible();
+        const selectLabel = await screen.getByTestId("select_label");
+        expect(selectLabel).toBeVisible();
     });
 
     it("openがtrueのとき、ロックアイコンが表示される", async () => {
@@ -122,12 +132,14 @@ describe("InputForm", () => {
             </NoteProvider>
         );
 
+        const input = screen.getByTestId("input_content");
+
         await act(async () => {
-            fireEvent.click(screen.getByPlaceholderText("ノートを入力..."));
+            fireEvent.click(input);
         });
 
-        const input = await screen.getByTestId("unlock");
-        expect(input).toBeInTheDocument();
+        const buttonUnlock = await screen.getByTestId("unlock");
+        expect(buttonUnlock).toBeInTheDocument();
     });
 
     it("openがtrueのとき、テーブルノートアイコンが表示される", async () => {
@@ -139,15 +151,18 @@ describe("InputForm", () => {
             </NoteProvider>
         );
 
+        const input = screen.getByTestId("input_content");
+
         await act(async () => {
-            fireEvent.click(screen.getByPlaceholderText("ノートを入力..."));
+            fireEvent.click(input);
         });
 
-        const input = await screen.getByTestId("tablenote");
-        expect(input).toBeInTheDocument();
+        const buttonTablenote = await screen.getByTestId("tablenote");
+        expect(buttonTablenote).toBeInTheDocument();
     });
 
     it("タイトルを入力できる", async () => {
+        const user = userEvent.setup();
         render(
             <NoteProvider>
                 <LabelProvider>
@@ -155,19 +170,21 @@ describe("InputForm", () => {
                 </LabelProvider>
             </NoteProvider>
         );
-        await act(async () => {
-            fireEvent.click(screen.getByPlaceholderText("ノートを入力..."));
-        });
-        const input = await screen.findByPlaceholderText("タイトル") as HTMLInputElement;
+        const inputContent = screen.getByTestId("input_content");
 
         await act(async () => {
-            fireEvent.change(input, { target: { value: "新しいタイトル" } });
+            fireEvent.click(inputContent);
         });
 
-        expect(input.value).toBe("新しいタイトル");
+        const inputTitle = screen.getByTestId("input_title");
+
+        await user.type(inputTitle, "新しいタイトル");
+
+        expect(inputTitle).toHaveValue("新しいタイトル");
     });
 
     it("contentを入力できる", async () => {
+        const user = userEvent.setup();
         render(
             <NoteProvider>
                 <LabelProvider>
@@ -175,16 +192,16 @@ describe("InputForm", () => {
                 </LabelProvider>
             </NoteProvider>
         );
-        await act(async () => {
-            fireEvent.click(screen.getByPlaceholderText("ノートを入力..."));
-        });
-        const input = await screen.findByPlaceholderText("ノートを入力...") as HTMLInputElement;
+        const inputContent = screen.getByTestId("input_content");
 
         await act(async () => {
-            fireEvent.change(input, { target: { value: "新しい内容" } });
+            fireEvent.click(inputContent);
         });
 
-        expect(input.value).toBe("新しい内容");
+
+        await user.type(inputContent, "新しいコンテンツ");
+
+        expect(inputContent).toHaveValue("新しいコンテンツ");
     });
 
     it("ロックとアンロックを切り替えられる", async () => {
@@ -195,8 +212,10 @@ describe("InputForm", () => {
                 </LabelProvider>
             </NoteProvider>
         );
+        const inputContent = screen.getByTestId("input_content");
+
         await act(async () => {
-            fireEvent.click(screen.getByPlaceholderText("ノートを入力..."));
+            fireEvent.click(inputContent);
         });
         const unlockIcon = await screen.getByTestId("unlock");
 
@@ -217,8 +236,10 @@ describe("InputForm", () => {
                 </LabelProvider>
             </NoteProvider>
         );
+        const inputContent = screen.getByTestId("input_content");
+
         await act(async () => {
-            fireEvent.click(screen.getByPlaceholderText("ノートを入力..."));
+            fireEvent.click(inputContent);
         });
         const tableNoteIcon = await screen.getByTestId("tablenote");
 
@@ -246,12 +267,13 @@ describe("InputForm", () => {
             </>
         );
 
+        const inputContent = screen.getByTestId("input_content");
+
         await act(async () => {
-            const noteInput = screen.getByPlaceholderText("ノートを入力...");
-            fireEvent.focus(noteInput);
+            fireEvent.click(inputContent);
         });
 
-        await screen.findByPlaceholderText("タイトル");
+        expect(screen.getByTestId("input_title")).toBeVisible();
 
         // dummyにフォーカスを移す
         const dummyInput = screen.getByTestId("dummy-input");
@@ -261,7 +283,10 @@ describe("InputForm", () => {
 
         // Collapse が閉じてタイトルが消えるのを確認
         await waitFor(() => {
-            expect(screen.queryByPlaceholderText("タイトル")).not.toBeVisible();
+            const inputTitle = screen.getByTestId("input_title");
+            expect(inputTitle.closest('.MuiCollapse-root')).toHaveStyle({
+                height: '0px'
+            });
         });
-    });
-})
+    })
+});

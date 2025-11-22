@@ -28,6 +28,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useTranslation } from "react-i18next";
 
 interface InputFormProps {
     onInsert: (newId: string, newTitle: string, newContent: string, newLabel: string, isLocked: boolean) => void;
@@ -50,7 +51,7 @@ type RowCell = {
 // トップページ上部の入力フォームコンポーネント
 export default function InputForm({ onInsert, onInsertTableNote }: InputFormProps) {
 
-    const [expanded, setExpand] = useState(false);
+    const [expand, setExpand] = useState(false);
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
     const [isEditing, setIsEditing] = useState(false);
@@ -58,6 +59,7 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
     const [editLabelId, setEditLabelId] = React.useState<string | null>(null);
     const [isLocked, setIsLocked] = React.useState(false);
     const [tableNoteOpen, setTableNoteOpen] = useState(false);
+    const { t } = useTranslation();
 
     const { labels } = useLabelContext();
 
@@ -79,7 +81,11 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
         setEditRowCells(editRowCells.filter((_, idx) => idx !== rowIdx));
     };
 
-    const handleExpand = () => { setExpand(true) };
+    const handleExpand = () => {
+        if (!expand) {
+            setExpand(true);
+        }
+    };
     const handleCollapse = () => {
         setExpand(false);
         setTitle("");
@@ -179,7 +185,7 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
             const result = await response.json();
             console.log("Table note saved successfully!", result);
             setTableNoteOpen(false);
-            setEditColumns([{ id: 1, name: "カラム1", order: 1 }]);
+            setEditColumns([{ id: 1, name: "", order: 1 }]);
             setEditRowCells([[{ id: 1, rowIndex: 0, value: "", columnId: 1 }]]);
             setTitle("");
             setExpand(false);
@@ -255,26 +261,30 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                 }}
                 onClick={handleExpand}
             >
-                <Collapse in={expanded}>
+                <Collapse in={expand}>
                     <TextField
-                        placeholder="タイトル"
+                        placeholder={t("placeholder_title")}
                         fullWidth
                         variant="standard"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
+                        onFocus={handleExpand}
                         sx={{ mb: 1 }}
+                        inputProps={{ 'data-testid': 'input_title' }}
                     />
                 </Collapse>
                 <TextField
-                    placeholder="ノートを入力..."
+                    placeholder={t("placeholder_input_note")}
                     fullWidth
                     multiline
-                    minRows={expanded ? 3 : 1}
+                    minRows={expand ? 3 : 1}
                     variant="standard"
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
+                    onFocus={handleExpand}
+                    inputProps={{ 'data-testid': 'input_content' }}
                 />
-                <Collapse in={expanded}>
+                <Collapse in={expand}>
                     <Box sx={{
                         display: 'flex',
                         alignItems: 'center',
@@ -282,23 +292,24 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                         gap: 1,
                         mt: 1
                     }}>
-                        <Button onClick={saveButtonClick} variant="contained" sx={{ fontSize: isXs ? '0.7rem' : '0.875rem' }}>保存</Button>
-                        <Button onClick={handleCollapse} variant="contained" sx={{ fontSize: isXs ? '0.7rem' : '0.875rem' }}>キャンセル</Button>
+                        <Button onClick={saveButtonClick} variant="contained" sx={{ fontSize: isXs ? '0.7rem' : '0.875rem' }} data-testid="button_save">{t("button_save")}</Button>
+                        <Button onClick={handleCollapse} variant="contained" sx={{ fontSize: isXs ? '0.7rem' : '0.875rem' }} data-testid="button_cancel">{t("button_cancel")}</Button>
                         <FormControl size="small" sx={{ minWidth: 120 }}>
-                            <InputLabel id="select-label">ラベル</InputLabel>
+                            <InputLabel id="select-label">{t("dropdown_labels")}</InputLabel>
                             <Select
                                 labelId="select-label"
                                 value={editLabelId ?? ""}
                                 onChange={e => setEditLabelId(e.target.value === "" ? null : e.target.value)}
-                                label="ラベル"
+                                label={t("label_labels")}
                                 renderValue={(selected: string) => {
                                     if (!selected) return <em></em>;
                                     const found = labels?.find(l => l.id === selected);
                                     return found ? found.labelname : "";
                                 }}
+                                data-testid="select_label"
                             >
                                 <MenuItem value="">
-                                    <em>ラベルなし</em>
+                                    <em>{t("dropdown_no_labels")}</em>
                                 </MenuItem>
                                 {(labels ?? []).map(option => (
                                     <MenuItem key={option.id} value={option.id}>{option.labelname}</MenuItem>
@@ -320,7 +331,7 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
             <Dialog open={tableNoteOpen} onClose={() => setTableNoteOpen(false)} maxWidth="md" fullWidth>
                 <TableContainer component={Paper}>
                     <TextField
-                        label="タイトル"
+                        label={t("label_title")}
                         variant="outlined"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
@@ -339,7 +350,7 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                                                 newColumns[idx] = { ...newColumns[idx], name: e.target.value };
                                                 setEditColumns(newColumns);
                                             }}
-                                            placeholder={`カラム${idx + 1}`}
+                                            placeholder={`${t("placeholder_column")}${idx + 1}`}
                                             sx={{
                                                 minWidth: 80,
                                                 width: { xs: '35vw', sm: 200 },
@@ -394,18 +405,18 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                 </TableContainer>
                 <Box sx={{ textAlign: 'center', p: 2 }}>
                     <Button onClick={handleSaveTableNote} variant="contained" sx={{ mr: 2, mb: 1, fontSize: isXs ? '0.7rem' : '0.875rem' }}>
-                        保存
+                        {t("button_save")}
                     </Button>
                     <Button onClick={() => setTableNoteOpen(false)} variant="contained" sx={{ mb: 1, fontSize: isXs ? '0.7rem' : '0.875rem' }}>
-                        キャンセル
+                        {t("button_cancel")}
                     </Button>
                     <FormControl size="small" sx={{ minWidth: 120, ml: 2 }}>
-                        <InputLabel id="select-label">ラベル</InputLabel>
+                        <InputLabel id="select-label">{t("dropdown_labels")}</InputLabel>
                         <Select
                             labelId="select-label"
                             value={editLabelId ?? ""}
                             onChange={e => setEditLabelId(e.target.value === "" ? null : e.target.value)}
-                            label="ラベル"
+                            label={t("label_labels")}
                             renderValue={(selected: string) => {
                                 if (!selected) return <em></em>;
                                 const found = labels?.find(l => l.id === selected);
@@ -413,7 +424,7 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                             }}
                         >
                             <MenuItem value="">
-                                <em>ラベルなし</em>
+                                <em>{t("dropdown_no_labels")}</em>
                             </MenuItem>
                             {(labels ?? []).map(option => (
                                 <MenuItem key={option.id} value={option.id}>{option.labelname}</MenuItem>

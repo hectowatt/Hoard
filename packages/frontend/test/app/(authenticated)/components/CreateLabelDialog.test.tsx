@@ -4,6 +4,7 @@ import "@testing-library/jest-dom";
 import CreateLabelDialog from "@/app/(authenticated)/components/CreateLabelDialog";
 import { LabelProvider } from "@/app/(authenticated)/context/LabelProvider";
 import { NoteProvider } from "@/app/(authenticated)/context/NoteProvider";
+import userEvent from '@testing-library/user-event';
 
 // ラベルコンテキストのモック
 const mockLabels = [
@@ -42,10 +43,11 @@ describe("CreateLabelDialog", () => {
                 </LabelProvider>
             </NoteProvider>
         );
-        expect(screen.getByText("ラベルを編集")).toBeVisible();
+        expect(screen.getByTestId("label_input_labels")).toBeVisible();
     });
 
     it("ラベル名を入力できる", async () => {
+        const user = userEvent.setup();
         render(
             <NoteProvider>
                 <LabelProvider>
@@ -53,11 +55,9 @@ describe("CreateLabelDialog", () => {
                 </LabelProvider>
             </NoteProvider>
         );
-        const input = screen.getByLabelText("新しいラベルを作成") as HTMLInputElement;
-        await act(async () => {
-            fireEvent.change(input, { target: { value: "新しいラベル" } });
-        });
-        expect(input.value).toBe("新しいラベル");
+        const input = screen.getByTestId("label-input");
+        await user.type(input, "新しいラベル");
+        expect(input).toHaveValue("新しいラベル");
     });
 
     it("キャンセルボタンでonCloseが呼ばれる", async () => {
@@ -69,7 +69,7 @@ describe("CreateLabelDialog", () => {
             </NoteProvider>
         );
         await act(async () => {
-            fireEvent.click(screen.getByText("閉じる"));
+            fireEvent.click(screen.getByTestId("button_close"));
         });
         expect(mockOnClose).toHaveBeenCalled();
     });
