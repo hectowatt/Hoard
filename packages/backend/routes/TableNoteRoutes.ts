@@ -51,14 +51,14 @@ router.post('/',authMiddleware, async (req, res) => {
 
             // rowCellの登録
             const cellRepository = transactionalEntityManager.getRepository(TableNoteCell);
-            for (let rowIndex = 0; rowIndex < rowCells.length; rowIndex++) {
-                const row = rowCells[rowIndex];
+            for (let rowIdx = 0; rowIdx < rowCells.length; rowIdx++) {
+                const row = rowCells[rowIdx];
                 for (let colIndex = 0; colIndex < row.length; colIndex++) {
                     const cell = row[colIndex];
                     // クライアントのcolumnIdからDBのcolumnIdに変換
                     const dbColumnId = columnIdMap[cell.columnId];
                     const newCell = cellRepository.create({
-                        row_index: rowIndex,
+                        row_index: cell.rowIndex,
                         value: cell.value,
                         tableNote: savedTableNote,
                         column: { id: dbColumnId },
@@ -77,25 +77,25 @@ router.post('/',authMiddleware, async (req, res) => {
 });
 
 // 【SELECT】テーブルノート取得API
-router.get('/', authMiddleware,async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
     try {
-
         const tableNoteRepository = AppDataSource.getRepository(TableNote);
-        const tableNotes = await tableNoteRepository.find({where: {is_deleted: false }, order: { createdate: 'DESC' }});
+        const tableNotes = await tableNoteRepository.find({ where: { is_deleted: false }, order: { updatedate: 'DESC' } });
         if (!tableNotes) {
             return res.status(404).json({ error: "TableNote not found" });
         }
 
         // 返却するテーブルノートの配列
-        let tableNoteArray: { id: string; title: string; label_id: string; is_locked: boolean; createdate: string; updatedate: string; columns: {id:string, name: string, order: number}[]; rowCells: {id: string,rowIndex: number,value: string,columnId?: string}[][] }[] = [];
+        let tableNoteArray: { id: string; title: string; label_id: string; is_locked: boolean; createdate: string; updatedate: string; columns: { id: string, name: string, order: number }[]; rowCells: { id: string, rowIndex: number, value: string, columnId?: string }[][] }[] = [];
 
         // 各テーブルノートのカラムとセルを取得
-        for(var i=0; i< tableNotes.length; i++) {
+        for (var i = 0; i < tableNotes.length; i++) {
             const tableNote = tableNotes[i];
             const columnRepository = AppDataSource.getRepository(TableNoteColumn);
             const cellRepository = AppDataSource.getRepository(TableNoteCell);
             const columns = await columnRepository.find({ where: { tableNote: { id: tableNote.id } }, order: { order: 'ASC' } });
-            const rowCells = await cellRepository.find({ where: { tableNote: { id: tableNote.id } }, order: { row_index: 'ASC' } });
+            const rowCells = await cellRepository.find({ where: { tableNote: { id: tableNote.id } }, relations: ['column'], order: { row_index: 'ASC' } });
+            
             // rowCellsをrow_indexごとにグループ化して2次元配列に変換
             const groupedRowCells: { id: string; rowIndex: number; value: string; columnId?: string }[][] = [];
             rowCells.forEach(cell => {

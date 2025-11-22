@@ -65,7 +65,7 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
 
     // テーブルノート用
     const [editColumns, setEditColumns] = useState<Column[]>([
-        { id: 1, name: "", order: 1 }
+        { id: 1, name: "", order: 0 }
     ]);
     const [editRowCells, setEditRowCells] = useState<RowCell[][]>([[{
         id: 1,
@@ -75,11 +75,7 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
     }]]);
 
     const blurTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
-    // 行削除
-    const handleDeleteRow = (rowIdx: number) => {
-        if (editRowCells.length <= 1) return;
-        setEditRowCells(editRowCells.filter((_, idx) => idx !== rowIdx));
-    };
+
 
     const handleExpand = () => {
         if (!expand) {
@@ -185,7 +181,11 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
             const result = await response.json();
             console.log("Table note saved successfully!", result);
             setTableNoteOpen(false);
+<<<<<<< HEAD
             setEditColumns([{ id: 1, name: "", order: 1 }]);
+=======
+            setEditColumns([{ id: 1, name: "カラム1", order: 0 }]);
+>>>>>>> origin/develop
             setEditRowCells([[{ id: 1, rowIndex: 0, value: "", columnId: 1 }]]);
             setTitle("");
             setExpand(false);
@@ -204,14 +204,23 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
     const handleAddColumn = () => {
         const addColumnId = Date.now();
         if (editColumns.length >= 5) return;
-        setEditColumns([...editColumns, { id: addColumnId, name: "" }]);
-        setEditRowCells(editRowCells.map(editRowCell => [...editRowCell, { id: Date.now(), rowIndex: editRowCell.length, value: "", columnId: addColumnId }]));
+        const newOrder = editColumns.length;
+        setEditColumns([...editColumns, { id: addColumnId, name: "", order: newOrder }]);
+        setEditRowCells(editRowCells.map((editRowCell, rowIdx) => [...editRowCell, { id: Date.now(), rowIndex: rowIdx, value: "", columnId: addColumnId }]));
     };
 
     // カラム削除
     const handleDeleteColumn = (colIdx: number) => {
         if (editColumns.length <= 1) return;
-        setEditColumns(editColumns.filter((_, idx) => idx !== colIdx));
+        // カラムを削除
+        const newColumns = editColumns.filter((_, idx) => idx !== colIdx);
+
+        // 残りのカラムのorderを0から振り直す
+        const columnsWithReorderedOrder = newColumns.map((col, idx) => ({
+            ...col,
+            order: idx
+        }));
+        setEditColumns(columnsWithReorderedOrder);
         setEditRowCells(editRowCells.map(row => row.filter((_, idx) => idx !== colIdx)));
     };
 
@@ -231,11 +240,25 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
             ...editRowCells,
             editColumns.map((col, idx) => ({
                 id: Date.now() + idx,
-                rowIndex: editRowCells.length,
+                rowIndex: editRowCells.length + 1,
                 value: "",
                 columnId: col.id,
             }))
         ]);
+    };
+
+    // 行削除
+    const handleDeleteRow = (rowIdx: number) => {
+        if (editRowCells.length <= 1) return;
+        const newRowCells = editRowCells.filter((_, idx) => idx !== rowIdx);
+        // 残りの行のrowIndexを0から振り直す
+        const newRowCellsWithReorderdIndex = newRowCells.map((row, idx) =>
+            row.map(cell => ({
+                ...cell,
+                rowIndex: idx  // 各セルのrowIndexを更新
+            }))
+        );
+        setEditRowCells(newRowCellsWithReorderdIndex);
     };
 
     return (
@@ -331,8 +354,13 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
             <Dialog open={tableNoteOpen} onClose={() => setTableNoteOpen(false)} maxWidth="md" fullWidth>
                 <TableContainer component={Paper}>
                     <TextField
+<<<<<<< HEAD
                         label={t("label_title")}
                         variant="outlined"
+=======
+                        label="タイトル"
+                        variant="standard"
+>>>>>>> origin/develop
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         fullWidth
@@ -341,20 +369,26 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                         <TableHead>
                             <TableRow>
                                 {editColumns.map((col, idx) => (
-                                    <TableCell key={col.id}>
+                                    <TableCell key={col.id} sx={{ minWidth: 20, padding: '4px 6px' }} size="small">
                                         <TextField
                                             value={col.name}
-                                            variant="outlined"
+                                            variant="standard"
                                             onChange={e => {
                                                 const newColumns = [...editColumns];
                                                 newColumns[idx] = { ...newColumns[idx], name: e.target.value };
                                                 setEditColumns(newColumns);
                                             }}
+<<<<<<< HEAD
                                             placeholder={`${t("placeholder_column")}${idx + 1}`}
                                             sx={{
                                                 minWidth: 80,
                                                 width: { xs: '35vw', sm: 200 },
                                                 maxWidth: '100%'
+=======
+                                            placeholder={`カラム${idx + 1}`}
+                                            inputProps={{
+                                                size: Math.max(col.name.length, `カラム${idx + 1}`.length, 8)
+>>>>>>> origin/develop
                                             }}
                                             data-testid="column-input"
                                         />
@@ -374,15 +408,13 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                             {editRowCells.map((row, rowIdx) => (
                                 <TableRow key={rowIdx}>
                                     {row.map((cell, colIdx) => (
-                                        <TableCell key={colIdx}>
+                                        <TableCell key={colIdx} sx={{ minWidth: 20, padding: '4px 6px' }} size="small">
                                             <TextField
                                                 value={cell.value}
                                                 onChange={e => handleCellChange(rowIdx, colIdx, e.target.value)}
-                                                variant="outlined"
-                                                sx={{
-                                                    minWidth: 80,
-                                                    width: { xs: '35vw', sm: 200 },
-                                                    maxWidth: '100%'
+                                                variant="standard"
+                                                inputProps={{
+                                                    size: Math.max(cell.value.length, 8)
                                                 }}
                                             />
                                         </TableCell>
