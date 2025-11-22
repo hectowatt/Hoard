@@ -449,19 +449,10 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                                                         newColumns[idx] = { ...newColumns[idx], name: e.target.value };
                                                         setEditColumns(newColumns);
                                                     }}
-<<<<<<< HEAD
                                                     placeholder={`${t("placeholder_column")}${idx + 1}`}
-                                                    sx={{
-                                                        minWidth: 80,
-                                                        width: { xs: '35vw', sm: 200 },
-                                                        maxWidth: '100%'
-=======
-                                                    placeholder={`カラム${idx + 1}`}
                                                     inputProps={{
-                                                        size: Math.max(col.name.length, `カラム${idx + 1}`.length, 8)
->>>>>>> origin/develop
+                                                        size: Math.max(col.name.length, `${t("placeholder_column")}${idx + 1}`.length, 8)
                                                     }}
-
                                                     data-testid="column-input"
                                                 />
                                                 <IconButton size="small" onClick={() => handleDeleteColumn(idx)} disabled={editColumns.length <= 1}>

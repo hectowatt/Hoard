@@ -181,11 +181,9 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
             const result = await response.json();
             console.log("Table note saved successfully!", result);
             setTableNoteOpen(false);
-<<<<<<< HEAD
-            setEditColumns([{ id: 1, name: "", order: 1 }]);
-=======
+
             setEditColumns([{ id: 1, name: "カラム1", order: 0 }]);
->>>>>>> origin/develop
+
             setEditRowCells([[{ id: 1, rowIndex: 0, value: "", columnId: 1 }]]);
             setTitle("");
             setExpand(false);
@@ -354,13 +352,8 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
             <Dialog open={tableNoteOpen} onClose={() => setTableNoteOpen(false)} maxWidth="md" fullWidth>
                 <TableContainer component={Paper}>
                     <TextField
-<<<<<<< HEAD
                         label={t("label_title")}
-                        variant="outlined"
-=======
-                        label="タイトル"
                         variant="standard"
->>>>>>> origin/develop
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         fullWidth
@@ -378,17 +371,10 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                                                 newColumns[idx] = { ...newColumns[idx], name: e.target.value };
                                                 setEditColumns(newColumns);
                                             }}
-<<<<<<< HEAD
+
                                             placeholder={`${t("placeholder_column")}${idx + 1}`}
-                                            sx={{
-                                                minWidth: 80,
-                                                width: { xs: '35vw', sm: 200 },
-                                                maxWidth: '100%'
-=======
-                                            placeholder={`カラム${idx + 1}`}
                                             inputProps={{
-                                                size: Math.max(col.name.length, `カラム${idx + 1}`.length, 8)
->>>>>>> origin/develop
+                                                size: Math.max(col.name.length, `${t("placeholder_column")}${idx + 1}`.length, 8)
                                             }}
                                             data-testid="column-input"
                                         />
