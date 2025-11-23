@@ -44,6 +44,7 @@ import { useRouter } from "next/navigation";
 import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 import NewLabelOutlinedIcon from '@mui/icons-material/NewLabelOutlined';
 import { useTranslation } from "react-i18next";
+import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -134,7 +135,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 	// サイドバー上部のアイコン
 	const aboveIcons = [<TextSnippetOutlinedIcon data-testid="noteicon" />, <NewLabelOutlinedIcon data-testid="labelicon" />];
 	// サイドバー下部のアイコン
-	const belowIcons = [<DeleteOutlineRoundedIcon data-testid="trashicon" />, <SettingsOutlinedIcon data-testid="settingicon" />];
+	const belowIcons = [<DeleteOutlineRoundedIcon data-testid="trashicon" />, <SettingsOutlinedIcon data-testid="settingicon" />, <ReplayOutlinedIcon data-testid="reloadicon" />];
 
 	// サイドバー上部
 	const navAboveItems = [
@@ -191,6 +192,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 		setMode(mode === "light" ? "dark" : "light");
 	};
 
+	// ログアウト関数
 	const handleLogOut = async () => {
 		try {
 			const response = await fetch("/api/logout", {
@@ -211,6 +213,11 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 			alert(t("message_failed_to_logout"));
 		}
 	}
+
+	// リロード関数
+	const handleReload = () => {
+		window.location.reload();
+	};
 
 	if (!mode) {
 		return null;
@@ -382,6 +389,20 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 									</ListItemButton>
 								</ListItem>
 							))}
+							<ListItem disablePadding>
+								<ListItemButton onClick={handleReload} data-testid="reloadbutton">
+									<ListItemIcon sx={{ minWidth: 0, justifyContent: 'center' }}>
+										{belowIcons[2]}
+									</ListItemIcon>
+									{isDrawerOpen && <ListItemText primary={t("nav_reload")} sx={{
+										opacity: isDrawerOpen ? 1 : 0,
+										whiteSpace: 'nowrap',
+										transition: (theme) => theme.transitions.create('opacity', {
+											duration: theme.transitions.duration.enteringScreen,
+										})
+									}} />}
+								</ListItemButton>
+							</ListItem>
 						</List>
 					</Box>
 				</Drawer>
