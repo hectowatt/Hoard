@@ -342,7 +342,6 @@ export default function Note({
                         <TextField
                             fullWidth
                             multiline
-                            rows={4}
                             value={editContent}
                             onChange={e => setEditContent(e.target.value)}
                             variant="standard"
