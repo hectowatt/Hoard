@@ -119,6 +119,12 @@ export default function TrashNote({ id, title, content, label_id, is_locked, cre
         return found ? found.labelname : "";
     };
 
+    // キャンセルボタン押下時
+    const handleCancel = () => {
+        setIsEditing(false);
+        setOpen(false);
+    };
+
     return (
         <>
             <Paper elevation={3} sx={{ p: 2, maxWidth: 400, wordWrap: "break-word", cursor: "pointer" }} onClick={handleOpen}>
@@ -165,7 +171,7 @@ export default function TrashNote({ id, title, content, label_id, is_locked, cre
                         <>
                             <Button onClick={handleSave} variant="contained" sx={{ mr: 1, mb: 1 }} data-testid="button_restore">{t("button_restore")}</Button>
                             <Button onClick={handleDelete} variant="contained" sx={{ mr: 1, mb: 1 }} data-testid="button_permanently_delete">{t("button_permanently_delete")}</Button>
-                            <Button onClick={() => setIsEditing(false)} variant="contained" sx={{ mb: 1 }} data-testid="button_cancel">{t("button_cancel")}</Button>
+                            <Button onClick={handleCancel} variant="contained" sx={{ mb: 1 }} data-testid="button_cancel">{t("button_cancel")}</Button>
                         </>
                     </Box>
                 </DialogContent>

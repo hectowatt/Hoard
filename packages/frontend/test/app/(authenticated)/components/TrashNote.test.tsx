@@ -1,5 +1,5 @@
 import React, { act } from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import '@testing-library/jest-dom';
 import TrashNote from "@/app/(authenticated)/components/TrashNote";
 import { LabelProvider } from "@/app/(authenticated)/context/LabelProvider";
@@ -124,5 +124,33 @@ describe("TrashNote", () => {
         );
 
         expect(screen.getByText(lockedText)).toBeVisible();
+    });
+
+    it("キャンセルボタンを押したときにダイアログが閉じる", async () => {
+        render(
+            <NoteProvider>
+                <LabelProvider>
+                    <TrashNote {...mockNote} />
+                </LabelProvider>
+            </NoteProvider>
+        );
+
+        // ノートをクリックしてダイアログを開く
+        await waitFor(() => {
+            fireEvent.click(screen.getByText("テストノート"));
+        });
+
+        // ダイアログが開いていることを確認
+        const dialog = screen.getByRole("dialog");
+        expect(dialog).toBeInTheDocument();
+
+        // キャンセルボタンをクリック
+        const cancelButton = screen.getByTestId("button_cancel");
+        fireEvent.click(cancelButton);
+
+        // ダイアログが閉じたことを確認
+        await waitFor(() => {
+            expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+        });
     });
 });

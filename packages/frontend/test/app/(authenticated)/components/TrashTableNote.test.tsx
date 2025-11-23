@@ -130,4 +130,33 @@ describe("TrashTableNote", () => {
         expect(screen.getByText(lockedText)).toBeVisible();
     });
 
+
+    it("キャンセルボタンを押したときにダイアログが閉じる", async () => {
+        render(
+            <NoteProvider>
+                <LabelProvider>
+                    <TrashTableNote id={"testid111"} title={"テストノート"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={true} onRestore={mockOnRestore} onDelete={mockOnDelete} />
+                </LabelProvider>
+            </NoteProvider>
+        );
+
+        // ノートをクリックしてダイアログを開く
+        await waitFor(() => {
+            fireEvent.click(screen.getByText("テストノート"));
+        });
+
+        // ダイアログが開いていることを確認
+        const dialog = screen.getByRole("dialog");
+        expect(dialog).toBeInTheDocument();
+
+        // キャンセルボタンをクリック
+        const cancelButton = screen.getByTestId("button_cancel");
+        fireEvent.click(cancelButton);
+
+        // ダイアログが閉じたことを確認
+        await waitFor(() => {
+            expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+        });
+    });
+
 });
