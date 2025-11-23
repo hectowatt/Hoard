@@ -72,6 +72,7 @@ describe("RootLayout", () => {
         expect(screen.getByTestId("labelicon")).toBeInTheDocument();
         expect(screen.getByTestId("trashicon")).toBeInTheDocument();
         expect(screen.getByTestId("settingicon")).toBeInTheDocument();
+        expect(screen.getByTestId("reloadicon")).toBeInTheDocument();
 
         // 子コンテンツ
         expect(screen.getByText("Child Content")).toBeInTheDocument();
