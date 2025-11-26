@@ -5,7 +5,7 @@ import { jest } from '@jest/globals';
 import { AppDataSource } from "../../dist/DataSource.js";
 import { idText, server } from "typescript";
 
-import type Password from "../../entities/Password.js";
+import type NotePassword from "../../entities/NotePassword.js";
 import { authMiddleware } from "../../middleware/AuthMiddleware.js";
 import type { Request, Response, NextFunction } from "express";
 
@@ -63,7 +63,7 @@ const mockRepo = {
     create: jest.fn((data: { password_hashed: string }) => {
         return { id: 2, ...data };
     }),
-    save: jest.fn((password: Password) => {
+    save: jest.fn((password: NotePassword) => {
         return Promise.resolve({
             id: password.password_id,
             password_hashed: password.password_hashed
@@ -142,7 +142,7 @@ describe("PasswordRoutes", () => {
             .send({ password_id: "1", passwordString: "testpassword" });
 
         expect(response.status).toBe(500);
-        expect(response.body.error).toBe("Failed to fetch password");
+        expect(response.body.error).toBe("Failed to fetch notepassword");
     });
 
     it("POST /password should return 201 and message", async () => {
@@ -196,7 +196,7 @@ describe("PasswordRoutes", () => {
             .get("/api/password");
 
         expect(response.status).toBe(500);
-        expect(response.body.error).toBe("Failed to fetch password");
+        expect(response.body.error).toBe("Failed to fetch notepassword");
     });
 
     it("PUT /password should return 200 and message", async () => {

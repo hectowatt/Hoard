@@ -91,6 +91,45 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
     const theme = useTheme();
     const isXs = useMediaQuery(theme.breakpoints.down('sm'));
 
+    // ロックボタン押下処理
+    const handleLock = async () => {
+        if (!isLocked) {
+            // ロック解除時の処理
+
+            // パスワードが存在するかチェック
+            try {
+                const responseSelect = await fetch("/api/password", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    credentials: "include"
+                });
+
+                if (responseSelect.ok) {
+                    const resultSelect = await responseSelect.json();
+                    console.log("パスワード取得成功", resultSelect);
+                    if (resultSelect.password_id !== null && resultSelect.password_id !== "" && resultSelect.password_id !== undefined) {
+                        // すでにパスワードが登録されている場合はパスワード入力を求める
+                        setIsLocked(true);
+                    } else {
+                        // パスワードが未登録の場合はロック解除できない
+                        alert(t("message_cannot_lock_note_without_notepassword"));
+                    }
+
+                } else {
+                    console.error("failed to fetch notepassword");
+                }
+            } catch (error) {
+                console.error("Error fetching password", error);
+                return;
+            }
+        } else {
+            setIsLocked(false);
+        }
+    };
+
+
     // 保存ボタン押下処理
     const saveButtonClick = async () => {
 
@@ -338,7 +377,7 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                             </Select>
                         </FormControl>
                         <IconButton
-                            onClick={() => setIsLocked(!isLocked)}>
+                            onClick={() => handleLock()}>
                             {isLocked ? <LockOutlinedIcon data-testid="lock" /> : <NoEncryptionGmailerrorredOutlinedIcon data-testid="unlock" />}
                         </IconButton>
                         <IconButton
@@ -450,7 +489,7 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                         </Select>
                     </FormControl>
                     <IconButton
-                        onClick={() => setIsLocked(!isLocked)}
+                        onClick={() => handleLock()}
                         sx={{ ml: 1 }}>
                         {isLocked ? <LockOutlinedIcon /> : <NoEncryptionGmailerrorredOutlinedIcon />}
                     </IconButton>
