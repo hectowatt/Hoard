@@ -216,7 +216,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                     }
 
                 } else {
-                    console.error("failed to fetch password");
+                    console.error("failed to fetch notepassword");
                 }
             } catch (error) {
                 console.error("Error fetching password", error);

@@ -205,6 +205,23 @@ describe("InputForm", () => {
     });
 
     it("ロックとアンロックを切り替えられる", async () => {
+        // パスワード取得APIをモック
+        global.fetch = jest.fn((url) => {
+            if (url.includes("/api/password")) {
+                return Promise.resolve({
+                    ok: true,
+                    json: () => Promise.resolve({
+                        password_id: "test-password-id",
+                        password_hashed: "hashed-password"
+                    })
+                } as Response);
+            }
+            return Promise.resolve({
+                ok: true,
+                json: () => Promise.resolve({})
+            } as Response);
+        }) as jest.Mock;
+
         render(
             <NoteProvider>
                 <LabelProvider>
@@ -217,13 +234,14 @@ describe("InputForm", () => {
         await act(async () => {
             fireEvent.click(inputContent);
         });
-        const unlockIcon = await screen.getByTestId("unlock");
+
+        const unlockIcon = await screen.findByTestId("unlock");
 
         await act(async () => {
             fireEvent.click(unlockIcon);
         });
 
-        const lockIcon = await screen.getByTestId("lock");
+        const lockIcon = await screen.findByTestId("lock");
 
         expect(lockIcon).toBeInTheDocument();
     });

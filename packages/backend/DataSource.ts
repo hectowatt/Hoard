@@ -5,7 +5,7 @@ import Label from "./entities/Label.js";
 import TableNote from "./entities/TableNote.js";
 import TableNoteColumn from "./entities/TableNoteColumn.js";
 import TableNoteCell from "./entities/TableNoteCell.js";
-import Password from "./entities/Password.js";
+import Password from "./entities/NotePassword.js";
 import HoardUser from "./entities/HoardUser.js";
 
 export const AppDataSource: DataSource = new DataSource({

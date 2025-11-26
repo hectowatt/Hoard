@@ -186,7 +186,7 @@ export default function Note({
                     }
 
                 } else {
-                    console.error("failed to fetch password");
+                    console.error("failed to fetch notepassword");
                 }
             } catch (error) {
                 console.error("Error fetching password", error);

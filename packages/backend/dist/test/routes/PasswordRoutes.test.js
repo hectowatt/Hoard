@@ -110,7 +110,7 @@ describe("PasswordRoutes", () => {
             .post("/api/password/compare")
             .send({ password_id: "1", passwordString: "testpassword" });
         expect(response.status).toBe(500);
-        expect(response.body.error).toBe("Failed to fetch password");
+        expect(response.body.error).toBe("Failed to fetch notepassword");
     });
     it("POST /password should return 201 and message", async () => {
         const response = await request(app)
@@ -152,7 +152,7 @@ describe("PasswordRoutes", () => {
         const response = await request(app)
             .get("/api/password");
         expect(response.status).toBe(500);
-        expect(response.body.error).toBe("Failed to fetch password");
+        expect(response.body.error).toBe("Failed to fetch notepassword");
     });
     it("PUT /password should return 200 and message", async () => {
         const response = await request(app)
