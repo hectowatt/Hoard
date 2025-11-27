@@ -227,7 +227,7 @@ export default function Home() {
         <InputLabel id="select-lang">{t("label_select_language")}</InputLabel>
         <Select
           labelId="select-lang"
-          value={i18n.language || ""}
+          value={i18n.language?.split("-")[0] || ""}
           onChange={(e) => chageLanguage(String(e.target.value))}
           label={t("label_select_language")}
           renderValue={(selected: string) => {
@@ -316,72 +316,74 @@ export default function Home() {
         <h3>{t("label_note_password_settings")}</h3>
       </Box>
       <p>{t("label_note_password_settings_desc")}</p>
-      {isPasswordExist ? (
-        <form>
-          <TextField
-            id="password-confirm"
-            variant="outlined"
-            value={prevNotePasswordString}
-            onChange={(e) => setPrevNotePasswordString(e.target.value)}
-            size="small"
-            placeholder={t("placeholder_current_note_password")}
-            sx={{
-              width: {
-                xs: "100%",
-                sm: 350,
-                md: 500,
-              },
-              borderRadius: "5px",
-              mb: 1
-            }}
-            data-testid="prevnotepasswordinput"
-          />
-          <br />
-          <TextField
-            id="password-setting"
-            variant="outlined"
-            value={notePasswordString}
-            onChange={(e) => setNotePasswordString(e.target.value)}
-            size="small"
-            placeholder={t("placeholder_new_note_password")}
-            sx={{
-              width: {
-                xs: "100%",
-                sm: 350,
-                md: 500,
-              },
-              borderRadius: "5px",
-              mb: 1
-            }}
-            data-testid="notepasswordinput"
-          />
-          <br />
-          <Button onClick={handleSavePassword} variant="contained" data-testid="notepasswordsave">{t("button_save")}</Button>
-        </form>
-      ) : (
-        <form>
-          <TextField
-            id="password-setting"
-            variant="outlined"
-            value={notePasswordString}
-            onChange={(e) => setNotePasswordString(e.target.value)}
-            size="small"
-            placeholder={t("placeholder_new_note_password")}
-            sx={{
-              width: {
-                xs: "100%",
-                sm: 350,
-                md: 500,
-              },
-              borderRadius: "5px",
-              mb: 1
-            }}
-            data-testid="notepasswordinput"
-          />
-          <br />
-          <Button onClick={handleSavePassword} variant="contained" data-testid="notepasswordsave">{t("button_save")}</Button>
-        </form>
-      )}
+      {
+        isPasswordExist ? (
+          <form>
+            <TextField
+              id="password-confirm"
+              variant="outlined"
+              value={prevNotePasswordString}
+              onChange={(e) => setPrevNotePasswordString(e.target.value)}
+              size="small"
+              placeholder={t("placeholder_current_note_password")}
+              sx={{
+                width: {
+                  xs: "100%",
+                  sm: 350,
+                  md: 500,
+                },
+                borderRadius: "5px",
+                mb: 1
+              }}
+              data-testid="prevnotepasswordinput"
+            />
+            <br />
+            <TextField
+              id="password-setting"
+              variant="outlined"
+              value={notePasswordString}
+              onChange={(e) => setNotePasswordString(e.target.value)}
+              size="small"
+              placeholder={t("placeholder_new_note_password")}
+              sx={{
+                width: {
+                  xs: "100%",
+                  sm: 350,
+                  md: 500,
+                },
+                borderRadius: "5px",
+                mb: 1
+              }}
+              data-testid="notepasswordinput"
+            />
+            <br />
+            <Button onClick={handleSavePassword} variant="contained" data-testid="notepasswordsave">{t("button_save")}</Button>
+          </form>
+        ) : (
+          <form>
+            <TextField
+              id="password-setting"
+              variant="outlined"
+              value={notePasswordString}
+              onChange={(e) => setNotePasswordString(e.target.value)}
+              size="small"
+              placeholder={t("placeholder_new_note_password")}
+              sx={{
+                width: {
+                  xs: "100%",
+                  sm: 350,
+                  md: 500,
+                },
+                borderRadius: "5px",
+                mb: 1
+              }}
+              data-testid="notepasswordinput"
+            />
+            <br />
+            <Button onClick={handleSavePassword} variant="contained" data-testid="notepasswordsave">{t("button_save")}</Button>
+          </form>
+        )
+      }
 
       {/* TODO: テーマ選択のUIをここに追加 */}
 
