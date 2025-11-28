@@ -2,6 +2,7 @@ import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import AuthenticatedLayout from "@/app/(authenticated)/layout";
 import "@testing-library/jest-dom";
+import { SnackbarProvider } from "@/app/(authenticated)/context/SnackBarProvider";
 
 // ラベルコンテキストのモック
 const mockLabels = [
@@ -58,9 +59,11 @@ import { LabelProvider } from "@/app/(authenticated)/context/LabelProvider";
 describe("RootLayout", () => {
     it("renders logo, nav, and children", async () => {
         render(
-            <AuthenticatedLayout>
-                <div>Child Content</div>
-            </AuthenticatedLayout>
+            <SnackbarProvider>
+                <AuthenticatedLayout>
+                    <div>Child Content</div>
+                </AuthenticatedLayout>
+            </SnackbarProvider>
         );
 
         // ロゴ
@@ -79,9 +82,11 @@ describe("RootLayout", () => {
     });
     it("カラーテーマ切り替え", () => {
         render(
-            <AuthenticatedLayout>
-                <div>Toggle Test</div>
-            </AuthenticatedLayout>
+            <SnackbarProvider>
+                <AuthenticatedLayout>
+                    <div>Toggle Test</div>
+                </AuthenticatedLayout>
+            </SnackbarProvider>
         );
 
         const toggleButtons = screen.getAllByTestId("togglecolormode");
@@ -101,9 +106,11 @@ describe("RootLayout", () => {
 
     it("ラベルアイテムがクリックされたとき、ダイアログが表示される", async () => {
         render(
-            <AuthenticatedLayout>
-                <div>Label Dialog Test</div>
-            </AuthenticatedLayout>
+            <SnackbarProvider>
+                <AuthenticatedLayout>
+                    <div>Label Dialog Test</div>
+                </AuthenticatedLayout>
+            </SnackbarProvider>
         );
 
         const labelButton = screen.getByTestId("labelicon");
@@ -116,9 +123,11 @@ describe("RootLayout", () => {
 
     it("登録済みラベルがあるときにラベルリストが表示される", async () => {
         render(
-            <AuthenticatedLayout>
-                <div>Label List Test</div>
-            </AuthenticatedLayout>
+            <SnackbarProvider>
+                <AuthenticatedLayout>
+                    <div>Label List Test</div>
+                </AuthenticatedLayout>
+            </SnackbarProvider>
         );
 
         await waitFor(() => {

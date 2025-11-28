@@ -20,6 +20,7 @@ import { useLabelContext } from "@/app/(authenticated)/context/LabelProvider";
 import NoEncryptionGmailerrorredOutlinedIcon from '@mui/icons-material/NoEncryptionGmailerrorredOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useTranslation } from "react-i18next";
+import { useSnackbar } from "../context/SnackBarProvider";
 
 interface Column {
     id: number;
@@ -72,6 +73,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
     const [editColumns, setEditColumns] = useState<Column[]>(columns);
     const [editRowCells, setEditRowCells] = useState<RowCell[][]>(rowCells);
     const { t } = useTranslation();
+    const { showSnackbar } = useSnackbar();
 
 
     // 初期状態でのタイトル設定
@@ -212,7 +214,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                         setPasswordDialogOpen(true);
                     } else {
                         // パスワードが未登録の場合はロック解除できない
-                        alert(t("message_cannot_lock_note_without_notepassword"));
+                        showSnackbar(t("message_cannot_lock_note_without_notepassword"), "warning");
                     }
 
                 } else {
@@ -255,11 +257,11 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                         setIsLocked(true);
                     } else {
                         // パスワードが未登録の場合はロックできない
-                        alert(t("message_cannot_lock_note_without_notepassword"));
+                        showSnackbar(t("message_cannot_lock_note_without_notepassword"), "warning");
                     }
                 } else {
                     // パスワード取得に失敗した場合の処理
-                    alert(t("message_cannot_get_notepassword"));
+                    showSnackbar(t("message_cannot_get_notepassword"), "error");
                 }
             } catch (error) {
                 console.error("Error locking note", error);
@@ -271,7 +273,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
     // ロック解除処理
     const hubdlePasswordSubmit = async () => {
         if (!inputPassword || inputPassword.trim() === "") {
-            alert(t("message_notepassword_must_be_set_to_unlock"));
+            showSnackbar(t("message_notepassword_must_be_set_to_unlock"), "warning");
             return;
         }
 
@@ -317,7 +319,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                     return;
                 }
             } else {
-                alert("パスワードが違います。再度入力してください。");
+                showSnackbar(t("message_incorrect_password"), "warning");
             }
         } else {
             console.error("failed to compare password");

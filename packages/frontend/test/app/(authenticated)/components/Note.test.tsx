@@ -2,6 +2,7 @@ import React, { act } from "react";
 import { render, screen, fireEvent, within, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import Note from "@/app/(authenticated)/components/Note";
+import { SnackbarProvider } from "@/app/(authenticated)/context/SnackBarProvider";
 
 // ラベルコンテキストのモック
 const mockLabels = [
@@ -39,9 +40,11 @@ describe("Note", () => {
     it("openがfalseのとき、タイトルとcontent、作成日、更新日が表示される", () => {
         render(
             <NoteProvider>
-                <LabelProvider>
-                    <Note id={"testid111"} title={"テストノート"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
-                </LabelProvider>
+                <SnackbarProvider>
+                    <LabelProvider>
+                        <Note id={"testid111"} title={"テストノート"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
+                    </LabelProvider>
+                </SnackbarProvider>
             </NoteProvider>
         );
 
@@ -54,9 +57,11 @@ describe("Note", () => {
     it("クリックした時、編集、削除、ロックアイコンボタンが表示される", async () => {
         render(
             <NoteProvider>
-                <LabelProvider>
-                    <Note id={"testid111"} title={"テストノート"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
-                </LabelProvider>
+                <SnackbarProvider>
+                    <LabelProvider>
+                        <Note id={"testid111"} title={"テストノート"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
+                    </LabelProvider>
+                </SnackbarProvider>
             </NoteProvider>
         );
 
@@ -72,9 +77,11 @@ describe("Note", () => {
     it("編集モード時、タイトルを編集できる", async () => {
         render(
             <NoteProvider>
-                <LabelProvider>
-                    <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
-                </LabelProvider>
+                <SnackbarProvider>
+                    <LabelProvider>
+                        <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
+                    </LabelProvider>
+                </SnackbarProvider>
             </NoteProvider>
         );
 
@@ -99,9 +106,11 @@ describe("Note", () => {
     it("編集モード時、contentを編集できる", async () => {
         render(
             <NoteProvider>
-                <LabelProvider>
-                    <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
-                </LabelProvider>
+                <SnackbarProvider>
+                    <LabelProvider>
+                        <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
+                    </LabelProvider>
+                </SnackbarProvider>
             </NoteProvider>
         );
 
@@ -126,9 +135,11 @@ describe("Note", () => {
     it("編集モード時、ラベルを編集できる", async () => {
         render(
             <NoteProvider>
-                <LabelProvider>
-                    <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={"label1"} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
-                </LabelProvider>
+                <SnackbarProvider>
+                    <LabelProvider>
+                        <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={"label1"} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
+                    </LabelProvider>
+                </SnackbarProvider>
             </NoteProvider>
         );
 
@@ -156,9 +167,11 @@ describe("Note", () => {
         render(
             <>
                 <NoteProvider>
-                    <LabelProvider>
-                        <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={"label1"} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
-                    </LabelProvider>
+                    <SnackbarProvider>
+                        <LabelProvider>
+                            <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={"label1"} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
+                        </LabelProvider>
+                    </SnackbarProvider>
                 </NoteProvider>
                 <input data-testid="dummy-input" placeholder="ダミー入力" />
             </>
@@ -187,9 +200,11 @@ describe("Note", () => {
         const lockedText = i18n.t("label_lockednote");
         render(
             <NoteProvider>
-                <LabelProvider>
-                    <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
-                </LabelProvider>
+                <SnackbarProvider>
+                    <LabelProvider>
+                        <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
+                    </LabelProvider>
+                </SnackbarProvider>
             </NoteProvider>
         );
 
@@ -222,9 +237,11 @@ describe("Note", () => {
         const lockedText = i18n.t("label_lockednote");
         render(
             <NoteProvider>
-                <LabelProvider>
-                    <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={true} onSave={mockOnSave} onDelete={mockOnDelete} />
-                </LabelProvider>
+                <SnackbarProvider>
+                    <LabelProvider>
+                        <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={true} onSave={mockOnSave} onDelete={mockOnDelete} />
+                    </LabelProvider>
+                </SnackbarProvider>
             </NoteProvider>
         );
 

@@ -53,6 +53,7 @@
     "message_logouted": "Logged out.",
     "message_failed_to_logout": "Logout failed.",
     "mmessage_login_failed": "Login failed. Please check your username and password.",
+    "message_failed_to_create_user": "Failed to create user.",
     "message_user_info_saved": "User info Updated!",
     "message_failed_to_save_user_info": "Failed to update user info",
     "message_notepassword_saved": "Note password updated!",
@@ -72,6 +73,7 @@
     "message_cannot_lock_note_without_notepassword": "The note cannot be locked because no note password has been set.\nPlease set a note password.",
     "message_cannot_get_notepassword": "Failed to get note password",
     "message_notepassword_must_be_set_to_unlock": "To unlock the note, a note password must be set.",
+    "message_incorrect_password": "The password is incorrect. Please enter it again.",
     "dropdown_labels": "Label",
     "dropdown_no_labels": "No Labels",
     "dropdown_no_languages": "No Available Languages"

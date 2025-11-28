@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import ThemeRegistry from "@/app/context/ThemeProvider";
 import { useTranslation } from "react-i18next";
+import { useSnackbar } from "@/app/(authenticated)/context/SnackBarProvider";
 
 
 export default function LoginPage() {
@@ -21,6 +22,7 @@ export default function LoginPage() {
     const [isChecking, setIsChecking] = React.useState(true);
     const router = useRouter();
     const { t } = useTranslation();
+    const { showSnackbar } = useSnackbar();
 
     // ログイン用処理
     const handleLogin = async () => {
@@ -41,7 +43,7 @@ export default function LoginPage() {
             router.push("/");
         } else {
             const errorData = await response.json();
-            alert("failed to login");
+            showSnackbar(t("mmessage_login_failed"), "error");
         }
     };
 
@@ -64,7 +66,7 @@ export default function LoginPage() {
             router.push("/");
         } else {
             const errorData = await response.json();
-            alert("failed to create user: " + errorData.message);
+            showSnackbar(t("message_failed_to_create_user") + errorData.message, "error");
         }
     };
 

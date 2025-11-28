@@ -53,6 +53,7 @@
     "message_logouted": "ログアウトしました",
     "message_failed_to_logout": "ログアウトに失敗しました。",
     "mmessage_login_failed": "ログインに失敗しました。ユーザー名とパスワードを確認してください。",
+    "message_failed_to_create_user": "ユーザ作成に失敗しました。",
     "message_user_info_saved": "アカウント情報を更新しました!",
     "message_failed_to_save_user_info": "アカウント情報の更新に失敗しました",
     "message_notepassword_saved": "ノートパスワードを更新しました!",
@@ -72,6 +73,7 @@
     "message_cannot_lock_note_without_notepassword": "ノートパスワードが設定されていないため、ノートにロックをかけることはできません。\nノートパスワードを設定してください。",
     "message_cannot_get_notepassword": "ノートパスワードの取得に失敗しました",
     "message_notepassword_must_be_set_to_unlock": "ノートのロックを解除するには、ノートパスワードを入力する必要があります",
+    "message_incorrect_password": "パスワードが違います。再度入力してください。",
     "dropdown_labels": "ラベル",
     "dropdown_no_labels": "ラベルなし",
     "dropdown_no_languages": "利用可能言語なし"

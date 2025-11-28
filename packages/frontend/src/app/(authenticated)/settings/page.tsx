@@ -8,6 +8,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useTranslation } from "react-i18next";
 import LanguageOutlinedIcon from '@mui/icons-material/LanguageOutlined';
 import i18n from "@/app/lib/i18n";
+import { useSnackbar } from "../context/SnackBarProvider";
 
 // 設定ページのコンテンツ
 export default function Home() {
@@ -23,8 +24,8 @@ export default function Home() {
   const langNames: Record<string, string> = {
     ja: "日本語",
     en: "English",
-    // 必要なら他言語を追加
   };
+  const { showSnackbar } = useSnackbar();
 
   const fetchPasswordStatus = async () => {
     const responseSelect = await fetch("/api/password", {
@@ -53,13 +54,13 @@ export default function Home() {
   // ノートパスワードの保存処理
   const handleSavePassword = async () => {
     if (notePasswordString.trim() === "") {
-      alert(t("message_new_notepassword_must_be_set"));
+      showSnackbar(t("message_new_notepassword_must_be_set"), "warning");
       return;
     }
 
     if (isPasswordExist) {
       if (prevNotePasswordString.trim() === "") {
-        alert(t("message_current_notepassword_must_be_set"));
+        showSnackbar(t("message_current_notepassword_must_be_set"), "warning");
         return;
       }
 
@@ -92,17 +93,17 @@ export default function Home() {
           });
 
           if (response.ok) {
-            alert(t("message_notepassword_saved"));
+            showSnackbar(t("message_notepassword_saved"), "success");
             setNotePasswordString(""); // 入力フィールドをクリア
             setPrevNotePasswordString("");
           } else {
-            alert(t("message_failed_to_save_notepassword"));
+            showSnackbar(t("message_failed_to_save_notepassword"), "error");
           }
         } else {
-          alert(t("message_incorrect_current_notepassword"));
+          showSnackbar(t("message_incorrect_current_notepassword"), "warning");
         }
       } else {
-        alert(t("message_error_occured"));
+        showSnackbar(t("message_error_occured"), "error");
         return;
       }
     } else {
@@ -118,14 +119,14 @@ export default function Home() {
 
       if (response.ok) {
         const result = await response.json();
-        alert(t("message_notepassword_regist"));
+        showSnackbar(t("message_notepassword_regist"), "success");
         setNotePasswordString(""); // 入力フィールドをクリア
         setIsPasswordExist(true);
         if (result?.password_id) {
           setNotePasswordId(result.password_id); // 新しいIDをセット
         }
       } else {
-        alert(t("message_failed_to_regist_notepassword"));
+        showSnackbar(t("message_failed_to_regist_notepassword"), "error");
       }
     }
 
@@ -134,12 +135,12 @@ export default function Home() {
   // アカウント情報の更新処理
   const handleSaveAccountInfo = async () => {
     if (!newUsernameString && !newPasswordString) {
-      alert(t("message_username_or_password_must_be_set"));
+      showSnackbar(t("message_username_or_password_must_be_set"), "warning");
       return;
     }
 
     if (newPasswordString && !prevPasswordString) {
-      alert(t("message_new_password_must_be_set_when_change"));
+      showSnackbar(t("message_new_password_must_be_set_when_change"), "warning");
       return;
     }
 
@@ -172,15 +173,15 @@ export default function Home() {
             credentials: "include"
           });
           if (response.ok) {
-            alert(t("message_user_settings_saved"));
+            showSnackbar(t("message_user_settings_saved"), "success");
             setNewUsernameString("");
             setPrevPasswordString("");
             setNewPasswordString("");
           } else {
-            alert(t("message_failed_to_save_user_info"));
+            showSnackbar(t("message_failed_to_save_user_info"), "error");
           }
         } else {
-          alert(t("message_incorrect_current_password"));
+          showSnackbar(t("message_incorrect_current_password"), "warning");
         }
       }
     } else {
@@ -196,12 +197,12 @@ export default function Home() {
         credentials: "include"
       });
       if (response.ok) {
-        alert(t("message_user_info_saved"));
+        showSnackbar(t("message_user_info_saved"), "success");
         setNewUsernameString("");
         setPrevPasswordString("");
         setNewPasswordString("");
       } else {
-        alert(t("message_failed_to_save_user_info"));
+        showSnackbar(t("message_failed_to_save_user_info"), "error");
       }
     }
   }

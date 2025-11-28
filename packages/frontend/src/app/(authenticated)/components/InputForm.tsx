@@ -29,6 +29,7 @@ import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useTranslation } from "react-i18next";
+import { useSnackbar } from "@/app/(authenticated)/context/SnackBarProvider";
 
 interface InputFormProps {
     onInsert: (newId: string, newTitle: string, newContent: string, newLabel: string, isLocked: boolean) => void;
@@ -60,6 +61,7 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
     const [isLocked, setIsLocked] = React.useState(false);
     const [tableNoteOpen, setTableNoteOpen] = useState(false);
     const { t } = useTranslation();
+    const { showSnackbar } = useSnackbar();
 
     const { labels } = useLabelContext();
 
@@ -114,7 +116,7 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                         setIsLocked(true);
                     } else {
                         // パスワードが未登録の場合はロック解除できない
-                        alert(t("message_cannot_lock_note_without_notepassword"));
+                        showSnackbar(t("message_cannot_lock_note_without_notepassword"), "warning");
                     }
 
                 } else {
