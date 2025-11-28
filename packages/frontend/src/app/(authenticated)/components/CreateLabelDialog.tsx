@@ -6,6 +6,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useLabelContext } from "@/app/(authenticated)/context/LabelProvider";
 import { useNoteContext } from "@/app/(authenticated)/context/NoteProvider";
 import { useTranslation } from "react-i18next";
+import { useSnackbar } from "@/app/(authenticated)/context/SnackBarProvider";
 
 
 interface LabelDialogProps {
@@ -22,13 +23,14 @@ export default function CreateLabelDialog({ open, onClose }: LabelDialogProps) {
     const [targetLabelId, setTargetLabelId] = useState<string | null>(null);
     const { notes } = useNoteContext();
     const { t } = useTranslation();
+    const { showSnackbar } = useSnackbar();
 
     const isLabelUsed = (labelId: string) => !!notes && notes.some(note => note.label_id === labelId);
 
     // 保存ボタン押下処理
     const handleAdd = async () => {
         if (!input.trim()) {
-            alert(t("message_label_must_not_be_empty"));
+            showSnackbar(t("message_label_must_not_be_empty"), "warning");
             return
         }
         try {
@@ -48,9 +50,9 @@ export default function CreateLabelDialog({ open, onClose }: LabelDialogProps) {
                 if (response.status === 400) {
                     const errorData = await response.json();
                     if (errorData.error === "Label name must be unique") {
-                        alert(t("message_label_must_be_unique"));
+                        showSnackbar(t("message_label_must_be_unique"), "warning");
                     } else if (errorData.error === "Label name is too long") {
-                        alert(t("message_labelname_is_too_long"));
+                        showSnackbar(t("message_labelname_is_too_long"), "warning");
                     }
                     return;
                 }

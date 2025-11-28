@@ -5,6 +5,7 @@ import InputForm from "@/app/(authenticated)/components/InputForm";
 import { LabelProvider } from "@/app/(authenticated)/context/LabelProvider";
 import { NoteProvider } from "@/app/(authenticated)/context/NoteProvider";
 import userEvent from '@testing-library/user-event';
+import { SnackbarProvider } from "@/app/(authenticated)/context/SnackBarProvider";
 
 // ラベルコンテキストのモック
 const mockLabels = [
@@ -37,9 +38,11 @@ describe("InputForm", () => {
     it("openがfalseのとき、プレースホルダが表示される", () => {
         render(
             <NoteProvider>
-                <LabelProvider>
-                    <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
-                </LabelProvider>
+                <SnackbarProvider>
+                    <LabelProvider>
+                        <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
+                    </LabelProvider>
+                </SnackbarProvider>
             </NoteProvider>
         )
 
@@ -50,9 +53,11 @@ describe("InputForm", () => {
         const user = userEvent.setup();
         render(
             <NoteProvider>
-                <LabelProvider>
-                    <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
-                </LabelProvider>
+                <SnackbarProvider>
+                    <LabelProvider>
+                        <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
+                    </LabelProvider>
+                </SnackbarProvider>
             </NoteProvider>
         );
         const input = screen.getByTestId("input_content");
@@ -68,9 +73,11 @@ describe("InputForm", () => {
     it("openがtrueのとき、保存ボタンが表示される", async () => {
         render(
             <NoteProvider>
-                <LabelProvider>
-                    <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
-                </LabelProvider>
+                <SnackbarProvider>
+                    <LabelProvider>
+                        <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
+                    </LabelProvider>
+                </SnackbarProvider>
             </NoteProvider>
         );
 
@@ -88,9 +95,11 @@ describe("InputForm", () => {
     it("openがtrueのとき、キャンセルボタンが表示される", async () => {
         render(
             <NoteProvider>
-                <LabelProvider>
-                    <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
-                </LabelProvider>
+                <SnackbarProvider>
+                    <LabelProvider>
+                        <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
+                    </LabelProvider>
+                </SnackbarProvider>
             </NoteProvider>
         );
 
@@ -107,9 +116,11 @@ describe("InputForm", () => {
     it("openがtrueのとき、ラベルのドロップダウンが表示される", async () => {
         render(
             <NoteProvider>
-                <LabelProvider>
-                    <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
-                </LabelProvider>
+                <SnackbarProvider>
+                    <LabelProvider>
+                        <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
+                    </LabelProvider>
+                </SnackbarProvider>
             </NoteProvider>
         );
 
@@ -126,9 +137,11 @@ describe("InputForm", () => {
     it("openがtrueのとき、ロックアイコンが表示される", async () => {
         render(
             <NoteProvider>
-                <LabelProvider>
-                    <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
-                </LabelProvider>
+                <SnackbarProvider>
+                    <LabelProvider>
+                        <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
+                    </LabelProvider>
+                </SnackbarProvider>
             </NoteProvider>
         );
 
@@ -145,9 +158,11 @@ describe("InputForm", () => {
     it("openがtrueのとき、テーブルノートアイコンが表示される", async () => {
         render(
             <NoteProvider>
-                <LabelProvider>
-                    <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
-                </LabelProvider>
+                <SnackbarProvider>
+                    <LabelProvider>
+                        <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
+                    </LabelProvider>
+                </SnackbarProvider>
             </NoteProvider>
         );
 
@@ -165,9 +180,11 @@ describe("InputForm", () => {
         const user = userEvent.setup();
         render(
             <NoteProvider>
-                <LabelProvider>
-                    <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
-                </LabelProvider>
+                <SnackbarProvider>
+                    <LabelProvider>
+                        <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
+                    </LabelProvider>
+                </SnackbarProvider>
             </NoteProvider>
         );
         const inputContent = screen.getByTestId("input_content");
@@ -187,9 +204,11 @@ describe("InputForm", () => {
         const user = userEvent.setup();
         render(
             <NoteProvider>
-                <LabelProvider>
-                    <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
-                </LabelProvider>
+                <SnackbarProvider>
+                    <LabelProvider>
+                        <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
+                    </LabelProvider>
+                </SnackbarProvider>
             </NoteProvider>
         );
         const inputContent = screen.getByTestId("input_content");
@@ -224,9 +243,11 @@ describe("InputForm", () => {
 
         render(
             <NoteProvider>
-                <LabelProvider>
-                    <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
-                </LabelProvider>
+                <SnackbarProvider>
+                    <LabelProvider>
+                        <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
+                    </LabelProvider>
+                </SnackbarProvider>
             </NoteProvider>
         );
         const inputContent = screen.getByTestId("input_content");
@@ -249,9 +270,12 @@ describe("InputForm", () => {
     it("テーブルノート編集画面を開くことができる", async () => {
         render(
             <NoteProvider>
-                <LabelProvider>
-                    <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
-                </LabelProvider>
+                <SnackbarProvider>
+                    <LabelProvider>
+                        <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
+                    </LabelProvider>
+                </SnackbarProvider>
+
             </NoteProvider>
         );
         const inputContent = screen.getByTestId("input_content");
@@ -277,9 +301,11 @@ describe("InputForm", () => {
         render(
             <>
                 <NoteProvider>
-                    <LabelProvider>
-                        <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
-                    </LabelProvider>
+                    <SnackbarProvider>
+                        <LabelProvider>
+                            <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
+                        </LabelProvider>
+                    </SnackbarProvider>
                 </NoteProvider>
                 <input data-testid="dummy-input" placeholder="ダミー入力" />
             </>

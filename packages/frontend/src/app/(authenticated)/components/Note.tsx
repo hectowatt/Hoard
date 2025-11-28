@@ -6,6 +6,7 @@ import { useLabelContext } from "@/app/(authenticated)/context/LabelProvider";
 import NoEncryptionGmailerrorredOutlinedIcon from '@mui/icons-material/NoEncryptionGmailerrorredOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useTranslation } from "react-i18next";
+import { useSnackbar } from "@/app/(authenticated)/context/SnackBarProvider";
 
 interface NoteProps {
     id: string;
@@ -56,6 +57,7 @@ export default function Note({
     const [passwordDialogOpen, setPasswordDialogOpen] = React.useState(false);
     const [passwordId, setPasswordId] = React.useState<string | null>(null);
     const { t } = useTranslation();
+    const { showSnackbar } = useSnackbar();
 
     // 画面描画時にノートロック状態を設定
     useEffect(() => {
@@ -182,7 +184,7 @@ export default function Note({
                         setPasswordDialogOpen(true);
                     } else {
                         // パスワードが未登録の場合はロック解除できない
-                        alert(t("message_cannot_lock_note_without_notepassword"));
+                        showSnackbar(t("message_cannot_lock_note_without_notepassword"), "warning");
                     }
 
                 } else {
@@ -225,11 +227,11 @@ export default function Note({
                         setIsLocked(true);
                     } else {
                         // パスワードが未登録の場合はロックできない
-                        alert(t("message_cannot_lock_note_without_notepassword"));
+                        showSnackbar(t("message_cannot_lock_note_without_notepassword"), "warning");
                     }
                 } else {
                     // パスワード取得に失敗した場合の処理
-                    alert(t("message_cannot_get_notepassword"));
+                    showSnackbar(t("message_cannot_get_notepassword"), "error");
                 }
             } catch (error) {
                 console.error("Error locking note", error);
@@ -241,7 +243,7 @@ export default function Note({
     // ロック解除処理
     const hubdlePasswordSubmit = async () => {
         if (!inputPassword || inputPassword.trim() === "") {
-            alert(t("message_notepassword_must_be_set_to_unlock"));
+            showSnackbar(t("message_notepassword_must_be_set_to_unlock"), "warning");
             return;
         }
 
@@ -287,7 +289,7 @@ export default function Note({
                     return;
                 }
             } else {
-                alert(t("message_incorrect_current_password"));
+                showSnackbar(t("message_incorrect_current_password"), "warning");
             }
         } else {
             console.error("failed to compare password");

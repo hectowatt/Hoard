@@ -45,6 +45,7 @@ import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 import NewLabelOutlinedIcon from '@mui/icons-material/NewLabelOutlined';
 import { useTranslation } from "react-i18next";
 import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
+import { useSnackbar } from "@/app/(authenticated)/context/SnackBarProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -130,6 +131,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 	const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
 	const { searchWord, setSearchWord } = useSearchWordContext();
 	const { t } = useTranslation();
+	const { showSnackbar } = useSnackbar();
 
 
 	// サイドバー上部のアイコン
@@ -204,13 +206,13 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 			})
 
 			if (response.ok) {
-				alert(t("message_logouted"));
+				showSnackbar(t("message_logouted"), "success");
 				// ログアウト後はログインページにリダイレクト
 				router.push("/login");
 			}
 		} catch (error) {
 			console.error("Logout failed:", error);
-			alert(t("message_failed_to_logout"));
+			showSnackbar(t("message_failed_to_logout"), "error");
 		}
 	}
 

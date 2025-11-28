@@ -5,6 +5,7 @@ import CreateLabelDialog from "@/app/(authenticated)/components/CreateLabelDialo
 import { LabelProvider } from "@/app/(authenticated)/context/LabelProvider";
 import { NoteProvider } from "@/app/(authenticated)/context/NoteProvider";
 import userEvent from '@testing-library/user-event';
+import { SnackbarProvider } from "@/app/(authenticated)/context/SnackBarProvider";
 
 // ラベルコンテキストのモック
 const mockLabels = [
@@ -38,9 +39,11 @@ describe("CreateLabelDialog", () => {
     it("ダイアログが開いているときタイトルが表示される", () => {
         render(
             <NoteProvider>
-                <LabelProvider>
-                    <CreateLabelDialog open={true} onClose={mockOnClose} />
-                </LabelProvider>
+                <SnackbarProvider>
+                    <LabelProvider>
+                        <CreateLabelDialog open={true} onClose={mockOnClose} />
+                    </LabelProvider>
+                </SnackbarProvider>
             </NoteProvider>
         );
         expect(screen.getByTestId("label_input_labels")).toBeVisible();
@@ -50,9 +53,11 @@ describe("CreateLabelDialog", () => {
         const user = userEvent.setup();
         render(
             <NoteProvider>
-                <LabelProvider>
-                    <CreateLabelDialog open={true} onClose={mockOnClose} />
-                </LabelProvider>
+                <SnackbarProvider>
+                    <LabelProvider>
+                        <CreateLabelDialog open={true} onClose={mockOnClose} />
+                    </LabelProvider>
+                </SnackbarProvider>
             </NoteProvider>
         );
         const input = screen.getByTestId("label-input");
@@ -63,9 +68,11 @@ describe("CreateLabelDialog", () => {
     it("キャンセルボタンでonCloseが呼ばれる", async () => {
         render(
             <NoteProvider>
-                <LabelProvider>
-                    <CreateLabelDialog open={true} onClose={mockOnClose} />
-                </LabelProvider>
+                <SnackbarProvider>
+                    <LabelProvider>
+                        <CreateLabelDialog open={true} onClose={mockOnClose} />
+                    </LabelProvider>
+                </SnackbarProvider>
             </NoteProvider>
         );
         await act(async () => {

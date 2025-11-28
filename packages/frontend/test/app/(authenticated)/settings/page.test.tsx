@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import Home from "@/app/(authenticated)/settings/page";
 import i18n from "@/app/lib/i18n";
-
+import { SnackbarProvider } from "@/app/(authenticated)/context/SnackBarProvider";
 
 
 // グローバル fetch モック
@@ -33,7 +33,11 @@ describe("Setting Page", () => {
         const label_user_settings_desc = i18n.t("label_user_settings_desc");
         const label_note_password_settings = i18n.t("label_note_password_settings");
         const label_note_password_settings_desc = i18n.t("label_note_password_settings_desc");
-        render(<Home />);
+        render(
+            <SnackbarProvider>
+                <Home />
+            </SnackbarProvider>
+        );
 
         expect(screen.getByText(label_settings)).toBeInTheDocument();
         expect(screen.getByText(label_user_settings)).toBeInTheDocument();
@@ -55,7 +59,9 @@ describe("Setting Page", () => {
 
     it("ユーザ情報保存ボタンをクリックしたとき、/api/userにリクエストが送信される", async () => {
         render(
-            <Home />
+            <SnackbarProvider>
+                <Home />
+            </SnackbarProvider>
         );
 
         const userNameInput = await screen.getByTestId("usernameinput");
@@ -72,7 +78,9 @@ describe("Setting Page", () => {
 
     it("ノートパスワード保存ボタンをクリックしたとき、/api/passwordにリクエストが送信される", async () => {
         render(
-            <Home />
+            <SnackbarProvider>
+                <Home />
+            </SnackbarProvider>
         );
 
         const notePasswordInput = await screen.getByTestId("notepasswordinput");
