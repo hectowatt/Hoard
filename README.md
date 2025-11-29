@@ -40,6 +40,9 @@ If you want to customise connection setting, edit these files;
 
 After building docker container with docker compose, you can launch Hoard;
 
+## Languages
+Hoard supports Japanese and English(US).
+
 ## Development
 To develop Hoard, Devcontainer is usefull.
 

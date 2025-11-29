@@ -121,15 +121,18 @@ export default function Home() {
   // ノート削除ボタン押下時のコールバック関数
   const handleDelete = (id: string) => {
     if (setNotes !== undefined) {
-      setNotes(prevNote => prevNote.filter(note => note.id !== id));
+      setNotes(prevNote => {
+        const filteredNotes = prevNote.filter(note => note.id !== id);
+        // 削除後もupdatedateの降順でソート
+        return filteredNotes.sort((a, b) =>
+          new Date(b.updatedate).getTime() - new Date(a.updatedate).getTime()
+        );
+      });
     } else {
       console.error("setNotes is undefined");
-    };
-
-    if (labels === undefined) {
-      return <div>Loading...</div>;
     }
   };
+
 
   // テーブルノート保存ボタン押下時のコールバック関数
   const handleSaveTableNote = (id: string, newTitle: string, newLabel: string, is_Locked: boolean, newUpdateDate: string, newColumn: Column[], newRowCells: RowCell[][]) => {
@@ -151,13 +154,15 @@ export default function Home() {
   // テーブルノート削除ボタン押下時のコールバック関数
   const handleDeleteTableNote = (id: string) => {
     if (setTableNotes !== undefined) {
-      setTableNotes(prevTableNote => prevTableNote.filter(tableNote => tableNote.id !== id));
+      setTableNotes(prevTableNote => {
+        const filteredTableNotes = prevTableNote.filter(tableNote => tableNote.id !== id);
+        // 削除後もupdatedateの降順でソート
+        return filteredTableNotes.sort((a, b) =>
+          new Date(b.updatedate).getTime() - new Date(a.updatedate).getTime()
+        );
+      });
     } else {
-      console.error("setNotes is undefined");
-    };
-
-    if (labels === undefined) {
-      return <div>Loading...</div>;
+      console.error("setTableNotes is undefined");
     }
   };
 
@@ -167,13 +172,13 @@ export default function Home() {
       {/* ノートとテーブルノート一覧表示 */}
       <Grid container spacing={2}>
         {filterdNotes.map((note, index) => (
-          <Grid key={index}>
+          <Grid key={note.id}>
             {/* Noteコンポーネントを生成 */}
             <Note {...note} onSave={handleSave} onDelete={handleDelete} data-testid="note" />
           </Grid>
         ))}
         {filterdTableNotes.map((tableNote, index) => (
-          <Grid key={index}>
+          <Grid key={tableNote.id}>
             {/* TableNoteコンポーネントを生成 */}
             <TableNote {...tableNote} onSave={handleSaveTableNote} onDelete={handleDeleteTableNote} data-testid="tablenote" />
           </Grid>
