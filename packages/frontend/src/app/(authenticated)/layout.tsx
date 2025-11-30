@@ -46,6 +46,7 @@ import NewLabelOutlinedIcon from '@mui/icons-material/NewLabelOutlined';
 import { useTranslation } from "react-i18next";
 import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
 import { useSnackbar } from "@/app/(authenticated)/context/SnackBarProvider";
+import Image from "next/image";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -133,6 +134,8 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 	const { t } = useTranslation();
 	const { showSnackbar } = useSnackbar();
 
+	const logoHorizontalPadding = { xs: 1, sm: 2 };
+	const closedDrawerPaddingRight = logoHorizontalPadding;
 
 	// サイドバー上部のアイコン
 	const aboveIcons = [<TextSnippetOutlinedIcon data-testid="noteicon" />, <NewLabelOutlinedIcon data-testid="labelicon" />];
@@ -240,21 +243,33 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 						paddingTop: 'env(safe-area-inset-top)',
 					}}
 				>
-					<Toolbar sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+					<Toolbar sx={{
+						display: "flex",
+						alignItems: "center",
+						gap: 2,
+						paddingLeft: { xs: 1, sm: 2 },
+						paddingRight: { xs: 1, sm: 2 },
+					}}>
 						<Box sx={{
 							flexGrow: { xs: 0, md: 1 },
 							flexShrink: 0,
 						}}>
-							{isSmallScreen ? <img
-								src="/Hoard.png"
-								alt="Hoard Icon"
-								style={{ height: 29, objectFit: "contain", display: "block" }}
-							/> :
-								<img
-									src="/Hoard_logo.png"
-									alt="Hoard Logo"
-									style={{ height: 29, objectFit: "contain", display: "block" }}
-								/>}
+							<Box
+								sx={{
+									height: 55,
+									width: 55,
+									position: 'relative',
+								}}
+							>
+								<Image
+									src="/Hoard_icon.png"
+									alt="Hoard Icon"
+									fill
+									sizes="55px"
+									style={{ objectFit: "contain", objectPosition: "left" }}
+								/>
+							</Box>
+
 						</Box>
 						<Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>
 							<SearchWordBar mode={mode} />
@@ -289,6 +304,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 							width: currentDrawerWidth,
 							boxSizing: "border-box",
 							overflowX: "hidden",
+							border: "none",
 							transition: theme.transitions.create("width", {
 								easing: theme.transitions.easing.sharp,
 								duration: theme.transitions.duration.enteringScreen,
@@ -299,16 +315,16 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 					<Toolbar />
 					<Box sx={{ overflowY: "auto", overflowX: "hidden" }}>
 						<List>
-							<ListItemButton onClick={() => setIsDrawerOpen(!isDrawerOpen)}>
-								<ListItemIcon sx={{ minWidth: 0, justifyContent: 'center' }}>
+							<ListItemButton onClick={() => setIsDrawerOpen(!isDrawerOpen)} sx={{ pl: logoHorizontalPadding }}>
+								<ListItemIcon sx={{ minWidth: 0, justifyContent: 'center', pl: logoHorizontalPadding }}>
 									<MenuOutlinedIcon />
 								</ListItemIcon>
 							</ListItemButton>
 							{navAboveItems.map(({ text, icon, href, dialog, onClick }) => (
 								<ListItem key={text} disablePadding>
 									{dialog ? (
-										<ListItemButton onClick={() => setLabelDialogOpen(true)}>
-											<ListItemIcon sx={{ minWidth: 0, justifyContent: 'center' }}>
+										<ListItemButton onClick={() => setLabelDialogOpen(true)} sx={{ pl: logoHorizontalPadding }}>
+											<ListItemIcon sx={{ minWidth: 0, justifyContent: 'center', px: logoHorizontalPadding }}>
 												{icon}
 											</ListItemIcon>
 											{isDrawerOpen && <ListItemText primary={text} sx={{
@@ -321,8 +337,8 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 										</ListItemButton>
 									) : (
 										onClick ? (
-											<ListItemButton component={Link} href={href!} onClick={onClick}>
-												<ListItemIcon sx={{ minWidth: 0, justifyContent: 'center' }}>
+											<ListItemButton component={Link} href={href!} onClick={onClick} sx={{ pl: logoHorizontalPadding }}>
+												<ListItemIcon sx={{ minWidth: 0, justifyContent: 'center', px: logoHorizontalPadding }}>
 													{icon}
 												</ListItemIcon>
 												{isDrawerOpen && <ListItemText primary={text} sx={{
@@ -334,8 +350,8 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 												}} />}
 											</ListItemButton>
 										) : (
-											<ListItemButton component={Link} href={href!}>
-												<ListItemIcon sx={{ minWidth: 0, justifyContent: 'center' }}>
+											<ListItemButton component={Link} href={href!} sx={{ pl: logoHorizontalPadding }}>
+												<ListItemIcon sx={{ minWidth: 0, justifyContent: 'center', px: logoHorizontalPadding }}>
 													{icon}
 												</ListItemIcon>
 												{isDrawerOpen && <ListItemText primary={text} sx={{
@@ -352,8 +368,8 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 							))}
 							{labels.map((label) => (
 								<ListItem key={label.id} disablePadding>
-									<ListItemButton onClick={() => setSearchWord(label.labelname)}>
-										<ListItemIcon sx={{ minWidth: 0, justifyContent: "center" }}>
+									<ListItemButton onClick={() => setSearchWord(label.labelname)} sx={{ pl: logoHorizontalPadding }} data-testid={`labellistitem-${label.id}`}>
+										<ListItemIcon sx={{ minWidth: 0, justifyContent: "center", pl: logoHorizontalPadding }}>
 											<LabelImportantOutlineRoundedIcon data-testid={`addedlabelicon-${label.id}`} />
 										</ListItemIcon>
 										{isDrawerOpen && (
@@ -377,8 +393,8 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 						<List>
 							{navBelowItems.map(({ text, icon, href }) => (
 								<ListItem key={text} disablePadding>
-									<ListItemButton component={Link} href={href}>
-										<ListItemIcon sx={{ minWidth: 0, justifyContent: 'center' }}>
+									<ListItemButton component={Link} href={href} sx={{ pl: logoHorizontalPadding }}>
+										<ListItemIcon sx={{ minWidth: 0, justifyContent: 'center', px: logoHorizontalPadding }}>
 											{icon}
 										</ListItemIcon>
 										{isDrawerOpen && <ListItemText primary={text} sx={{
@@ -392,8 +408,8 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 								</ListItem>
 							))}
 							<ListItem disablePadding>
-								<ListItemButton onClick={handleReload} data-testid="reloadbutton">
-									<ListItemIcon sx={{ minWidth: 0, justifyContent: 'center' }}>
+								<ListItemButton onClick={handleReload} data-testid="reloadbutton" sx={{ pl: logoHorizontalPadding }}>
+									<ListItemIcon sx={{ minWidth: 0, justifyContent: 'center', px: logoHorizontalPadding }}>
 										{belowIcons[2]}
 									</ListItemIcon>
 									{isDrawerOpen && <ListItemText primary={t("nav_reload")} sx={{

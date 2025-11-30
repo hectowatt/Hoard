@@ -67,7 +67,7 @@ describe("RootLayout", () => {
         );
 
         // ロゴ
-        const logo = screen.getByAltText("Hoard Logo");
+        const logo = screen.getByAltText("Hoard Icon");
         expect(logo).toBeInTheDocument();
 
         // ナビゲーション項目
