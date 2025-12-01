@@ -1,33 +1,64 @@
 services:
-  app:
+  app-dev:
     build:
       context: .
-    container_name: hoard_app
+    container_name: hoard_dev
+    env_file:
+      - .env
+    volumes:
+      - ./:/app
+    networks:
+      - hoard_network
+    command: sleep infinity
+
+  frontend:
+    build:
+      context: .
+    container_name: hoard_frontend
+    working_dir: /app/packages/frontend
     restart: unless-stopped
     ports:
-      - "3500:3500" # frontend用
-      - "4000:4000" # backend用
-    environment:
-      - DATABASE_URL=postgres://hoard_user:hoard_password@db:5432/hoard_db
-      - REDIS_URL=redis://redis:6379
-    depends_on:
-      - db
-      - redis
+      - "3500:3500"
     env_file:
       - .env
     networks:
       hoard_network:
         ipv4_address: 192.168.1.100
+    depends_on:
+      - backend
     volumes:
-      - ./:/app
-      - /app/packages/backend/node_modules
+      - ./packages/frontend:/app/packages/frontend
       - /app/packages/frontend/node_modules
-    command: sleep infinity
+    command: /bin/sh -c "npm run build && npm run dev"
+
+  backend:
+    build:
+      context: .
+    container_name: hoard_backend
+    working_dir: /app/packages/backend
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      - DATABASE_URL=postgres://hoard_user:hoard_password@db:5432/hoard_db
+      - REDIS_URL=redis://redis:6379
+    env_file:
+      - .env
+    networks:
+      hoard_network:
+        ipv4_address: 192.168.1.104
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./packages/backend:/app/packages/backend
+      - /app/packages/backend/node_modules
+    command: /bin/sh -c "npm run build && npm run dev"
 
   db:
     image: postgres:15
     container_name: hoard_db
-    restart: unless-stopped
+    restart: always
     ports:
       - "7654:5432"
     environment:
@@ -39,7 +70,6 @@ services:
     networks:
       hoard_network:
         ipv4_address: 192.168.1.101
-
   redis:
     image: redis:7
     container_name: hoard_redis
@@ -53,14 +83,16 @@ services:
   nginx:
     image: nginx:latest
     container_name: hoard_nginx
-    restart: unless-stopped
+    restart: always
     ports:
       - "8080:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./nginx/conf.d:/etc/nginx/conf.d
     depends_on:
-      - app
+      - app-dev
+      - frontend
+      - backend
     networks:
       hoard_network:
         ipv4_address: 192.168.1.102

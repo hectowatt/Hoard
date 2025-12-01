@@ -1,7 +1,7 @@
 {
     "name": "Hoard Dev Container",
     "dockerComposeFile": "../docker-compose.yml",
-    "service": "app",
+    "service": "app-dev",
     "workspaceFolder": "/app",
     "postCreateCommand": "cd /app/packages/frontend && npm install && cd /app/packages/backend && npm install && npm run generate && npm run migrate",
     "remoteEnv": {
