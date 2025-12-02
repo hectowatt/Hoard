@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import Home from "@/app/(authenticated)/settings/page";
 import i18n from "@/app/lib/i18n";
-import { SnackbarProvider } from "@/app/(authenticated)/context/SnackBarProvider";
+import { SnackbarProvider } from "@/app/(authenticated)/context/SnackbarProvider";
 
 
 // グローバル fetch モック

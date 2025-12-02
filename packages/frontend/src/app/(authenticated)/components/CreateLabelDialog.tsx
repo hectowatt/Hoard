@@ -6,7 +6,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useLabelContext } from "@/app/(authenticated)/context/LabelProvider";
 import { useNoteContext } from "@/app/(authenticated)/context/NoteProvider";
 import { useTranslation } from "react-i18next";
-import { useSnackbar } from "@/app/(authenticated)/context/SnackBarProvider";
+import { useSnackbar } from "@/app/(authenticated)/context/SnackbarProvider";
+import { useRouter } from "next/navigation";
 
 
 interface LabelDialogProps {
@@ -24,6 +25,7 @@ export default function CreateLabelDialog({ open, onClose }: LabelDialogProps) {
     const { notes } = useNoteContext();
     const { t } = useTranslation();
     const { showSnackbar } = useSnackbar();
+    const router = useRouter();
 
     const isLabelUsed = (labelId: string) => !!notes && notes.some(note => note.label_id === labelId);
 
@@ -55,9 +57,15 @@ export default function CreateLabelDialog({ open, onClose }: LabelDialogProps) {
                         showSnackbar(t("message_labelname_is_too_long"), "warning");
                     }
                     return;
+                } else if (response.status === 401) {
+                    console.error("Error saving label");
+                    showSnackbar(t("message_error_occured_redirect_login"), "warning");
+                    router.push("/login");
+                } else {
+                    throw new Error("Failed to save label");
                 }
-                throw new Error("Failed to save label");
             }
+
 
             const result = await response.json();
             console.log("Save success!", result);
@@ -96,6 +104,11 @@ export default function CreateLabelDialog({ open, onClose }: LabelDialogProps) {
                 credentials: "include"
             });
             if (!response.ok) {
+                if (response.status === 401) {
+                    console.error("Error deleting label");
+                    showSnackbar(t("message_error_occured_redirect_login"), "warning");
+                    router.push("/login");
+                }
                 throw new Error("Failed to delete label");
             }
             const result = await response.json();

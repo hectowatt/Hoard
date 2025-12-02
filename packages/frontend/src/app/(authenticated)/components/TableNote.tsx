@@ -20,7 +20,8 @@ import { useLabelContext } from "@/app/(authenticated)/context/LabelProvider";
 import NoEncryptionGmailerrorredOutlinedIcon from '@mui/icons-material/NoEncryptionGmailerrorredOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useTranslation } from "react-i18next";
-import { useSnackbar } from "../context/SnackBarProvider";
+import { useSnackbar } from "../context/SnackbarProvider";
+import { useRouter } from "next/navigation";
 
 interface Column {
     id: number;
@@ -74,6 +75,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
     const [editRowCells, setEditRowCells] = useState<RowCell[][]>(rowCells);
     const { t } = useTranslation();
     const { showSnackbar } = useSnackbar();
+    const router = useRouter();
 
 
     // 初期状態でのタイトル設定
@@ -251,8 +253,12 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                             credentials: "include"
                         });
                         if (!responseLock.ok) {
-                            console.error("Failed to lock note");
-                            return;
+                            if (responseLock.status === 401) {
+                                console.error("Failed to lock note");
+                                showSnackbar(t("message_error_occured_redirect_login"), "warning");
+                                router.push("/login");
+                            }
+                            throw new Error("Failed to lock note");
                         }
                         setIsLocked(true);
                     } else {
@@ -308,7 +314,12 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                         credentials: "include"
                     });
                     if (!responseUnlock.ok) {
-                        throw new Error("Failed to unlock note");
+                        if (responseUnlock.status === 401) {
+                            showSnackbar(t("message_error_occured_redirect_login"), "warning");
+                            router.push("/login");
+                        } else {
+                            throw new Error("Failed to unlock note");
+                        }
                     }
 
                     setIsLocked(false);
@@ -347,7 +358,12 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
             })
 
             if (!response.ok) {
-                throw new Error("Failed to save table note");
+                if (response.status === 401) {
+                    showSnackbar(t("message_error_occured_redirect_login"), "warning");
+                    router.push("/login");
+                } else {
+                    throw new Error("Failed to save table note");
+                }
             }
 
             const result = await response.json();
@@ -375,7 +391,12 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                 credentials: "include"
             });
             if (!response.ok) {
-                throw new Error("Failed to delete note");
+                if (response.status === 401) {
+                    showSnackbar(t("message_error_occured_redirect_login"), "warning");
+                    router.push("/login");
+                } else {
+                    throw new Error("Failed to delete note");
+                }
             }
             const result = await response.json();
             console.log("Delete success!", result);

@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import AuthenticatedLayout from "@/app/(authenticated)/layout";
 import "@testing-library/jest-dom";
-import { SnackbarProvider } from "@/app/(authenticated)/context/SnackBarProvider";
+import { SnackbarProvider } from "@/app/(authenticated)/context/SnackbarProvider";
 
 // ラベルコンテキストのモック
 const mockLabels = [

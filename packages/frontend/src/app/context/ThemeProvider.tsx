@@ -169,6 +169,18 @@ export default function ThemeRegistry({ children }: { children: React.ReactNode 
                             },
                         },
                     }),
+                    input: {
+                        fontSize: "16px",
+                        lineHeight: "20px",
+                    }
+                },
+            },
+            MuiInputBase: {
+                styleOverrides: {
+                    input: {
+                        fontSize: "16px",
+                        lineHeight: "20px",
+                    },
                 },
             },
         },

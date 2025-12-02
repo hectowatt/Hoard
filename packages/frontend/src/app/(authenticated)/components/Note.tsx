@@ -6,7 +6,8 @@ import { useLabelContext } from "@/app/(authenticated)/context/LabelProvider";
 import NoEncryptionGmailerrorredOutlinedIcon from '@mui/icons-material/NoEncryptionGmailerrorredOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useTranslation } from "react-i18next";
-import { useSnackbar } from "@/app/(authenticated)/context/SnackBarProvider";
+import { useSnackbar } from "@/app/(authenticated)/context/SnackbarProvider";
+import { useRouter } from "next/navigation";
 
 interface NoteProps {
     id: string;
@@ -58,6 +59,7 @@ export default function Note({
     const [passwordId, setPasswordId] = React.useState<string | null>(null);
     const { t } = useTranslation();
     const { showSnackbar } = useSnackbar();
+    const router = useRouter();
 
     // 画面描画時にノートロック状態を設定
     useEffect(() => {
@@ -92,6 +94,11 @@ export default function Note({
                 credentials: "include"
             });
             if (!response.ok) {
+                if (response.status === 401) {
+                    console.error("Error deleting note");
+                    showSnackbar(t("message_error_occured_redirect_login"), "warning");
+                    router.push("/login");
+                }
                 throw new Error("Failed to delete note");
             }
             const result = await response.json();
@@ -131,6 +138,11 @@ export default function Note({
             })
 
             if (!response.ok) {
+                if (response.status === 401) {
+                    console.error("Error saving note");
+                    showSnackbar(t("message_error_occured_redirect_login"), "warning");
+                    router.push("/login");
+                }
                 throw new Error("Failed to save note");
             }
 
@@ -221,8 +233,13 @@ export default function Note({
                             credentials: "include"
                         });
                         if (!responseLock.ok) {
+                            if (responseLock.status === 401) {
+                                console.error("Error locking note");
+                                showSnackbar(t("message_error_occured_redirect_login"), "warning");
+                                router.push("/login");
+                            }
                             console.error("Failed to lock note");
-                            return;
+                            throw new Error("Failed to lock note");
                         }
                         setIsLocked(true);
                     } else {
@@ -278,6 +295,11 @@ export default function Note({
                         credentials: "include"
                     });
                     if (!responseUnlock.ok) {
+                        if (responseUnlock.status === 401) {
+                            console.error("Error unlocking note");
+                            showSnackbar(t("message_error_occured_redirect_login"), "warning");
+                            router.push("/login");
+                        }
                         throw new Error("Failed to unlock note");
                     }
 

@@ -5,6 +5,8 @@ import TrashNote from "@/app/(authenticated)/components/TrashNote";
 import { LabelProvider } from "@/app/(authenticated)/context/LabelProvider";
 import { NoteProvider } from "@/app/(authenticated)/context/NoteProvider";
 import i18n from "@/app/lib/i18n";
+import { LocaleProvider } from "@/app/context/LocaleProvider";
+import { SnackbarProvider } from "@/app/(authenticated)/context/SnackbarProvider";
 
 jest.mock("@/app/(authenticated)/context/LabelProvider", () => {
     return {
@@ -15,6 +17,16 @@ jest.mock("@/app/(authenticated)/context/LabelProvider", () => {
         LabelProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
     };
 });
+
+jest.mock("next/navigation", () => ({
+    ...jest.requireActual("next/navigation"),
+    useRouter: () => ({
+        push: jest.fn(),
+        replace: jest.fn(),
+        prefetch: jest.fn(),
+    }),
+}));
+
 
 // モックデータ
 const mockNote = {
@@ -68,11 +80,15 @@ beforeEach(() => {
 describe("TrashNote", () => {
     it("タイトル・内容・日付・ラベルが表示される", () => {
         render(
-            <NoteProvider>
-                <LabelProvider>
-                    <TrashNote {...mockNote} />
-                </LabelProvider>
-            </NoteProvider>
+            <LocaleProvider>
+                <SnackbarProvider>
+                    <NoteProvider>
+                        <LabelProvider>
+                            <TrashNote {...mockNote} />
+                        </LabelProvider>
+                    </NoteProvider>
+                </SnackbarProvider>
+            </LocaleProvider>
         );
         expect(screen.getByText("テストノート")).toBeVisible();
         expect(screen.getByText("これはテストノートです。")).toBeVisible();
@@ -83,11 +99,15 @@ describe("TrashNote", () => {
 
     it("クリックでダイアログが開く", async () => {
         render(
-            <NoteProvider>
-                <LabelProvider>
-                    <TrashNote {...mockNote} />
-                </LabelProvider>
-            </NoteProvider>
+            <LocaleProvider>
+                <SnackbarProvider>
+                    <NoteProvider>
+                        <LabelProvider>
+                            <TrashNote {...mockNote} />
+                        </LabelProvider>
+                    </NoteProvider>
+                </SnackbarProvider>
+            </LocaleProvider>
         );
         await act(async () => {
             fireEvent.click(screen.getByText("テストノート"));
@@ -100,11 +120,15 @@ describe("TrashNote", () => {
 
     it("復元ボタン・削除ボタンが表示される", async () => {
         render(
-            <NoteProvider>
-                <LabelProvider>
-                    <TrashNote {...mockNote} />
-                </LabelProvider>
-            </NoteProvider>
+            <LocaleProvider>
+                <SnackbarProvider>
+                    <NoteProvider>
+                        <LabelProvider>
+                            <TrashNote {...mockNote} />
+                        </LabelProvider>
+                    </NoteProvider>
+                </SnackbarProvider>
+            </LocaleProvider>
         );
         await act(async () => {
             fireEvent.click(screen.getByText("テストノート"));
@@ -116,11 +140,15 @@ describe("TrashNote", () => {
     it("ロックされているノートはロックされている旨がcontentに表示される", async () => {
         const lockedText = i18n.t("label_lockednote");
         render(
-            <NoteProvider>
-                <LabelProvider>
-                    <TrashNote {...mockLockedNote} />
-                </LabelProvider>
-            </NoteProvider>
+            <LocaleProvider>
+                <SnackbarProvider>
+                    <NoteProvider>
+                        <LabelProvider>
+                            <TrashNote {...mockLockedNote} />
+                        </LabelProvider>
+                    </NoteProvider>
+                </SnackbarProvider>
+            </LocaleProvider>
         );
 
         expect(screen.getByText(lockedText)).toBeVisible();
@@ -128,11 +156,15 @@ describe("TrashNote", () => {
 
     it("キャンセルボタンを押したときにダイアログが閉じる", async () => {
         render(
-            <NoteProvider>
-                <LabelProvider>
-                    <TrashNote {...mockNote} />
-                </LabelProvider>
-            </NoteProvider>
+            <LocaleProvider>
+                <SnackbarProvider>
+                    <NoteProvider>
+                        <LabelProvider>
+                            <TrashNote {...mockNote} />
+                        </LabelProvider>
+                    </NoteProvider>
+                </SnackbarProvider>
+            </LocaleProvider>
         );
 
         // ノートをクリックしてダイアログを開く

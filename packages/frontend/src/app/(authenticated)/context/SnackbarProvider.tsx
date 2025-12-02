@@ -60,7 +60,7 @@ export function SnackbarProvider({ children }: { children: React.ReactNode }) {
 export function useSnackbar() {
     const context = useContext(SnackbarContext);
     if (!context) {
-        throw new Error("useSnackbar must be used within SnackbarProvider");
+        throw new Error("useSnackbar must be used within SnackBarProvider");
     }
     return context;
 }

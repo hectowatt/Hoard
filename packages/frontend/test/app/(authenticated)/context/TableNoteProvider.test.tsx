@@ -3,6 +3,8 @@ import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import { TableNoteProvider, useTableNoteContext } from "@/app/(authenticated)/context/TableNoteProvider"; // パスを調整してください
 import "@testing-library/jest-dom";
+import { LocaleProvider } from "@/app/context/LocaleProvider";
+import { SnackbarProvider } from "@/app/(authenticated)/context/SnackbarProvider";
 
 type Column = {
     id: number;
@@ -27,6 +29,16 @@ type TableNote = {
     columns: Column[];
     rowCells: RowCell[][];
 }
+
+jest.mock("next/navigation", () => ({
+    ...jest.requireActual("next/navigation"),
+    useRouter: () => ({
+        push: jest.fn(),
+        replace: jest.fn(),
+        prefetch: jest.fn(),
+    }),
+}));
+
 
 // モックデータ
 const mockTableNotes: TableNote[] = [
@@ -76,9 +88,13 @@ describe("NoteProvider", () => {
 
     it("fetchNotesでノートを取得し、コンテキストで提供する", async () => {
         render(
-            <TableNoteProvider>
-                <TestComponent />
-            </TableNoteProvider>
+            <LocaleProvider>
+                <SnackbarProvider>
+                    <TableNoteProvider>
+                        <TestComponent />
+                    </TableNoteProvider>
+                </SnackbarProvider>
+            </LocaleProvider>
         );
 
         await waitFor(() => {

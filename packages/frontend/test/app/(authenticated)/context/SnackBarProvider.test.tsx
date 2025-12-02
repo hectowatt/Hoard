@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { SnackbarProvider, useSnackbar } from "@/app/(authenticated)/context/SnackBarProvider";
+import { SnackbarProvider, useSnackbar } from "@/app/(authenticated)/context/SnackbarProvider";
 
 const TestComponent = () => {
     const { showSnackbar } = useSnackbar();

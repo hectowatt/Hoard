@@ -3,6 +3,8 @@ import { Box, Paper, Typography, Dialog, DialogTitle, DialogContent, TextField, 
 import { useLabelContext } from "@/app/(authenticated)/context/LabelProvider";
 import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
 import { useTranslation } from "react-i18next";
+import { useRouter } from "next/navigation";
+import { useSnackbar } from "@/app/(authenticated)/context/SnackbarProvider";
 
 interface trashTableNoteProps {
     id: string;
@@ -36,6 +38,8 @@ export default function TrashTableNote({ id, title, label_id, is_locked, created
     const [updateDateAfterSaving, setUpdateDateAfterSaving] = React.useState(updatedate);
     const [editLabel, setEditLabel] = React.useState(label_id ?? "");
     const { t } = useTranslation();
+    const { showSnackbar } = useSnackbar();
+    const router = useRouter();
 
     const { labels } = useLabelContext();
 
@@ -65,7 +69,12 @@ export default function TrashTableNote({ id, title, label_id, is_locked, created
                 credentials: "include"
             });
             if (!response.ok) {
-                throw new Error("Failed to delete tableNote");
+                if (response.status === 401) {
+                    showSnackbar(t("message_error_occured_redirect_login"), "warning");
+                    router.push("/login");
+                } else {
+                    throw new Error("Failed to delete tableNote");
+                }
             }
             const result = await response.json();
             console.log("Delete success!", result);
@@ -96,7 +105,12 @@ export default function TrashTableNote({ id, title, label_id, is_locked, created
             })
 
             if (!response.ok) {
-                throw new Error("Failed to save note");
+                if (response.status === 401) {
+                    showSnackbar(t("message_error_occured_redirect_login"), "warning");
+                    router.push("/login");
+                } else {
+                    throw new Error("Failed to save note");
+                }
             }
 
             const result = await response.json();

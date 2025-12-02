@@ -67,6 +67,7 @@
     "message_new_notepassword_must_be_set": "Please enter a new note password",
     "message_current_notepassword_must_be_set": "Please enter the current note password",
     "message_error_occured": "An error has occurred",
+    "message_error_occured_redirect_login": "An error has occurred. Please log in again.",
     "message_username_or_password_must_be_set": "Please enter either a username or password",
     "message_new_password_must_be_set_when_change": "When changing the password, please enter the current password",
     "message_incorrect_current_password": "Incorrect current password",

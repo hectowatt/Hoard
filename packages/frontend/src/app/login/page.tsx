@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import ThemeRegistry from "@/app/context/ThemeProvider";
 import { useTranslation } from "react-i18next";
-import { useSnackbar } from "@/app/(authenticated)/context/SnackBarProvider";
+import { useSnackbar } from "@/app/(authenticated)/context/SnackbarProvider";
 
 
 export default function LoginPage() {

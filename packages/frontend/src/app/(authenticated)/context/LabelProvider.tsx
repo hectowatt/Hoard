@@ -1,4 +1,7 @@
 import React, { createContext, useContext, useState, useCallback } from "react";
+import { useSnackbar } from "@/app/(authenticated)/context/SnackbarProvider";
+import { useTranslation } from "react-i18next";
+import { useRouter } from "next/navigation";
 
 // ラベルをグローバルに保持するためのコンテキストプロバイダー
 type Label = { id: string; labelname: string };
@@ -18,15 +21,30 @@ export const useLabelContext = () => {
 
 export const LabelProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [labels, setLabels] = useState<Label[]>([]);
+    const { showSnackbar } = useSnackbar();
+    const { t } = useTranslation();
+    const router = useRouter();
 
     const fetchLabels = useCallback(async () => {
-        const response = await fetch("/api/labels", {
-            method: "GET",
-            credentials: "include"
-        });
-        if (!response.ok) throw new Error("Failed to fetch labels");
-        const data = await response.json();
-        setLabels(Array.isArray(data) ? data : []);
+        try {
+            const response = await fetch("/api/labels", {
+                method: "GET",
+                credentials: "include"
+            });
+            if (!response.ok) {
+                if (response.status === 401) {
+                    console.error("Error fetching labels");
+                    showSnackbar(t("message_error_occured_redirect_login"), "warning");
+                    router.push("/login");
+                }
+                throw new Error("Failed to fetch notes")
+            };
+            const data = await response.json();
+            setLabels(Array.isArray(data) ? data : []);
+        } catch (error) {
+            console.error("Error fetching labels:", error);
+            showSnackbar(t("message_error_occured"), "error");
+        }
     }, []);
 
     React.useEffect(() => { fetchLabels(); }, [fetchLabels]);

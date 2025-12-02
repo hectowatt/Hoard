@@ -3,6 +3,8 @@ import { render, screen, waitFor } from "@testing-library/react";
 import Home from "@/app/(authenticated)/trash/page";
 import "@testing-library/jest-dom";
 import i18n from "@/app/lib/i18n";
+import { LocaleProvider } from "@/app/context/LocaleProvider";
+import { SnackbarProvider } from "@/app/(authenticated)/context/SnackbarProvider";
 
 // モック：TrashNote, TrashTableNote
 jest.mock("@/app/(authenticated)/components/TrashNote", () => (props: any) => (
@@ -19,6 +21,16 @@ jest.mock("@/app/(authenticated)/context/LabelProvider", () => ({
         fetchLabels: jest.fn(),
     }),
 }));
+
+jest.mock("next/navigation", () => ({
+    ...jest.requireActual("next/navigation"),
+    useRouter: () => ({
+        push: jest.fn(),
+        replace: jest.fn(),
+        prefetch: jest.fn(),
+    }),
+}));
+
 
 // グローバル fetch モック
 beforeEach(() => {
@@ -65,7 +77,13 @@ beforeEach(() => {
 describe("Trash Page", () => {
     it("renders trash notes and table notes", async () => {
         const label_trash_desc = i18n.t("label_trash_desc");
-        render(<Home />);
+        render(
+            <LocaleProvider>
+                <SnackbarProvider>
+                    <Home />
+                </SnackbarProvider>
+            </LocaleProvider>
+        );
 
         // 最初のテキスト
         expect(screen.getByText(label_trash_desc)).toBeInTheDocument();
