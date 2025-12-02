@@ -6,6 +6,8 @@ import { useLabelContext } from "@/app/(authenticated)/context/LabelProvider";
 import TrashNote from "@/app/(authenticated)/components/TrashNote";
 import TrashTableNote from "@/app/(authenticated)/components/TrashTableNote";
 import { useTranslation } from "react-i18next";
+import { useRouter } from "next/navigation";
+import { useSnackbar } from "@/app/(authenticated)/context/SnackbarProvider";
 
 
 // 削除されたNoteを表示するページコンテンツ
@@ -14,6 +16,8 @@ export default function Home() {
   const [trashTableNotes, setTrashTableNotes] = useState<{ id: string, title: string; label_id: string, is_locked: boolean, createdate: string; updatedate: string }[]>([]);
   const { labels, fetchLabels } = useLabelContext();
   const { t } = useTranslation();
+  const { showSnackbar } = useSnackbar();
+  const router = useRouter();
 
   // 画面描画時にDBからノートを全件取得して表示する
   const fetchTrashNotes = async () => {
@@ -28,8 +32,13 @@ export default function Home() {
       });
 
       if (!response.ok) {
-        console.error("Get notes failed");
-        return;
+        if (response.status === 401) {
+          showSnackbar(t("message_error_occured_redirect_login"), "warning");
+          router.push("/login");
+        } else {
+          console.error("Get notes failed");
+          return;
+        }
       }
 
       const data = await response.json();

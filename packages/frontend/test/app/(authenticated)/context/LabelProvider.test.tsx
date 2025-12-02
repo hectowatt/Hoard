@@ -3,6 +3,8 @@ import React from "react";
 import { render, waitFor, screen } from "@testing-library/react";
 import { LabelProvider, useLabelContext } from "@/app/(authenticated)/context/LabelProvider";
 import "@testing-library/jest-dom";
+import { LocaleProvider } from "@/app/context/LocaleProvider";
+import { SnackbarProvider } from "@/app/(authenticated)/context/SnackbarProvider";
 
 const mockLabels = [
   { id: "1", labelname: "仕事" },
@@ -10,6 +12,16 @@ const mockLabels = [
 ];
 
 type label = { id: string; labelname: string }
+
+jest.mock("next/navigation", () => ({
+  ...jest.requireActual("next/navigation"),
+  useRouter: () => ({
+    push: jest.fn(),
+    replace: jest.fn(),
+    prefetch: jest.fn(),
+  }),
+}));
+
 
 // テスト用の子コンポーネント
 const TestComponent = () => {
@@ -33,9 +45,13 @@ describe("LabelProvider", () => {
 
   it("fetchLabelsでAPIからラベルを取得し、コンテキスト経由で提供する", async () => {
     render(
-      <LabelProvider>
-        <TestComponent />
-      </LabelProvider>
+      <LocaleProvider>
+        <SnackbarProvider>
+          <LabelProvider>
+            <TestComponent />
+          </LabelProvider>
+        </SnackbarProvider>
+      </LocaleProvider>
     );
 
     // fetch の完了と再レンダリングを待つ

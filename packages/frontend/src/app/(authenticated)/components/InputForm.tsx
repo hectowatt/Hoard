@@ -29,7 +29,8 @@ import TableChartOutlinedIcon from '@mui/icons-material/TableChartOutlined';
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useTranslation } from "react-i18next";
-import { useSnackbar } from "@/app/(authenticated)/context/SnackBarProvider";
+import { useSnackbar } from "@/app/(authenticated)/context/SnackbarProvider";
+import { useRouter } from "next/navigation";
 
 interface InputFormProps {
     onInsert: (newId: string, newTitle: string, newContent: string, newLabel: string, isLocked: boolean) => void;
@@ -62,6 +63,7 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
     const [tableNoteOpen, setTableNoteOpen] = useState(false);
     const { t } = useTranslation();
     const { showSnackbar } = useSnackbar();
+    const router = useRouter();
 
     const { labels } = useLabelContext();
 
@@ -152,6 +154,11 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
             })
 
             if (!response.ok) {
+                if (response.status === 401) {
+                    console.error("Error saving note");
+                    showSnackbar(t("message_error_occured_redirect_login"), "warning");
+                    router.push("/login");
+                }
                 throw new Error("Failed to save note");
             }
 
@@ -216,6 +223,11 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
             })
 
             if (!response.ok) {
+                if (response.status === 401) {
+                    console.error("Error saving table note");
+                    showSnackbar(t("message_error_occured_redirect_login"), "warning");
+                    router.push("/login");
+                }
                 throw new Error("Failed to save table note");
             }
 

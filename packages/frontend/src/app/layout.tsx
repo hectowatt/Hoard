@@ -1,4 +1,4 @@
-import { SnackbarProvider } from './(authenticated)/context/SnackBarProvider';
+import { SnackbarProvider } from './(authenticated)/context/SnackbarProvider';
 import { LocaleProvider } from './context/LocaleProvider';
 import ThemeRegistry from './context/ThemeProvider';
 import type { Metadata, Viewport } from 'next';

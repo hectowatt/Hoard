@@ -5,7 +5,8 @@ import CreateLabelDialog from "@/app/(authenticated)/components/CreateLabelDialo
 import { LabelProvider } from "@/app/(authenticated)/context/LabelProvider";
 import { NoteProvider } from "@/app/(authenticated)/context/NoteProvider";
 import userEvent from '@testing-library/user-event';
-import { SnackbarProvider } from "@/app/(authenticated)/context/SnackBarProvider";
+import { SnackbarProvider } from "@/app/(authenticated)/context/SnackbarProvider";
+import { LocaleProvider } from "@/app/context/LocaleProvider";
 
 // ラベルコンテキストのモック
 const mockLabels = [
@@ -24,6 +25,15 @@ jest.mock("@/app/(authenticated)/context/LabelProvider", () => {
     };
 });
 
+jest.mock("next/navigation", () => ({
+    ...jest.requireActual("next/navigation"),
+    useRouter: () => ({
+        push: jest.fn(),
+        replace: jest.fn(),
+        prefetch: jest.fn(),
+    }),
+}));
+
 describe("CreateLabelDialog", () => {
     const mockOnClose = jest.fn();
     const mockOnLabelUpdate = jest.fn();
@@ -38,13 +48,15 @@ describe("CreateLabelDialog", () => {
 
     it("ダイアログが開いているときタイトルが表示される", () => {
         render(
-            <NoteProvider>
+            <LocaleProvider>
                 <SnackbarProvider>
-                    <LabelProvider>
-                        <CreateLabelDialog open={true} onClose={mockOnClose} />
-                    </LabelProvider>
+                    <NoteProvider>
+                        <LabelProvider>
+                            <CreateLabelDialog open={true} onClose={mockOnClose} />
+                        </LabelProvider>
+                    </NoteProvider>
                 </SnackbarProvider>
-            </NoteProvider>
+            </LocaleProvider>
         );
         expect(screen.getByTestId("label_input_labels")).toBeVisible();
     });
@@ -52,13 +64,15 @@ describe("CreateLabelDialog", () => {
     it("ラベル名を入力できる", async () => {
         const user = userEvent.setup();
         render(
-            <NoteProvider>
+            <LocaleProvider>
                 <SnackbarProvider>
-                    <LabelProvider>
-                        <CreateLabelDialog open={true} onClose={mockOnClose} />
-                    </LabelProvider>
+                    <NoteProvider>
+                        <LabelProvider>
+                            <CreateLabelDialog open={true} onClose={mockOnClose} />
+                        </LabelProvider>
+                    </NoteProvider>
                 </SnackbarProvider>
-            </NoteProvider>
+            </LocaleProvider>
         );
         const input = screen.getByTestId("label-input");
         await user.type(input, "新しいラベル");
@@ -67,13 +81,15 @@ describe("CreateLabelDialog", () => {
 
     it("キャンセルボタンでonCloseが呼ばれる", async () => {
         render(
-            <NoteProvider>
+            <LocaleProvider>
                 <SnackbarProvider>
-                    <LabelProvider>
-                        <CreateLabelDialog open={true} onClose={mockOnClose} />
-                    </LabelProvider>
+                    <NoteProvider>
+                        <LabelProvider>
+                            <CreateLabelDialog open={true} onClose={mockOnClose} />
+                        </LabelProvider>
+                    </NoteProvider>
                 </SnackbarProvider>
-            </NoteProvider>
+            </LocaleProvider>
         );
         await act(async () => {
             fireEvent.click(screen.getByTestId("button_close"));

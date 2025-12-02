@@ -2,7 +2,7 @@ import React, { act } from "react";
 import { render, screen, fireEvent, within, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import Note from "@/app/(authenticated)/components/Note";
-import { SnackbarProvider } from "@/app/(authenticated)/context/SnackBarProvider";
+import { SnackbarProvider } from "@/app/(authenticated)/context/SnackbarProvider";
 
 // ラベルコンテキストのモック
 const mockLabels = [
@@ -19,10 +19,20 @@ jest.mock("@/app/(authenticated)/context/LabelProvider", () => {
         LabelProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
     };
 });
+jest.mock("next/navigation", () => ({
+    ...jest.requireActual("next/navigation"),
+    useRouter: () => ({
+        push: jest.fn(),
+        replace: jest.fn(),
+        prefetch: jest.fn(),
+    }),
+}));
+
 
 import { LabelProvider } from "@/app/(authenticated)/context/LabelProvider";
 import { NoteProvider } from "@/app/(authenticated)/context/NoteProvider";
 import i18n from "@/app/lib/i18n";
+import { LocaleProvider } from "@/app/context/LocaleProvider";
 
 
 describe("Note", () => {
@@ -39,16 +49,18 @@ describe("Note", () => {
 
     it("openがfalseのとき、タイトルとcontent、作成日、更新日が表示される", () => {
         render(
-            <NoteProvider>
+            <LocaleProvider>
                 <SnackbarProvider>
-                    <LabelProvider>
-                        <Note id={"testid111"} title={"テストノート"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
-                    </LabelProvider>
+                    <NoteProvider>
+                        <LabelProvider>
+                            <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
+                        </LabelProvider>
+                    </NoteProvider>
                 </SnackbarProvider>
-            </NoteProvider>
+            </LocaleProvider>
         );
 
-        expect(screen.getByText("テストノート")).toBeVisible();
+        expect(screen.getByText("テストノートタイトル")).toBeVisible();
         expect(screen.getByText("テストノートcontent")).toBeVisible();
         expect(screen.getByText(/2025\/07\/05/)).toBeVisible();
         expect(screen.getByText(/2025\/07\/06/)).toBeVisible();
@@ -56,17 +68,19 @@ describe("Note", () => {
 
     it("クリックした時、編集、削除、ロックアイコンボタンが表示される", async () => {
         render(
-            <NoteProvider>
+            <LocaleProvider>
                 <SnackbarProvider>
-                    <LabelProvider>
-                        <Note id={"testid111"} title={"テストノート"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
-                    </LabelProvider>
+                    <NoteProvider>
+                        <LabelProvider>
+                            <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
+                        </LabelProvider>
+                    </NoteProvider>
                 </SnackbarProvider>
-            </NoteProvider>
+            </LocaleProvider>
         );
 
         await act(async () => {
-            fireEvent.click(screen.getByText("テストノート"));
+            fireEvent.click(screen.getByText("テストノートタイトル"));
         })
 
         expect(screen.getByTestId("button_edit")).toBeVisible();
@@ -76,13 +90,15 @@ describe("Note", () => {
 
     it("編集モード時、タイトルを編集できる", async () => {
         render(
-            <NoteProvider>
+            <LocaleProvider>
                 <SnackbarProvider>
-                    <LabelProvider>
-                        <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
-                    </LabelProvider>
+                    <NoteProvider>
+                        <LabelProvider>
+                            <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
+                        </LabelProvider>
+                    </NoteProvider>
                 </SnackbarProvider>
-            </NoteProvider>
+            </LocaleProvider>
         );
 
         await act(async () => {
@@ -105,13 +121,15 @@ describe("Note", () => {
 
     it("編集モード時、contentを編集できる", async () => {
         render(
-            <NoteProvider>
+            <LocaleProvider>
                 <SnackbarProvider>
-                    <LabelProvider>
-                        <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
-                    </LabelProvider>
+                    <NoteProvider>
+                        <LabelProvider>
+                            <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
+                        </LabelProvider>
+                    </NoteProvider>
                 </SnackbarProvider>
-            </NoteProvider>
+            </LocaleProvider>
         );
 
         await act(async () => {
@@ -134,13 +152,15 @@ describe("Note", () => {
 
     it("編集モード時、ラベルを編集できる", async () => {
         render(
-            <NoteProvider>
+            <LocaleProvider>
                 <SnackbarProvider>
-                    <LabelProvider>
-                        <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={"label1"} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
-                    </LabelProvider>
+                    <NoteProvider>
+                        <LabelProvider>
+                            <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
+                        </LabelProvider>
+                    </NoteProvider>
                 </SnackbarProvider>
-            </NoteProvider>
+            </LocaleProvider>
         );
 
         await act(async () => {
@@ -166,13 +186,15 @@ describe("Note", () => {
     it("フォーカスが外れたときに縮小化される", async () => {
         render(
             <>
-                <NoteProvider>
+                <LocaleProvider>
                     <SnackbarProvider>
-                        <LabelProvider>
-                            <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={"label1"} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
-                        </LabelProvider>
+                        <NoteProvider>
+                            <LabelProvider>
+                                <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
+                            </LabelProvider>
+                        </NoteProvider>
                     </SnackbarProvider>
-                </NoteProvider>
+                </LocaleProvider>
                 <input data-testid="dummy-input" placeholder="ダミー入力" />
             </>
         );
@@ -199,13 +221,15 @@ describe("Note", () => {
     it("ロックボタンをクリックするとロックされる", async () => {
         const lockedText = i18n.t("label_lockednote");
         render(
-            <NoteProvider>
+            <LocaleProvider>
                 <SnackbarProvider>
-                    <LabelProvider>
-                        <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
-                    </LabelProvider>
+                    <NoteProvider>
+                        <LabelProvider>
+                            <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
+                        </LabelProvider>
+                    </NoteProvider>
                 </SnackbarProvider>
-            </NoteProvider>
+            </LocaleProvider>
         );
 
         await act(async () => {
@@ -236,13 +260,15 @@ describe("Note", () => {
     it("ロックされているノートはロックされている旨がcontentに表示される", async () => {
         const lockedText = i18n.t("label_lockednote");
         render(
-            <NoteProvider>
+            <LocaleProvider>
                 <SnackbarProvider>
-                    <LabelProvider>
-                        <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-05 05:33:05.864" is_locked={true} onSave={mockOnSave} onDelete={mockOnDelete} />
-                    </LabelProvider>
+                    <NoteProvider>
+                        <LabelProvider>
+                            <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={true} onSave={mockOnSave} onDelete={mockOnDelete} />
+                        </LabelProvider>
+                    </NoteProvider>
                 </SnackbarProvider>
-            </NoteProvider>
+            </LocaleProvider>
         );
 
         expect(screen.getByText(lockedText)).toBeVisible();

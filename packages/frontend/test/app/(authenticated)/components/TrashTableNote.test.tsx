@@ -17,12 +17,23 @@ jest.mock("@/app/(authenticated)/context/LabelProvider", () => {
         LabelProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
     };
 });
+jest.mock("next/navigation", () => ({
+    ...jest.requireActual("next/navigation"),
+    useRouter: () => ({
+        push: jest.fn(),
+        replace: jest.fn(),
+        prefetch: jest.fn(),
+    }),
+}));
+
 
 import { LabelProvider } from "@/app/(authenticated)/context/LabelProvider";
 import { NoteProvider } from "@/app/(authenticated)/context/NoteProvider";
 import TableNote from "@/app/(authenticated)/components/TableNote";
 import TrashTableNote from "@/app/(authenticated)/components/TrashTableNote";
 import i18n from "@/app/lib/i18n";
+import { LocaleProvider } from "@/app/context/LocaleProvider";
+import { SnackbarProvider } from "@/app/(authenticated)/context/SnackbarProvider";
 
 
 describe("TrashTableNote", () => {
@@ -39,13 +50,17 @@ describe("TrashTableNote", () => {
 
     it("タイトル・内容・日付・ラベルが表示される", () => {
         render(
-            <NoteProvider>
-                <LabelProvider>
-                    <TrashTableNote id={"testid111"} title={"テストノート"} label_id={"label1"} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} onRestore={mockOnRestore} onDelete={mockOnDelete} />
-                </LabelProvider>
-            </NoteProvider>
+            <LocaleProvider>
+                <SnackbarProvider>
+                    <NoteProvider>
+                        <LabelProvider>
+                            <TrashTableNote id={"testid111"} title={"テストノートタイトル"} label_id={"label1"} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} onRestore={mockOnRestore} onDelete={mockOnDelete} />
+                        </LabelProvider>
+                    </NoteProvider>
+                </SnackbarProvider>
+            </LocaleProvider>
         );
-        expect(screen.getByText("テストノート")).toBeVisible();
+        expect(screen.getByText("テストノートタイトル")).toBeVisible();
         expect(screen.getByText(/2025\/07\/05/)).toBeVisible();
         expect(screen.getByText(/2025\/07\/06/)).toBeVisible();
         expect(screen.getByText("仕事")).toBeVisible();
@@ -53,29 +68,37 @@ describe("TrashTableNote", () => {
 
     it("openがfalseのとき、タイトルと作成日、更新日が表示される", () => {
         render(
-            <NoteProvider>
-                <LabelProvider>
-                    <TrashTableNote id={"testid111"} title={"テストノート"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} onRestore={mockOnRestore} onDelete={mockOnDelete} />
-                </LabelProvider>
-            </NoteProvider>
+            <LocaleProvider>
+                <SnackbarProvider>
+                    <NoteProvider>
+                        <LabelProvider>
+                            <TrashTableNote id={"testid111"} title={"テストノートタイトル"} label_id={"label1"} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} onRestore={mockOnRestore} onDelete={mockOnDelete} />
+                        </LabelProvider>
+                    </NoteProvider>
+                </SnackbarProvider>
+            </LocaleProvider>
         );
 
-        expect(screen.getByText("テストノート")).toBeVisible();
+        expect(screen.getByText("テストノートタイトル")).toBeVisible();
         expect(screen.getByText(/2025\/07\/05/)).toBeVisible();
         expect(screen.getByText(/2025\/07\/06/)).toBeVisible();
     })
 
     it("クリックした時、復元、完全に削除、キャンセルボタンが表示される", async () => {
         render(
-            <NoteProvider>
-                <LabelProvider>
-                    <TrashTableNote id={"testid111"} title={"テストノート"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} onRestore={mockOnRestore} onDelete={mockOnDelete} />
-                </LabelProvider>
-            </NoteProvider>
+            <LocaleProvider>
+                <SnackbarProvider>
+                    <NoteProvider>
+                        <LabelProvider>
+                            <TrashTableNote id={"testid111"} title={"テストノートタイトル"} label_id={"label1"} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} onRestore={mockOnRestore} onDelete={mockOnDelete} />
+                        </LabelProvider>
+                    </NoteProvider>
+                </SnackbarProvider>
+            </LocaleProvider>
         );
 
         await act(async () => {
-            fireEvent.click(screen.getByText("テストノート"));
+            fireEvent.click(screen.getByText("テストノートタイトル"));
         })
 
         expect(screen.getByRole("dialog")).toBeVisible();
@@ -89,11 +112,15 @@ describe("TrashTableNote", () => {
     it("フォーカスが外れたときに縮小化される", async () => {
         render(
             <>
-                <NoteProvider>
-                    <LabelProvider>
-                        <TrashTableNote id={"testid111"} title={"テストノートタイトル"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} onRestore={mockOnRestore} onDelete={mockOnDelete} />
-                    </LabelProvider>
-                </NoteProvider>
+                <LocaleProvider>
+                    <SnackbarProvider>
+                        <NoteProvider>
+                            <LabelProvider>
+                                <TrashTableNote id={"testid111"} title={"テストノートタイトル"} label_id={"label1"} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} onRestore={mockOnRestore} onDelete={mockOnDelete} />
+                            </LabelProvider>
+                        </NoteProvider>
+                    </SnackbarProvider>
+                </LocaleProvider>
                 <input data-testid="dummy-input" placeholder="ダミー入力" />
             </>
         );
@@ -120,11 +147,15 @@ describe("TrashTableNote", () => {
     it("ロックされているノートはロックされている旨がcontentに表示される", async () => {
         const lockedText = i18n.t("label_lockednote");
         render(
-            <NoteProvider>
-                <LabelProvider>
-                    <TrashTableNote id={"testid111"} title={"テストノート"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={true} onRestore={mockOnRestore} onDelete={mockOnDelete} />
-                </LabelProvider>
-            </NoteProvider>
+            <LocaleProvider>
+                <SnackbarProvider>
+                    <NoteProvider>
+                        <LabelProvider>
+                            <TrashTableNote id={"testid111"} title={"テストノートタイトル"} label_id={"label1"} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={true} onRestore={mockOnRestore} onDelete={mockOnDelete} />
+                        </LabelProvider>
+                    </NoteProvider>
+                </SnackbarProvider>
+            </LocaleProvider>
         );
 
         expect(screen.getByText(lockedText)).toBeVisible();
@@ -133,16 +164,20 @@ describe("TrashTableNote", () => {
 
     it("キャンセルボタンを押したときにダイアログが閉じる", async () => {
         render(
-            <NoteProvider>
-                <LabelProvider>
-                    <TrashTableNote id={"testid111"} title={"テストノート"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={true} onRestore={mockOnRestore} onDelete={mockOnDelete} />
-                </LabelProvider>
-            </NoteProvider>
+            <LocaleProvider>
+                <SnackbarProvider>
+                    <NoteProvider>
+                        <LabelProvider>
+                            <TrashTableNote id={"testid111"} title={"テストノートタイトル"} label_id={"label1"} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} onRestore={mockOnRestore} onDelete={mockOnDelete} />
+                        </LabelProvider>
+                    </NoteProvider>
+                </SnackbarProvider>
+            </LocaleProvider>
         );
 
         // ノートをクリックしてダイアログを開く
         await waitFor(() => {
-            fireEvent.click(screen.getByText("テストノート"));
+            fireEvent.click(screen.getByText("テストノートタイトル"));
         });
 
         // ダイアログが開いていることを確認

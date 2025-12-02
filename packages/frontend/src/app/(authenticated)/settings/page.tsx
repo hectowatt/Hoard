@@ -8,7 +8,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useTranslation } from "react-i18next";
 import LanguageOutlinedIcon from '@mui/icons-material/LanguageOutlined';
 import i18n from "@/app/lib/i18n";
-import { useSnackbar } from "../context/SnackBarProvider";
+import { useSnackbar } from "../context/SnackbarProvider";
 
 // 設定ページのコンテンツ
 export default function Home() {

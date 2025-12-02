@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { useSnackbar } from "./SnackBarProvider";
+import { useSnackbar } from "@/app/(authenticated)/context/SnackbarProvider";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
 
@@ -50,13 +50,19 @@ export const TableNoteProvider: React.FC<{ children: React.ReactNode }> = ({ chi
                 headers: { "Content-Type": "application/json" },
                 credentials: "include"
             });
-            if (!response.ok) throw new Error("Failed to fetch table notes");
+            if (!response.ok) {
+                if (response.status === 401) {
+                    console.error("Error fetching table notes");
+                    showSnackbar(t("message_error_occured_redirect_login"), "warning");
+                    router.push("/login");
+                }
+                throw new Error("Failed to fetch notes")
+            };
             const data = await response.json();
             setTableNotes(data);
         } catch (error) {
             console.error("Error fetching table notes:", error);
-            showSnackbar(t("message_error_occured_redirect_login"), "warning");
-            router.push("/login");
+            showSnackbar(t("message_error_occured"), "error");
         }
     };
 

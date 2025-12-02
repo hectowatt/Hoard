@@ -2,6 +2,8 @@ import React, { useEffect } from "react";
 import { Box, Paper, Typography, Dialog, DialogTitle, DialogContent, TextField, Button, FormControl, Select, MenuItem, InputLabel } from "../../../../node_modules/@mui/material";
 import { useLabelContext } from "@/app/(authenticated)/context/LabelProvider";
 import { useTranslation } from "react-i18next";
+import { useRouter } from "next/navigation";
+import { useSnackbar } from "@/app/(authenticated)/context/SnackbarProvider";
 
 interface trashNoteProps {
     id: string;
@@ -37,6 +39,8 @@ export default function TrashNote({ id, title, content, label_id, is_locked, cre
     const [updateDateAfterSaving, setUpdateDateAfterSaving] = React.useState(updatedate);
     const [editLabel, setEditLabel] = React.useState(label_id ?? "");
     const { t } = useTranslation();
+    const { showSnackbar } = useSnackbar();
+    const router = useRouter();
 
     const { labels } = useLabelContext();
 
@@ -61,7 +65,12 @@ export default function TrashNote({ id, title, content, label_id, is_locked, cre
                 credentials: "include"
             });
             if (!response.ok) {
-                throw new Error("Failed to delete note");
+                if (response.status === 401) {
+                    showSnackbar(t("message_error_occured_redirect_login"), "warning");
+                    router.push("/login");
+                } else {
+                    throw new Error("Failed to delete note");
+                }
             }
             const result = await response.json();
             console.log("Delete success!", result);
@@ -92,7 +101,12 @@ export default function TrashNote({ id, title, content, label_id, is_locked, cre
             })
 
             if (!response.ok) {
-                throw new Error("Failed to save note");
+                if (response.status === 401) {
+                    showSnackbar(t("message_error_occured_redirect_login"), "warning");
+                    router.push("/login");
+                } else {
+                    throw new Error("Failed to save note");
+                }
             }
 
             const result = await response.json();

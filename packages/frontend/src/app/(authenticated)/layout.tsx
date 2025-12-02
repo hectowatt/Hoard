@@ -45,7 +45,7 @@ import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
 import NewLabelOutlinedIcon from '@mui/icons-material/NewLabelOutlined';
 import { useTranslation } from "react-i18next";
 import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
-import { useSnackbar } from "@/app/(authenticated)/context/SnackBarProvider";
+import { useSnackbar } from "@/app/(authenticated)/context/SnackbarProvider";
 import Image from "next/image";
 
 const inter = Inter({ subsets: ["latin"] });
