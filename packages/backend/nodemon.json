@@ -1,6 +1,11 @@
 {
-    "watch": ["./backend"],
+    "watch": [
+        "."
+    ],
     "ext": "ts",
-    "ignore": ["./node_modules", "./migrations"],
+    "ignore": [
+        "./node_modules",
+        "./migrations"
+    ],
     "exec": "node --loader ts-node/esm ./server.ts"
 }
