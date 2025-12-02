@@ -8,7 +8,7 @@ import { redis } from '../server.js';
 const router = Router();
 const SECRET = process.env.SECRET || 'hoard_secret';
 
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', async (req, res) => {
     const token = req.cookies.token;
     if (token) {
         try {

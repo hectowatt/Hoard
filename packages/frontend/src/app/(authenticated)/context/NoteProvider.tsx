@@ -1,4 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { useSnackbar } from "./SnackBarProvider";
+import { useTranslation } from "react-i18next";
+import { useRouter } from "next/navigation";
 
 type note = {
     id: string;
@@ -20,6 +23,9 @@ type noteContextType = {
 
 export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [notes, setNotes] = useState<{ id: string, title: string; content: string; label_id: string; createdate: string; updatedate: string; is_locked: boolean; }[]>([]);
+    const { showSnackbar } = useSnackbar();
+    const { t } = useTranslation();
+    const router = useRouter();
 
     // Noteを取得
     const fetchNotes = async () => {
@@ -28,11 +34,20 @@ export const NoteProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 method: "GET",
                 credentials: "include"
             });
-            if (!response.ok) throw new Error("Failed to fetch notes");
+            if (!response.ok) {
+                if (response.status === 401) {
+                    console.error("Error fetching notes:");
+                    showSnackbar(t("message_error_occured_redirect_login"), "warning");
+                    router.push("/login");
+                }
+                throw new Error("Failed to fetch notes")
+            };
             const data = await response.json();
             setNotes(data);
         } catch (error) {
             console.error("Error fetching notes:", error);
+            showSnackbar(t("message_error_occured_redirect_login"), "warning");
+            router.push("/login");
         }
     };
 

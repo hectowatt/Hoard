@@ -1,11 +1,10 @@
 import { Router } from 'express';
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
-import { authMiddleware } from '../middleware/AuthMiddleware.js';
 import { redis } from '../server.js';
 const router = Router();
 const SECRET = process.env.SECRET || 'hoard_secret';
-router.post('/', authMiddleware, async (req, res) => {
+router.post('/', async (req, res) => {
     const token = req.cookies.token;
     if (token) {
         try {

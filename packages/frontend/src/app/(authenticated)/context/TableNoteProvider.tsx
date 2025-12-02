@@ -1,4 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { useSnackbar } from "./SnackBarProvider";
+import { useTranslation } from "react-i18next";
+import { useRouter } from "next/navigation";
 
 type tableNote = {
     id: string;
@@ -35,19 +38,27 @@ type tableNoteContextType = {
 export const TableNoteProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
     const [tableNotes, setTableNotes] = useState<tableNote[]>([]);
-
+    const { showSnackbar } = useSnackbar();
+    const { t } = useTranslation();
+    const router = useRouter();
 
     // TableNoteを取得
     const fetchTableNotes = async () => {
-        const response = await fetch("/api/tablenotes", {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include"
-        });
-        if (!response.ok) throw new Error("Failed to fetch table notes");
-        const data = await response.json();
-        setTableNotes(data);
-    }
+        try {
+            const response = await fetch("/api/tablenotes", {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include"
+            });
+            if (!response.ok) throw new Error("Failed to fetch table notes");
+            const data = await response.json();
+            setTableNotes(data);
+        } catch (error) {
+            console.error("Error fetching table notes:", error);
+            showSnackbar(t("message_error_occured_redirect_login"), "warning");
+            router.push("/login");
+        }
+    };
 
     useEffect(() => { fetchTableNotes(); }, []);
 
