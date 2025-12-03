@@ -271,7 +271,7 @@ export default function Home() {
         />
         <br />
         <TextField
-          id="new-password"
+          id="current-password"
           variant="outlined"
           value={prevPasswordString}
           onChange={(e) => setPrevPasswordString(e.target.value)}
