@@ -441,7 +441,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                     {t("label_updatedate")}: {formatDate(updatedate)}
                 </Typography>
                 {label_id && label_id.trim() !== "" && getLabelName(label_id) && (
-                    <Typography variant="caption" color="textSecondary" sx={{ mb: 1, border: "1px solid #ccc", p: 0.5, borderRadius: 1 }}>
+                    <Typography variant="caption" color="textSecondary" sx={{ mb: 1, mt: 1, border: "1px solid #ccc", p: 0.5, borderRadius: 1 }}>
                         {getLabelName(label_id)}
                     </Typography>
                 )}

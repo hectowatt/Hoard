@@ -265,6 +265,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 									src="/Hoard_icon.png"
 									alt="Hoard Icon"
 									fill
+									priority
 									sizes="55px"
 									style={{ objectFit: "contain", objectPosition: "left" }}
 								/>
