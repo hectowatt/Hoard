@@ -441,7 +441,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                     {t("label_updatedate")}: {formatDate(updatedate)}
                 </Typography>
                 {label_id && label_id.trim() !== "" && getLabelName(label_id) && (
-                    <Typography variant="caption" color="textSecondary" sx={{ mb: 1, mt: 1, border: "1px solid #ccc", p: 0.5, borderRadius: 1 }}>
+                    <Typography variant="caption" color="textSecondary" sx={{ mb: 1, mt: 1, border: "1px solid #ccc", p: 0.5, borderRadius: 1, display: "inline-block" }}>
                         {getLabelName(label_id)}
                     </Typography>
                 )}
@@ -534,7 +534,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                         {t("label_updatedate")}: {formatDate(updatedate)}
                     </Typography>
                     {label_id && label_id.trim() !== "" && getLabelName(label_id) && (
-                        <Typography variant="caption" color="textSecondary" sx={{ mb: 1, border: "1px solid #ccc", p: 0.5, borderRadius: 1 }}>
+                        <Typography variant="caption" color="textSecondary" sx={{ mb: 1, mt: 1, border: "1px solid #ccc", p: 0.5, borderRadius: 1, display: "inline-block" }}>
                             {getLabelName(label_id)}
                         </Typography>
                     )}
@@ -543,7 +543,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                             // 編集中でパスワードロックされていない場合
                             <>
                                 <FormControl size="small" sx={{ minWidth: 120 }} data-testid="label-select">
-                                    <InputLabel id="select-label">ラベル</InputLabel>
+                                    <InputLabel id="select-label">{t("dropdown_labels")}</InputLabel>
                                     <Select
                                         labelId="select-label"
                                         value={editLabel ?? ""}
