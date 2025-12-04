@@ -521,10 +521,54 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                             </Table>
                             <Button onClick={handleAddRow} sx={{ m: 2 }}><AddIcon data-testid="addRowIcon" /></Button>
                         </TableContainer>
-                    ) : (
+                    ) : isLocked ? (
                         <Typography variant="body1" sx={{ whiteSpace: "pre-line", mb: 2 }}>
-                            {isLocked ? t("label_lockednote") : < TableChartOutlinedIcon />}
+                            {t("label_lockednote")}
                         </Typography>
+                    ) : (
+                        <TableContainer component={Paper}>
+                            <Table>
+                                <TableHead>
+                                    <TableRow>
+                                        {editColumns.map((col, idx) => (
+                                            <TableCell key={col.id} sx={{ minWidth: 20, padding: '4px 6px' }} size="small">
+                                                <TextField
+                                                    value={col.name}
+                                                    variant="standard"
+                                                    placeholder={`${t("placeholder_column")}${idx + 1}`}
+                                                    inputProps={{
+                                                        size: Math.max(col.name.length, `${t("placeholder_column")}${idx + 1}`.length, 8),
+                                                        readOnly: true
+                                                    }}
+                                                    data-testid="column-input-not-editable"
+                                                />
+                                            </TableCell>
+                                        ))}
+                                        <TableCell>
+                                        </TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {editRowCells.map((row, rowIdx) => (
+                                        <TableRow key={rowIdx}>
+                                            {row.map((cell, colIdx) => (
+                                                <TableCell key={colIdx} sx={{ minWidth: 20, padding: '4px 6px' }} size="small">
+                                                    <TextField
+                                                        value={cell.value}
+                                                        variant="standard"
+                                                        inputProps={{
+                                                            size: Math.max(cell.value.length, 8),
+                                                            readOnly: true
+                                                        }}
+                                                        data-testid="row-input-not-editable"
+                                                    />
+                                                </TableCell>
+                                            ))}
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
                     )
                     }
                     <Typography variant="caption" color="textSecondary" sx={{ display: "block" }}>
