@@ -31,14 +31,15 @@
       {
         "name": "next"
       }
-    ],
+    ]
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "next.config.mj"
+    "next.config.mj",
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"
