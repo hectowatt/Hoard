@@ -18,6 +18,12 @@ jest.unstable_mockModule("ioredis", () => ({
   })),
 }));
 
+const mockExecute = jest.fn(() => Promise.resolve({ affected: 1 }));
+const mockAndWhere = jest.fn(() => ({ execute: mockExecute }));
+const mockWhere = jest.fn(() => ({ andWhere: mockAndWhere }));
+const mockFrom = jest.fn(() => ({ where: mockWhere }));
+const mockDelete = jest.fn(() => ({ from: mockFrom }));
+
 // ラベルのモック
 const mockLabels = [
   { id: "1", labelname: "work", createdate: new Date(), notes: [] },
@@ -70,6 +76,9 @@ const mockRepo = {
     });
   }),
   remove: jest.fn((note: Note) => Promise.resolve(note)),
+  createQueryBuilder: jest.fn(() => ({
+    delete: mockDelete,
+  }))
 };
 
 jest.unstable_mockModule("../../dist/DataSource.js", () => ({
@@ -83,6 +92,11 @@ jest.unstable_mockModule("../../dist/DataSource.js", () => ({
 const { app, hoardserver } = await import("../../dist/server.js");
 
 describe("NoteRoutes", () => {
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it("GET /notes should return 200 and all notes", async () => {
     const response = await request(app).get("/api/notes");
 
@@ -235,7 +249,7 @@ describe("NoteRoutes", () => {
     expect(response.body.error).toBe("Failed to fetch trash notes");
   });
 
-  it("DELETE /notes/trash should return 200 and message", async () => {
+  it("DELETE /notes/trash:2 should return 200 and message", async () => {
     mockRepo.remove.mockImplementationOnce(() => Promise.resolve());
     const response = await request(app)
       .delete("/api/notes/trash/2");
@@ -252,7 +266,7 @@ describe("NoteRoutes", () => {
     expect(response.body.error).toBe("TrashNote not found");
   });
 
-  it("DELETE /notes/trash and error occured should return 500 and message", async () => {
+  it("DELETE /notes/trash:2 and error occured should return 500 and message", async () => {
     mockRepo.findOneBy.mockImplementationOnce(() => Promise.reject(new Error("DB find error")));
     const response = await request(app)
       .delete("/api/notes/trash/2");
@@ -264,8 +278,7 @@ describe("NoteRoutes", () => {
   it("PUT /notes/trash should return 200 and message", async () => {
     mockRepo.findOneBy.mockImplementationOnce(() => Promise.resolve(mockDeletedNotes[0]));
     const response = await request(app)
-      .put("/api/notes/trash")
-      .send({ id: 3 });
+      .put("/api/notes/trash/3");
 
     expect(response.status).toBe(200);
     expect(response.body.message).toBe("Restore note success!");
@@ -276,8 +289,7 @@ describe("NoteRoutes", () => {
 
   it("PUT /notes/trash with NOT exist note should return 404 and message", async () => {
     const response = await request(app)
-      .put("/api/notes/trash")
-      .send({ id: 999 });
+      .put("/api/notes/trash/999");
 
     expect(response.status).toBe(404);
     expect(response.body.error).toBe("TrashNote not found");
@@ -286,8 +298,7 @@ describe("NoteRoutes", () => {
   it("PUT /notes/trash and error occured should return 500 and message", async () => {
     mockRepo.findOneBy.mockImplementationOnce(() => Promise.reject(new Error("DB find error")));
     const response = await request(app)
-      .put("/api/notes/trash")
-      .send({ id: 3 });
+      .put("/api/notes/trash/3");
 
     expect(response.status).toBe(500);
     expect(response.body.error).toBe("Failed to restore notes");
@@ -321,6 +332,26 @@ describe("NoteRoutes", () => {
 
     expect(response.status).toBe(500);
     expect(response.body.error).toBe("Failed to update lock state");
+  });
+
+  it("DELETE /notes/trash should return 200 and message", async () => {
+
+    const response = await request(app)
+      .delete("/api/notes/trash");
+
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe("All TrashNote deleted successfully");
+  });
+
+  it("DELETE /notes/trash and error occured should return 500 and message", async () => {
+    const dbError = new Error("DB Deletion Failed during execution");
+    mockExecute.mockRejectedValue(dbError);
+
+    const response = await request(app)
+      .delete("/api/notes/trash");
+
+    expect(response.status).toBe(500);
+    expect(response.body.error).toBe("Failed to delete trashnote");
   });
 
 

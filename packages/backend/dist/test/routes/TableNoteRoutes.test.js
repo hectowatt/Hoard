@@ -7,6 +7,11 @@ jest.unstable_mockModule("ioredis", () => ({
         get: jest.fn().mockImplementation(() => Promise.resolve("valid")),
     })),
 }));
+const mockExecute = jest.fn(() => Promise.resolve({ affected: 1 }));
+const mockAndWhere = jest.fn(() => ({ execute: mockExecute }));
+const mockWhere = jest.fn(() => ({ andWhere: mockAndWhere }));
+const mockFrom = jest.fn(() => ({ where: mockWhere }));
+const mockDelete = jest.fn(() => ({ from: mockFrom }));
 // ラベルのモック
 const mockLabels = [
     { id: "1", labelname: "work", createdate: new Date(), notes: [] },
@@ -78,6 +83,9 @@ const mockRepoTableNote = {
         });
     }),
     remove: jest.fn((tableNote) => Promise.resolve(tableNote)),
+    createQueryBuilder: jest.fn(() => ({
+        delete: mockDelete,
+    }))
 };
 // TableNoteColumnのリポジトリをモック
 const mockRepoTableNoteColumn = {
@@ -373,8 +381,7 @@ describe("TableNoteRoutes", () => {
     it("PUT /tablenotes/trash should return 200 and message", async () => {
         mockRepoTableNote.findOneBy.mockImplementationOnce(() => Promise.resolve(mockDeletedTableNotes));
         const response = await request(app)
-            .put("/api/tablenotes/trash")
-            .send({ id: 3 });
+            .put("/api/tablenotes/trash/3");
         console.log("response body:", response.body);
         expect(response.status).toBe(200);
         expect(response.body.tablenote.is_deleted).toBe(false);
@@ -392,16 +399,14 @@ describe("TableNoteRoutes", () => {
             }
         });
         const response = await request(app)
-            .put("/api/tablenotes/trash")
-            .send({ id: 999 });
+            .put("/api/tablenotes/trash/999");
         expect(response.status).toBe(404);
         expect(response.body.error).toBe("Can't find TableNote");
     });
     it("PUT /tablenotes/trash and error occured should return 500 and message", async () => {
         mockRepoTableNote.findOneBy.mockImplementationOnce(() => Promise.reject(new Error("DB find error!")));
         const response = await request(app)
-            .put("/api/tablenotes/trash")
-            .send({ id: 3 });
+            .put("/api/tablenotes/trash/3");
         expect(response.status).toBe(500);
         expect(response.body.error).toBe("Failed to restore TableNote");
     });
@@ -441,6 +446,22 @@ describe("TableNoteRoutes", () => {
             .send({ id: 3 });
         expect(response.status).toBe(500);
         expect(response.body.error).toBe("Failed to update lock state");
+    });
+    it("DELETE /tablenotes/trash should return 200 and message", async () => {
+        const response = await request(app)
+            .delete("/api/tablenotes/trash");
+        console.log("response.body.tablenote:", response.body.tablenote);
+        expect(response.status).toBe(200);
+        expect(response.body.message).toBe("All TrashTableNote deleted successfully");
+    });
+    it("DELETE /tablenotes/trash and error occured should return 500 and message", async () => {
+        const dbError = new Error("DB Deletion Failed during execution");
+        mockExecute.mockRejectedValue(dbError);
+        const response = await request(app)
+            .delete("/api/tablenotes/trash");
+        console.log("response.body.tablenote:", response.body.tablenote);
+        expect(response.status).toBe(500);
+        expect(response.body.error).toBe("Failed to delete all TrashTableNote");
     });
     afterAll(async () => {
         if (hoardserver) {
