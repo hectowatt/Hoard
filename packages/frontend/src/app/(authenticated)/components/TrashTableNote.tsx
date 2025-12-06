@@ -93,14 +93,11 @@ export default function TrashTableNote({ id, title, label_id, is_locked, created
     // 復元ボタン押下処理
     const handleSave = async () => {
         try {
-            const response = await fetch("/api/tablenotes/trash", {
+            const response = await fetch('/api/tablenotes/trash/${id}', {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({
-                    id: id
-                }),
                 credentials: "include"
             })
 

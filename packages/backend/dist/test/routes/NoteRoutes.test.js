@@ -8,6 +8,11 @@ jest.unstable_mockModule("ioredis", () => ({
         get: jest.fn().mockImplementation(() => Promise.resolve("valid")),
     })),
 }));
+const mockExecute = jest.fn(() => Promise.resolve({ affected: 1 }));
+const mockAndWhere = jest.fn(() => ({ execute: mockExecute }));
+const mockWhere = jest.fn(() => ({ andWhere: mockAndWhere }));
+const mockFrom = jest.fn(() => ({ where: mockWhere }));
+const mockDelete = jest.fn(() => ({ from: mockFrom }));
 // ラベルのモック
 const mockLabels = [
     { id: "1", labelname: "work", createdate: new Date(), notes: [] },
@@ -57,6 +62,9 @@ const mockRepo = {
         });
     }),
     remove: jest.fn((note) => Promise.resolve(note)),
+    createQueryBuilder: jest.fn(() => ({
+        delete: mockDelete,
+    }))
 };
 jest.unstable_mockModule("../../dist/DataSource.js", () => ({
     AppDataSource: {
@@ -67,6 +75,9 @@ jest.unstable_mockModule("../../dist/DataSource.js", () => ({
 // モックが終わってから import
 const { app, hoardserver } = await import("../../dist/server.js");
 describe("NoteRoutes", () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
+    });
     it("GET /notes should return 200 and all notes", async () => {
         const response = await request(app).get("/api/notes");
         expect(response.status).toBe(200);
@@ -211,8 +222,7 @@ describe("NoteRoutes", () => {
     it("PUT /notes/trash should return 200 and message", async () => {
         mockRepo.findOneBy.mockImplementationOnce(() => Promise.resolve(mockDeletedNotes[0]));
         const response = await request(app)
-            .put("/api/notes/trash")
-            .send({ id: 3 });
+            .put("/api/notes/trash/3");
         expect(response.status).toBe(200);
         expect(response.body.message).toBe("Restore note success!");
         expect(response.body.note.id).toBe("3");
@@ -221,16 +231,14 @@ describe("NoteRoutes", () => {
     });
     it("PUT /notes/trash with NOT exist note should return 404 and message", async () => {
         const response = await request(app)
-            .put("/api/notes/trash")
-            .send({ id: 999 });
+            .put("/api/notes/trash/999");
         expect(response.status).toBe(404);
         expect(response.body.error).toBe("TrashNote not found");
     });
     it("PUT /notes/trash and error occured should return 500 and message", async () => {
         mockRepo.findOneBy.mockImplementationOnce(() => Promise.reject(new Error("DB find error")));
         const response = await request(app)
-            .put("/api/notes/trash")
-            .send({ id: 3 });
+            .put("/api/notes/trash/3");
         expect(response.status).toBe(500);
         expect(response.body.error).toBe("Failed to restore notes");
     });
@@ -257,6 +265,20 @@ describe("NoteRoutes", () => {
             .send({ id: "1", isLocked: true });
         expect(response.status).toBe(500);
         expect(response.body.error).toBe("Failed to update lock state");
+    });
+    it("DELETE /notes/trash should return 200 and message", async () => {
+        const response = await request(app)
+            .delete("/api/notes/trash");
+        expect(response.status).toBe(200);
+        expect(response.body.message).toBe("All TrashNote deleted successfully");
+    });
+    it("DELETE /notes/trash and error occured should return 500 and message", async () => {
+        const dbError = new Error("DB Deletion Failed during execution");
+        mockExecute.mockRejectedValue(dbError);
+        const response = await request(app)
+            .delete("/api/notes/trash");
+        expect(response.status).toBe(500);
+        expect(response.body.error).toBe("Failed to delete trashnote");
     });
     afterAll(async () => {
         if (hoardserver) {

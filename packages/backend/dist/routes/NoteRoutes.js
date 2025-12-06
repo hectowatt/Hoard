@@ -61,6 +61,99 @@ router.put('/', authMiddleware, async (req, res) => {
         res.status(500).json({ error: "failed to update notes" });
     }
 });
+// 【UPDATE】Notesロック状態更新用API
+router.put('/lock', authMiddleware, async (req, res) => {
+    const { id, isLocked } = req.body;
+    try {
+        const noteRepository = AppDataSource.getRepository(Note);
+        const note = await noteRepository.findOneBy({ id: id });
+        if (!note) {
+            return res.status(404).json({ error: "Can't find note" });
+        }
+        note.is_locked = isLocked; // ロック状態を更新
+        const updatedNote = await noteRepository.save(note);
+        console.log('Note lock state updated: ', updatedNote.is_locked);
+        res.status(200).json({ message: "Update lock state success!", note: updatedNote });
+    }
+    catch (error) {
+        console.error("Error updating lock state", error);
+        res.status(500).json({ error: "Failed to update lock state" });
+    }
+});
+/************ TrashNote ************/
+// 【SELECT】TrashNote取得API
+router.get('/trash', authMiddleware, async (req, res) => {
+    try {
+        const noteRepository = AppDataSource.getRepository(Note);
+        const notes = await noteRepository.find({ where: { is_deleted: true }, order: { deletedate: 'DESC' } });
+        res.status(200).json(notes);
+    }
+    catch (error) {
+        console.error("Error fetching trash notes:", error);
+        res.status(500).json({ error: 'Failed to fetch trash notes' });
+    }
+});
+// 【DELETE】TrashNote一括削除用API
+router.delete('/trash', authMiddleware, async (req, res) => {
+    try {
+        const noteRepository = AppDataSource.getRepository(Note);
+        await noteRepository
+            .createQueryBuilder()
+            .delete()
+            .from(Note)
+            .where("is_deleted = :isDeleted", { isDeleted: true })
+            .andWhere("deletedate IS NOT NULL")
+            .execute();
+        res.status(200).json({ message: "All TrashNote deleted successfully" });
+    }
+    catch (error) {
+        console.error("Error deleting trashnote:", error);
+        res.status(500).json({ error: "Failed to delete trashnote" });
+    }
+});
+// 【UPDATE】Notes一括復元用API
+router.put('/trash', authMiddleware, async (req, res) => {
+    try {
+        const noteRepository = AppDataSource.getRepository(Note);
+        const result = await noteRepository
+            .createQueryBuilder()
+            .update(Note)
+            .set({
+            is_deleted: false,
+            deletedate: null,
+        })
+            .where("is_deleted = :isDeleted", { isDeleted: true })
+            .andWhere("deletedate IS NOT NULL")
+            .execute();
+        res.status(200).json({
+            message: "Restore all notes success!",
+            affected: result.affected, // 何件更新されたか
+        });
+    }
+    catch (error) {
+        console.error("Error restoring notes", error);
+        res.status(500).json({ error: "Failed to restore notes" });
+    }
+});
+// ******************* 動的パラメータ持ち *******************
+// 【DELETE】TrashNote削除用API
+router.delete('/trash/:id', authMiddleware, async (req, res) => {
+    const { id } = req.params;
+    console.log("delete id: ", id);
+    try {
+        const noteRepository = AppDataSource.getRepository(Note);
+        const note = await noteRepository.findOneBy({ id: id });
+        if (!note) {
+            return res.status(404).json({ error: "TrashNote not found" });
+        }
+        await noteRepository.remove(note);
+        res.status(200).json({ message: "Note deleted successfully" });
+    }
+    catch (error) {
+        console.error("Error deleting note:", error);
+        res.status(500).json({ error: "Failed to delete note" });
+    }
+});
 // 【DELETE】Notes削除用API
 router.delete('/:id', authMiddleware, async (req, res) => {
     const { id } = req.params;
@@ -81,40 +174,9 @@ router.delete('/:id', authMiddleware, async (req, res) => {
         res.status(500).json({ error: "Failed to move note to trash" });
     }
 });
-/************ TrashNote ************/
-// 【SELECT】TrashNote取得API
-router.get('/trash', authMiddleware, async (req, res) => {
-    try {
-        const noteRepository = AppDataSource.getRepository(Note);
-        const notes = await noteRepository.find({ where: { is_deleted: true }, order: { deletedate: 'DESC' } });
-        res.status(200).json(notes);
-    }
-    catch (error) {
-        console.error("Error fetching trash notes:", error);
-        res.status(500).json({ error: 'Failed to fetch trash notes' });
-    }
-});
-// 【DELETE】TrashNote削除用API
-router.delete('/trash/:id', authMiddleware, async (req, res) => {
-    const { id } = req.params;
-    console.log("delete id: ", id);
-    try {
-        const noteRepository = AppDataSource.getRepository(Note);
-        const note = await noteRepository.findOneBy({ id: id });
-        if (!note) {
-            return res.status(404).json({ error: "TrashNote not found" });
-        }
-        await noteRepository.remove(note);
-        res.status(200).json({ message: "Note deleted successfully" });
-    }
-    catch (error) {
-        console.error("Error deleting note:", error);
-        res.status(500).json({ error: "Failed to delete note" });
-    }
-});
 // 【UPDATE】Notes復元用API
-router.put('/trash', authMiddleware, async (req, res) => {
-    const { id } = req.body;
+router.put('/trash/:id', authMiddleware, async (req, res) => {
+    const { id } = req.params;
     try {
         const noteRepository = AppDataSource.getRepository(Note);
         const note = await noteRepository.findOneBy({ id: id });
@@ -130,25 +192,6 @@ router.put('/trash', authMiddleware, async (req, res) => {
     catch (error) {
         console.error("Error restoring note", error);
         res.status(500).json({ error: "Failed to restore notes" });
-    }
-});
-// 【UPDATE】Notesロック状態更新用API
-router.put('/lock', authMiddleware, async (req, res) => {
-    const { id, isLocked } = req.body;
-    try {
-        const noteRepository = AppDataSource.getRepository(Note);
-        const note = await noteRepository.findOneBy({ id: id });
-        if (!note) {
-            return res.status(404).json({ error: "Can't find note" });
-        }
-        note.is_locked = isLocked; // ロック状態を更新
-        const updatedNote = await noteRepository.save(note);
-        console.log('Note lock state updated: ', updatedNote.is_locked);
-        res.status(200).json({ message: "Update lock state success!", note: updatedNote });
-    }
-    catch (error) {
-        console.error("Error updating lock state", error);
-        res.status(500).json({ error: "Failed to update lock state" });
     }
 });
 export default router;

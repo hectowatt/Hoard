@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import Home from "@/app/(authenticated)/trash/page";
 import "@testing-library/jest-dom";
 import i18n from "@/app/lib/i18n";
@@ -87,6 +87,8 @@ describe("Trash Page", () => {
 
         // 最初のテキスト
         expect(screen.getByText(label_trash_desc)).toBeInTheDocument();
+        expect(screen.getByTestId("button_all_delete")).toBeInTheDocument();
+        expect(screen.getByTestId("button_all_restore")).toBeInTheDocument();
 
         // 非同期描画を待つ
         await waitFor(() => {
@@ -95,6 +97,40 @@ describe("Trash Page", () => {
         });
 
         // fetchが呼ばれていることを確認
+        expect(fetch).toHaveBeenCalledWith("/api/notes/trash", expect.any(Object));
+        expect(fetch).toHaveBeenCalledWith("/api/tablenotes/trash", expect.any(Object));
+    });
+
+    it("一括削除ボタンをクリックしたとき、/api/notes/trashと/api/tablenotes/trashにリクエストが送信される", async () => {
+        render(
+            <LocaleProvider>
+                <SnackbarProvider>
+                    <Home />
+                </SnackbarProvider>
+            </LocaleProvider>
+        );
+
+        const allDeleteButton = await screen.getByTestId("button_all_delete");
+
+        fireEvent.click(allDeleteButton);
+
+        expect(fetch).toHaveBeenCalledWith("/api/notes/trash", expect.any(Object));
+        expect(fetch).toHaveBeenCalledWith("/api/tablenotes/trash", expect.any(Object));
+    });
+
+    it("一括復元ボタンをクリックしたとき、/api/notes/trashと/api/tablenotes/trashにリクエストが送信される", async () => {
+        render(
+            <LocaleProvider>
+                <SnackbarProvider>
+                    <Home />
+                </SnackbarProvider>
+            </LocaleProvider>
+        );
+
+        const allRestoreButton = await screen.getByTestId("button_all_restore");
+
+        fireEvent.click(allRestoreButton);
+
         expect(fetch).toHaveBeenCalledWith("/api/notes/trash", expect.any(Object));
         expect(fetch).toHaveBeenCalledWith("/api/tablenotes/trash", expect.any(Object));
     });

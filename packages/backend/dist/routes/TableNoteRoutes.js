@@ -244,6 +244,99 @@ router.put('/', authMiddleware, async (req, res) => {
         res.status(500).json({ error: "Failed to update TableNote" });
     }
 });
+// 【UPDATE】TableNoteロック状態更新用API
+router.put('/lock', authMiddleware, async (req, res) => {
+    const { id, isLocked } = req.body;
+    try {
+        const tableNoteRepository = AppDataSource.getRepository(TableNote);
+        const tableNote = await tableNoteRepository.findOneBy({ id: id });
+        if (!tableNote) {
+            return res.status(404).json({ error: "Can't find TableNote" });
+        }
+        tableNote.is_locked = isLocked; // ロック状態を更新
+        const updatedNote = await tableNoteRepository.save(tableNote);
+        console.log('Note lock state updated: ', updatedNote.is_locked);
+        res.status(200).json({ message: "Update lock state success!", tablenote: updatedNote });
+    }
+    catch (error) {
+        console.error("Error updating lock state", error);
+        res.status(500).json({ error: "Failed to update lock state" });
+    }
+});
+/************ TrashNote ************/
+// 【SELECT】TrashTableNote取得API
+router.get('/trash', authMiddleware, async (req, res) => {
+    try {
+        const noteRepository = AppDataSource.getRepository(TableNote);
+        const notes = await noteRepository.find({ where: { is_deleted: true }, order: { deletedate: 'DESC' } });
+        res.status(200).json(notes);
+    }
+    catch (error) {
+        console.error("Error fetching trash TableNotes:", error);
+        res.status(500).json({ error: 'Failed to fetch trash TableNotes' });
+    }
+});
+// 【DELETE】TrashTableNote一括削除用API
+router.delete('/trash', authMiddleware, async (req, res) => {
+    try {
+        const tableNoteRepository = AppDataSource.getRepository(TableNote);
+        await tableNoteRepository
+            .createQueryBuilder()
+            .delete()
+            .from(TableNote)
+            .where("is_deleted = :isDeleted", { isDeleted: true })
+            .andWhere("deletedate IS NOT NULL")
+            .execute();
+        res.status(200).json({ message: "All TrashTableNote deleted successfully" });
+    }
+    catch (error) {
+        console.error("Error deleting TrashTableNote:", error);
+        res.status(500).json({ error: "Failed to delete all TrashTableNote" });
+    }
+});
+// 【UPDATE】TableNotes一括復元用API
+router.put('/trash', authMiddleware, async (req, res) => {
+    try {
+        const tableNoteRepository = AppDataSource.getRepository(TableNote);
+        const result = await tableNoteRepository
+            .createQueryBuilder()
+            .update(TableNote)
+            .set({
+            is_deleted: false,
+            deletedate: null,
+        })
+            .where("is_deleted = :isDeleted", { isDeleted: true })
+            .andWhere("deletedate IS NOT NULL")
+            .execute();
+        res.status(200).json({
+            message: "Restore all tablenotes success!",
+            affected: result.affected, // 何件更新されたか
+        });
+    }
+    catch (error) {
+        console.error("Error restoring tablenotes", error);
+        res.status(500).json({ error: "Failed to restore tablenotes" });
+    }
+});
+// ******************* 動的パラメータ持ち *******************
+// 【DELETE】TrashTableNote削除用API
+router.delete('/trash/:id', authMiddleware, async (req, res) => {
+    const { id } = req.params;
+    console.log("delete id: ", id);
+    try {
+        const tableNoteRepository = AppDataSource.getRepository(TableNote);
+        const tableNote = await tableNoteRepository.findOneBy({ id: id });
+        if (!tableNote) {
+            return res.status(404).json({ error: "TableNotes not found" });
+        }
+        await tableNoteRepository.remove(tableNote);
+        res.status(200).json({ message: "TableNote deleted successfully" });
+    }
+    catch (error) {
+        console.error("Error deleting TableNote:", error);
+        res.status(500).json({ error: "Failed to delete TableNote" });
+    }
+});
 // 【DELETE】Notes削除用API
 router.delete('/:id', authMiddleware, async (req, res) => {
     const { id } = req.params;
@@ -264,40 +357,9 @@ router.delete('/:id', authMiddleware, async (req, res) => {
         res.status(500).json({ error: "Failed moved to trash" });
     }
 });
-/************ TrashNote ************/
-// 【SELECT】TrashNote取得API
-router.get('/trash', authMiddleware, async (req, res) => {
-    try {
-        const noteRepository = AppDataSource.getRepository(TableNote);
-        const notes = await noteRepository.find({ where: { is_deleted: true }, order: { deletedate: 'DESC' } });
-        res.status(200).json(notes);
-    }
-    catch (error) {
-        console.error("Error fetching trash TableNotes:", error);
-        res.status(500).json({ error: 'Failed to fetch trash TableNotes' });
-    }
-});
-// 【DELETE】TrashNote削除用API
-router.delete('/trash/:id', authMiddleware, async (req, res) => {
+// 【UPDATE】TableTableNote復元用API
+router.put('/trash/:id', authMiddleware, async (req, res) => {
     const { id } = req.params;
-    console.log("delete id: ", id);
-    try {
-        const tableNoteRepository = AppDataSource.getRepository(TableNote);
-        const tableNote = await tableNoteRepository.findOneBy({ id: id });
-        if (!tableNote) {
-            return res.status(404).json({ error: "TableNotes not found" });
-        }
-        await tableNoteRepository.remove(tableNote);
-        res.status(200).json({ message: "TableNote deleted successfully" });
-    }
-    catch (error) {
-        console.error("Error deleting TableNote:", error);
-        res.status(500).json({ error: "Failed to delete TableNote" });
-    }
-});
-// 【UPDATE】TableNote復元用API
-router.put('/trash', authMiddleware, async (req, res) => {
-    const { id } = req.body;
     try {
         const tableNoteRepository = AppDataSource.getRepository(TableNote);
         const tableNote = await tableNoteRepository.findOneBy({ id: id });
@@ -313,25 +375,6 @@ router.put('/trash', authMiddleware, async (req, res) => {
     catch (error) {
         console.error("Error restoring TableNote", error);
         res.status(500).json({ error: "Failed to restore TableNote" });
-    }
-});
-// 【UPDATE】TableNoteロック状態更新用API
-router.put('/lock', authMiddleware, async (req, res) => {
-    const { id, isLocked } = req.body;
-    try {
-        const tableNoteRepository = AppDataSource.getRepository(TableNote);
-        const tableNote = await tableNoteRepository.findOneBy({ id: id });
-        if (!tableNote) {
-            return res.status(404).json({ error: "Can't find TableNote" });
-        }
-        tableNote.is_locked = isLocked; // ロック状態を更新
-        const updatedNote = await tableNoteRepository.save(tableNote);
-        console.log('Note lock state updated: ', updatedNote.is_locked);
-        res.status(200).json({ message: "Update lock state success!", tablenote: updatedNote });
-    }
-    catch (error) {
-        console.error("Error updating lock state", error);
-        res.status(500).json({ error: "Failed to update lock state" });
     }
 });
 export default router;

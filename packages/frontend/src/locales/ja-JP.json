@@ -18,6 +18,8 @@
     "button_unlock": "ロック解除",
     "button_restore": "復元",
     "button_permanently_delete": "完全に削除",
+    "button_all_delete": "一括削除",
+    "button_all_restore": "一括復元",
     "label_createdate": "作成日",
     "label_updatedate": "更新日",
     "label_labels": "ラベル",
@@ -75,6 +77,8 @@
     "message_cannot_get_notepassword": "ノートパスワードの取得に失敗しました",
     "message_notepassword_must_be_set_to_unlock": "ノートのロックを解除するには、ノートパスワードを入力する必要があります",
     "message_incorrect_password": "パスワードが違います。再度入力してください。",
+    "message_all_delete": "すべて削除しました！",
+    "message_all_restore": "すべて復元しました！",
     "dropdown_labels": "ラベル",
     "dropdown_no_labels": "ラベルなし",
     "dropdown_no_languages": "利用可能言語なし"
