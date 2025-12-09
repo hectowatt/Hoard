@@ -94,7 +94,7 @@ router.get('/', authMiddleware, async (req, res) => {
       const columnRepository = AppDataSource.getRepository(TableNoteColumn);
       const cellRepository = AppDataSource.getRepository(TableNoteCell);
       const columns = await columnRepository.find({ where: { tableNote: { id: tableNote.id } }, order: { order: 'ASC' } });
-      const rowCells = await cellRepository.find({ where: { tableNote: { id: tableNote.id } }, relations: ['column'], order: { row_index: 'ASC' } });
+      const rowCells = await cellRepository.find({ where: { tableNote: { id: tableNote.id } }, relations: ['column'], order: { row_index: 'ASC',column: {order: 'ASC'} } });
 
       // rowCellsをrow_indexごとにグループ化して2次元配列に変換
       const groupedRowCells: { id: string; rowIndex: number; value: string; columnId?: string }[][] = [];
