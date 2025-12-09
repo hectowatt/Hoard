@@ -61,10 +61,12 @@ export default function Note({
     const { showSnackbar } = useSnackbar();
     const router = useRouter();
 
-    // 画面描画時にノートロック状態を設定
+    // 画面描画時にノートロック状態とラベルを設定
     useEffect(() => {
         setIsLocked(is_locked);
-    }, [is_locked]);
+        setEditTitle(title);
+        setEditLabel(label_id || null);
+    }, [title, label_id]);
 
 
     const handleOpen = () => {
