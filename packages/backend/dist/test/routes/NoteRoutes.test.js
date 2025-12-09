@@ -199,7 +199,7 @@ describe("NoteRoutes", () => {
         expect(response.status).toBe(500);
         expect(response.body.error).toBe("Failed to fetch trash notes");
     });
-    it("DELETE /notes/trash should return 200 and message", async () => {
+    it("DELETE /notes/trash:2 should return 200 and message", async () => {
         mockRepo.remove.mockImplementationOnce(() => Promise.resolve());
         const response = await request(app)
             .delete("/api/notes/trash/2");
@@ -212,7 +212,7 @@ describe("NoteRoutes", () => {
         expect(response.status).toBe(404);
         expect(response.body.error).toBe("TrashNote not found");
     });
-    it("DELETE /notes/trash and error occured should return 500 and message", async () => {
+    it("DELETE /notes/trash:2 and error occured should return 500 and message", async () => {
         mockRepo.findOneBy.mockImplementationOnce(() => Promise.reject(new Error("DB find error")));
         const response = await request(app)
             .delete("/api/notes/trash/2");

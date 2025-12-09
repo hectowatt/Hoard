@@ -271,7 +271,7 @@ describe("Note", () => {
             </LocaleProvider>
         );
 
-        expect(screen.getByText(lockedText)).toBeVisible();
+        expect(await screen.findByText(lockedText)).toBeVisible();
     });
 
 });
