@@ -46,6 +46,9 @@ router.get('/', authMiddleware, async (req, res) => {
 // 【UPDATE】ノートパスワード更新API
 router.put('/', authMiddleware, async (req, res) => {
     const { password_id, passwordString } = req.body;
+    if (!password_id || !passwordString) {
+        return res.status(400).json({ error: "Must set password_id, passwordString" });
+    }
     try {
         const passwordRepository = AppDataSource.getRepository(NotePassword);
         const password = await passwordRepository.findOneBy({ password_id: password_id });
@@ -66,7 +69,7 @@ router.post('/compare', authMiddleware, async (req, res) => {
     try {
         const password_id = req.body.password_id;
         const passwordString = req.body.passwordString;
-        if (!passwordString) {
+        if (!passwordString || !password_id) {
             return res.status(400).json({ error: "Must set password string" });
         }
         const passwordRepository = AppDataSource.getRepository(NotePassword);

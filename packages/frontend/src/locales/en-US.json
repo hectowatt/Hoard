@@ -79,6 +79,7 @@
     "message_incorrect_password": "The password is incorrect. Please enter it again.",
     "message_all_delete": "All Deleted!",
     "message_all_restore": "All Restored!",
+    "message_must_set_title_or_content": "To register a note, enter either the title or the content.",
     "dropdown_labels": "Label",
     "dropdown_no_labels": "No Labels",
     "dropdown_no_languages": "No Available Languages"

@@ -79,6 +79,7 @@
     "message_incorrect_password": "パスワードが違います。再度入力してください。",
     "message_all_delete": "すべて削除しました！",
     "message_all_restore": "すべて復元しました！",
+    "message_must_set_title_or_content": "ノートを登録するにはタイトルか内容のいずれかを入力してください",
     "dropdown_labels": "ラベル",
     "dropdown_no_labels": "ラベルなし",
     "dropdown_no_languages": "利用可能言語なし"
