@@ -136,6 +136,10 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
 
     // 保存ボタン押下処理
     const saveButtonClick = async () => {
+        if (!title && !content) {
+            showSnackbar(t("message_must_set_title_or_content"), "warning");
+            return;
+        }
 
         try {
 
@@ -176,7 +180,7 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                 onInsert(insertedNoteId, title, content, editLabelId || "", isLocked);
             }
         } catch (error) {
-            console.error("Error saving note:", error);
+            showSnackbar(t("message_error_occured"));
         }
 
         setIsEditing(false);
@@ -245,7 +249,7 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                 onInsertTableNote(result.tableNote.id, result.tableNote.title, editLabelId || "", isLocked, editColumns, editRowCells);
             }
         } catch (error) {
-            console.error("Error saving table note:", error);
+            showSnackbar(t("message_error_occured"));
         }
     }
 

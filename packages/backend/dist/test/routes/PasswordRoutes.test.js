@@ -176,6 +176,14 @@ describe("PasswordRoutes", () => {
         expect(response.status).toBe(500);
         expect(response.body.error).toBe("Failed to update password");
     });
+    it("PUT /password without password_id should return 400 and message", async () => {
+        mockRepo.findOneBy.mockImplementationOnce(() => Promise.reject(new Error("DB save error")));
+        const response = await request(app)
+            .put("/api/password")
+            .send({ passwordString: "updatedpassword" });
+        expect(response.status).toBe(400);
+        expect(response.body.error).toBe("Must set password_id, passwordString");
+    });
     afterAll(async () => {
         if (hoardserver) {
             await new Promise((resolve, reject) => {

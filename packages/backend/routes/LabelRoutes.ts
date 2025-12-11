@@ -52,6 +52,9 @@ router.get('/', authMiddleware, async (req, res) => {
 router.delete('/:id', authMiddleware, async (req, res) => {
   const id: string = req.params?.id ?? req.body?.id;
   console.log("delete label id: ", id);
+  if(!id ){
+    return res.status(400).json({ error: "Must set id" });
+  }
   try {
     const labelRepository = AppDataSource.getRepository(Label);
     const label = await labelRepository.findOneBy({ id: id });

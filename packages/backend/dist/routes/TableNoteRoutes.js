@@ -8,8 +8,8 @@ const router = Router();
 // 【INSERT】テーブルノート登録API
 router.post('/', authMiddleware, async (req, res) => {
     const { title, columns, rowCells, label_id, is_locked } = req.body;
-    if (!title || !columns || !rowCells) {
-        return res.status(400).json({ error: "Must set tablenote title, columns, rows" });
+    if (!columns || !rowCells) {
+        return res.status(400).json({ error: "Must set tablenote columns, rows" });
     }
     try {
         var savedTableNote = null;
@@ -113,6 +113,9 @@ router.get('/', authMiddleware, async (req, res) => {
 // 【UPDATE】テーブルノート更新API
 router.put('/', authMiddleware, async (req, res) => {
     const { id, title, columns, rowCells, label_id, is_locked } = req.body;
+    if (!columns || !rowCells) {
+        return res.status(400).json({ error: "Must set tablenote title, columns, rows" });
+    }
     try {
         await AppDataSource.transaction(async (transactionalEntityManager) => {
             const tableNoteRepository = transactionalEntityManager.getRepository(TableNote);
@@ -247,6 +250,9 @@ router.put('/', authMiddleware, async (req, res) => {
 // 【UPDATE】TableNoteロック状態更新用API
 router.put('/lock', authMiddleware, async (req, res) => {
     const { id, isLocked } = req.body;
+    if (!id || !isLocked) {
+        return res.status(400).json({ error: "Must set tablenote id,isLocked" });
+    }
     try {
         const tableNoteRepository = AppDataSource.getRepository(TableNote);
         const tableNote = await tableNoteRepository.findOneBy({ id: id });
@@ -340,6 +346,9 @@ router.delete('/trash/:id', authMiddleware, async (req, res) => {
 // 【DELETE】Notes削除用API
 router.delete('/:id', authMiddleware, async (req, res) => {
     const { id } = req.params;
+    if (!id) {
+        return res.status(400).json({ error: "Must set tablenote id" });
+    }
     console.log("delete id: ", id);
     try {
         const tableNoteRepository = AppDataSource.getRepository(TableNote);
@@ -357,9 +366,12 @@ router.delete('/:id', authMiddleware, async (req, res) => {
         res.status(500).json({ error: "Failed moved to trash" });
     }
 });
-// 【UPDATE】TableTableNote復元用API
+// 【UPDATE】TrashTableNote復元用API
 router.put('/trash/:id', authMiddleware, async (req, res) => {
     const { id } = req.params;
+    if (!id) {
+        return res.status(400).json({ error: "Must set tablenote id" });
+    }
     try {
         const tableNoteRepository = AppDataSource.getRepository(TableNote);
         const tableNote = await tableNoteRepository.findOneBy({ id: id });
