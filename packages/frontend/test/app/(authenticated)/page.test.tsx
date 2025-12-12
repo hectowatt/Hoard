@@ -4,6 +4,7 @@ import "@testing-library/jest-dom";
 import { NoteProvider } from "@/app/(authenticated)/context/NoteProvider";
 import { LabelProvider } from "@/app/(authenticated)/context/LabelProvider";
 import Home from "@/app/(authenticated)/page";
+import { SearchLabelProvider } from "@/app/(authenticated)/context/SearchLabelProvider";
 
 // ラベルコンテキストのモック
 const mockLabels = [
@@ -71,7 +72,9 @@ global.fetch = jest.fn(() =>
 describe("Top Page", () => {
     it("NoteとTableNoteが表示される", async () => {
         render(
-            <Home />
+            <SearchLabelProvider>
+                <Home />
+            </SearchLabelProvider>
         );
 
         expect(screen.getByTestId("note")).toBeInTheDocument();
