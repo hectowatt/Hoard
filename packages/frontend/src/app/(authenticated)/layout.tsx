@@ -37,6 +37,7 @@ import { TableNoteProvider } from "@/app/(authenticated)/context/TableNoteProvid
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import Brightness2OutlinedIcon from '@mui/icons-material/Brightness2Outlined';
 import { SearchWordProvider, useSearchWordContext } from "@/app/(authenticated)/context/SearchWordProvider";
+import { SearchLabelProvider, useSearchLabelContext } from "./context/SearchLabelProvider";
 import SearchWordBar from "@/app/(authenticated)/components/SearchWordBar";
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { Router } from "next/router";
@@ -110,13 +111,15 @@ export default function AuthenticatedLayout({
 		<ThemeProvider theme={theme}>
 			<AppRouterCacheProvider>
 				<SearchWordProvider>
-					<NoteProvider>
-						<TableNoteProvider>
-							<LabelProvider>
-								<InnerLayout>{children}</InnerLayout>
-							</LabelProvider>
-						</TableNoteProvider>
-					</NoteProvider>
+					<SearchLabelProvider>
+						<NoteProvider>
+							<TableNoteProvider>
+								<LabelProvider>
+									<InnerLayout>{children}</InnerLayout>
+								</LabelProvider>
+							</TableNoteProvider>
+						</NoteProvider>
+					</SearchLabelProvider>
 				</SearchWordProvider>
 			</AppRouterCacheProvider >
 		</ThemeProvider >
@@ -129,8 +132,13 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 	const { mode, setMode } = useThemeMode();
 	const router = useRouter();
 	const theme = useTheme();
-	const [isDrawerOpen, setIsDrawerOpen] = React.useState(false);
+	// useMediaQueryを使って画面サイズを判定
+	const themeForMediaQuery = useTheme();
+	// md (900px) より小さい画面で isSmallScreen が true になる
+	const isSmallScreen = useMediaQuery(themeForMediaQuery.breakpoints.down("md"));
+	const [isDrawerOpen, setIsDrawerOpen] = React.useState(!isSmallScreen);
 	const { searchWord, setSearchWord } = useSearchWordContext();
+	const { searchLabel, setSearchLabel } = useSearchLabelContext();
 	const { t } = useTranslation();
 	const { showSnackbar } = useSnackbar();
 
@@ -144,7 +152,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 
 	// サイドバー上部
 	const navAboveItems = [
-		{ text: t("nav_note"), icon: aboveIcons[0], href: "/", onClick: () => { setSearchWord("") } },
+		{ text: t("nav_note"), icon: aboveIcons[0], href: "/", onClick: () => { setSearchWord(""); setSearchLabel("") } },
 		{ text: t("nav_label"), icon: aboveIcons[1], dialog: true }
 	];
 
@@ -153,11 +161,6 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 		{ text: t("nav_trash"), icon: belowIcons[0], href: "/trash" },
 		{ text: t("nav_settings"), icon: belowIcons[1], href: "/settings" }
 	];
-
-	// useMediaQueryを使って画面サイズを判定
-	const themeForMediaQuery = useTheme();
-	// md (900px) より小さい画面で isSmallScreen が true になる
-	const isSmallScreen = useMediaQuery(themeForMediaQuery.breakpoints.down("md"));
 
 	// 現在のDrawerの幅をstateとして管理
 	const currentDrawerWidth = isDrawerOpen ? drawerWidthOpen : drawerWidthClosed;
@@ -180,6 +183,14 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 		}
 		setMode(determinedMode);
 	}, []);
+
+	React.useEffect(() => {
+		if (isSmallScreen) {
+			setIsDrawerOpen(false);
+		} else {
+			setIsDrawerOpen(true);
+		}
+	}, [isSmallScreen])
 
 	// モードが変わったら localStorage に保存
 	React.useEffect(() => {
@@ -369,7 +380,7 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 							))}
 							{labels.map((label) => (
 								<ListItem key={label.id} disablePadding>
-									<ListItemButton onClick={() => setSearchWord(label.labelname)} sx={{ pl: logoHorizontalPadding }} data-testid={`labellistitem-${label.id}`}>
+									<ListItemButton onClick={() => setSearchLabel(label.labelname)} sx={{ pl: logoHorizontalPadding }} data-testid={`labellistitem-${label.id}`}>
 										<ListItemIcon sx={{ minWidth: 0, justifyContent: "center", pl: logoHorizontalPadding }}>
 											<LabelImportantOutlineRoundedIcon data-testid={`addedlabelicon-${label.id}`} />
 										</ListItemIcon>
