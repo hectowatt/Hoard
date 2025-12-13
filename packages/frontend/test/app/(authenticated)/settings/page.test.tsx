@@ -5,6 +5,10 @@ import Home from "@/app/(authenticated)/settings/page";
 import i18n from "@/app/lib/i18n";
 import { SnackbarProvider } from "@/app/(authenticated)/context/SnackbarProvider";
 
+const mockBlob = new Blob(["mock zip data"], { type: "application/zip" });
+const mockZipFile = new File(["mock zip data"], "test.zip", { type: "application/zip" });
+global.URL.createObjectURL = jest.fn(() => "mock-object-url");
+global.URL.revokeObjectURL = jest.fn();
 
 // グローバル fetch モック
 beforeEach(() => {
@@ -17,6 +21,20 @@ beforeEach(() => {
                         password_id: "12345",
                         password_hashed: "$2b$10$EIX",
                     }),
+            });
+        }
+        if (url.includes("/api/export")) {
+            return Promise.resolve({
+                ok: true, // 成功ステータス
+                status: 200,
+                blob: () => Promise.resolve(mockBlob),
+                json: () => Promise.resolve({}),
+            });
+        }
+        if (url.includes("/api/import")) {
+            return Promise.resolve({
+                ok: true,
+                json: () => Promise.resolve({ message: "Import successful" }),
             });
         }
         return Promise.resolve({
@@ -92,6 +110,50 @@ describe("Setting Page", () => {
         fireEvent.click(saveButton);
 
         expect(fetch).toHaveBeenCalledWith("/api/password", expect.any(Object));
+    });
+
+    it("ダウンロードボタンをクリックしたとき、/api/exportにリクエストが送信される", async () => {
+        render(
+            <SnackbarProvider>
+                <Home />
+            </SnackbarProvider>
+        );
+
+        const downloadButton = await screen.findByTestId("button-download");
+        fireEvent.click(downloadButton);
+        await waitFor(() => { });
+
+        expect(fetch).toHaveBeenCalledWith("/api/export");
+    });
+
+    it("データアップロードボタンでファイルを選択したとき、/api/importにリクエストが送信される", async () => {
+        render(
+            <SnackbarProvider>
+                <Home />
+            </SnackbarProvider>
+        );
+
+        // 初期ロード（fetchPasswordStatus）の完了を待つ
+        const uploadButton = await screen.findByTestId("button-upload");
+
+        // 1. ファイルを選択したイベントをシミュレート
+        //    アップロードボタンをクリックしてもファイル選択ダイアログが開くだけなので、
+        //    実際にはボタン内の隠された <input type="file"> に change イベントを発火させる
+        const fileInput = uploadButton.querySelector('input[type="file"]') as HTMLInputElement;
+
+        fireEvent.change(fileInput, {
+            target: { files: [mockZipFile] },
+        });
+
+        // 2. 非同期処理（/api/import への fetch とその後の showSnackbar）の完了を待つ
+        //    リロード（window.location.reload）が呼ばれるまで待機
+        await waitFor(() => {
+            // /api/import への POST リクエストが送信されたことを確認
+            expect(fetch).toHaveBeenCalledWith("/api/import", expect.objectContaining({
+                method: "POST",
+                body: expect.any(FormData), // FormData が含まれていることを確認
+            }));
+        });
     });
 
 });

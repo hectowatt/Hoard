@@ -7,7 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from "typeorm";
 import TableNote from "./TableNote.js";
 let TableNoteColumn = class TableNoteColumn {
 };
@@ -24,7 +24,12 @@ __decorate([
     __metadata("design:type", Number)
 ], TableNoteColumn.prototype, "order", void 0);
 __decorate([
+    Column({ name: "table_note_id", type: "uuid" }),
+    __metadata("design:type", String)
+], TableNoteColumn.prototype, "table_note_id", void 0);
+__decorate([
     ManyToOne(() => TableNote, tableNote => tableNote.id, { onDelete: "CASCADE" }),
+    JoinColumn({ name: "table_note_id" }),
     __metadata("design:type", TableNote)
 ], TableNoteColumn.prototype, "tableNote", void 0);
 TableNoteColumn = __decorate([
