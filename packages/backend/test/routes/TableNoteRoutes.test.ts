@@ -230,6 +230,19 @@ describe("TableNoteRoutes", () => {
         jest.clearAllMocks();
     });
 
+    it("PUT /tablenotes/lock and error occured should return 500 and message", async () => {
+
+        const dbError = new Error("DB save error!");
+        mockRepoTableNote.save.mockRejectedValueOnce(dbError);
+
+        const response = await request(app)
+            .put("/api/tablenotes/lock")
+            .send({ id: "2", isLocked: true });
+
+        expect(response.status).toBe(500);
+        expect(response.body.error).toBe("Failed to update lock state");
+    });
+
 
     it("POST /tablenotes should return 201 and message", async () => {
         const response = await request(app)
@@ -248,7 +261,7 @@ describe("TableNoteRoutes", () => {
     });
 
     it("POST /tablenotes and error occured should return 500 and message", async () => {
-        mockRepoTableNote.save.mockImplementationOnce(() => Promise.reject(new Error("DB find error")));
+        mockRepoTableNote.save.mockRejectedValueOnce(() => Promise.reject(new Error("DB find error")));
         const response = await request(app)
             .post("/api/tablenotes")
             .send({ title: "test title", columns: mockTableNoteColumns, rowCells: mockTableNoteCells, label_id: mockLabels[0].id, is_locked: false });
@@ -257,13 +270,13 @@ describe("TableNoteRoutes", () => {
         expect(response.body.error).toBe("Failed to save TableNote");
     });
 
-    it("POST /tablenotes with NOT title should return 400 and message", async () => {
+    it("POST /tablenotes with NO columns should return 400 and message", async () => {
         const response = await request(app)
             .post("/api/tablenotes")
-            .send({ title: "", columns: mockTableNoteColumns, rowCells: mockTableNoteCells, label_id: mockLabels[0].id, is_locked: false });
+            .send({ title: "", columns: null, rowCells: mockTableNoteCells, label_id: mockLabels[0].id, is_locked: false });
 
         expect(response.status).toBe(400);
-        expect(response.body.error).toBe("Must set tablenote title, columns, rows");
+        expect(response.body.error).toBe("Must set tablenote columns, rows");
     });
 
     it("GET /tablenotes should return 200 and message", async () => {
@@ -319,7 +332,7 @@ describe("TableNoteRoutes", () => {
     });
 
     it("GET /tablenotes and error ocuured should return 200 and message", async () => {
-        mockRepoTableNote.find.mockImplementationOnce(() => Promise.reject(new Error("DB find error!")));
+        mockRepoTableNote.find.mockRejectedValueOnce(() => Promise.reject(new Error("DB find error!")));
         const response = await request(app)
             .get("/api/tablenotes");
 
@@ -355,7 +368,7 @@ describe("TableNoteRoutes", () => {
     });
 
     it("PUT /tablenotes and error occured should return 500 and message", async () => {
-        mockRepoTableNote.findOneBy.mockImplementationOnce(() => Promise.reject(new Error("DB find error!")));
+        mockRepoTableNote.findOneBy.mockRejectedValueOnce(() => Promise.reject(new Error("DB find error!")));
         const response = await request(app)
             .put("/api/tablenotes")
             .send({ id: "1", title: "updated title", columns: [mockTableNoteColumns[0]], rowCells: [[]], label: mockLabels[0], is_locked: false });
@@ -382,7 +395,7 @@ describe("TableNoteRoutes", () => {
     });
 
     it("DELETE /tablenotes and error occured should return 500 and message", async () => {
-        mockRepoTableNote.findOneBy.mockImplementationOnce(() => Promise.reject(new Error("DB find error!")));
+        mockRepoTableNote.findOneBy.mockRejectedValue(() => Promise.reject(new Error("DB find error!")));
         const response = await request(app)
             .delete("/api/tablenotes/1")
 
@@ -409,7 +422,7 @@ describe("TableNoteRoutes", () => {
     });
 
     it("GET /tablenotes/trash and error occured should return 200 and trash tablenotes", async () => {
-        mockRepoTableNote.find.mockImplementationOnce(() => Promise.reject(new Error("DB find error!")));
+        mockRepoTableNote.find.mockRejectedValueOnce(() => Promise.reject(new Error("DB find error!")));
 
         const response = await request(app)
             .get("/api/tablenotes/trash");
@@ -447,7 +460,7 @@ describe("TableNoteRoutes", () => {
     });
 
     it("DELETE /tablenotes/trash and error occured should return 500 and message", async () => {
-        mockRepoTableNote.findOneBy.mockImplementationOnce(() => Promise.reject(new Error("DB find error!")));
+        mockRepoTableNote.findOneBy.mockRejectedValueOnce(() => Promise.reject(new Error("DB find error!")));
 
         const response = await request(app)
             .delete("/api/tablenotes/trash/3");
@@ -487,7 +500,7 @@ describe("TableNoteRoutes", () => {
     });
 
     it("PUT /tablenotes/trash and error occured should return 500 and message", async () => {
-        mockRepoTableNote.findOneBy.mockImplementationOnce(() => Promise.reject(new Error("DB find error!")));
+        mockRepoTableNote.findOneBy.mockRejectedValueOnce(() => Promise.reject(new Error("DB find error!")));
 
         const response = await request(app)
             .put("/api/tablenotes/trash/3")
@@ -501,7 +514,7 @@ describe("TableNoteRoutes", () => {
 
         const response = await request(app)
             .put("/api/tablenotes/lock")
-            .send({ id: 3, isLocked: true });
+            .send({ id: "3", isLocked: true });
 
         console.log("response.body.tablenote:", response.body.tablenote);
         expect(response.status).toBe(200);
@@ -524,21 +537,27 @@ describe("TableNoteRoutes", () => {
 
         const response = await request(app)
             .put("/api/tablenotes/lock")
-            .send({ id: 999 });
+            .send({ id: "999", isLocked: true });
 
         expect(response.status).toBe(404);
         expect(response.body.error).toBe("Can't find TableNote");
     });
 
-    it("PUT /tablenotes/lock and error occured should return 500 and message", async () => {
-        mockRepoTableNote.findOneBy.mockImplementationOnce(() => Promise.reject(new Error("DB find error!")));
+    it("PUT /tablenotes/lock with NO id should return 400 and message", async () => {
+        mockRepoTableNote.findOneBy.mockImplementationOnce(({ id }) => {
+            if (id === 3) {
+                return Promise.resolve(mockDeletedTableNotes);
+            } else {
+                return Promise.resolve(null);
+            }
+        });
 
         const response = await request(app)
             .put("/api/tablenotes/lock")
-            .send({ id: 3 });
+            .send({ isLocked: true });
 
-        expect(response.status).toBe(500);
-        expect(response.body.error).toBe("Failed to update lock state");
+        expect(response.status).toBe(400);
+        expect(response.body.error).toBe("Must set tablenote id,isLocked");
     });
 
     it("DELETE /tablenotes/trash should return 200 and message", async () => {
@@ -553,7 +572,7 @@ describe("TableNoteRoutes", () => {
 
     it("DELETE /tablenotes/trash and error occured should return 500 and message", async () => {
         const dbError = new Error("DB Deletion Failed during execution");
-        mockExecute.mockRejectedValue(dbError);
+        mockExecute.mockRejectedValueOnce(dbError);
 
         const response = await request(app)
             .delete("/api/tablenotes/trash");

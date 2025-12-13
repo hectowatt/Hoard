@@ -7,6 +7,7 @@ import { NoteProvider } from "@/app/(authenticated)/context/NoteProvider";
 import userEvent from '@testing-library/user-event';
 import { SnackbarProvider } from "@/app/(authenticated)/context/SnackbarProvider";
 import { LocaleProvider } from "@/app/context/LocaleProvider";
+import i18n from "@/app/lib/i18n";
 
 // ラベルコンテキストのモック
 const mockLabels = [
@@ -249,6 +250,33 @@ describe("InputForm", () => {
         await user.type(inputContent, "新しいコンテンツ");
 
         expect(inputContent).toHaveValue("新しいコンテンツ");
+    });
+
+    it("titleもcontentもない状態で保存ボタンを押した時、snackbarが表示される", async () => {
+        const warning = i18n.t("message_must_set_title_or_content");
+        render(
+            <LocaleProvider>
+                <SnackbarProvider>
+                    <NoteProvider>
+                        <LabelProvider>
+                            <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
+                        </LabelProvider>
+                    </NoteProvider>
+                </SnackbarProvider>
+            </LocaleProvider>
+        );
+
+        const button = screen.getByTestId("button_save");
+
+        await act(async () => {
+            fireEvent.click(button);
+        });
+
+        await waitFor(() => {
+            const texts = screen.getAllByText(warning);
+            expect(texts.length).toBeGreaterThan(0);
+            expect(texts[0]).toBeVisible();
+        });
     });
 
     it("ロックとアンロックを切り替えられる", async () => {

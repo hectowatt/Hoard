@@ -8,8 +8,8 @@ const router = Router();
 // 【INSERT】テーブルノート登録API
 router.post('/', authMiddleware, async (req, res) => {
     const { title, columns, rowCells, label_id, is_locked } = req.body;
-    if (!title || !columns || !rowCells) {
-        return res.status(400).json({ error: "Must set tablenote title, columns, rows" });
+    if (!columns || !rowCells) {
+        return res.status(400).json({ error: "Must set tablenote columns, rows" });
     }
     try {
         var savedTableNote = null;
@@ -77,8 +77,13 @@ router.get('/', authMiddleware, async (req, res) => {
             const tableNote = tableNotes[i];
             const columnRepository = AppDataSource.getRepository(TableNoteColumn);
             const cellRepository = AppDataSource.getRepository(TableNoteCell);
+<<<<<<< HEAD
             const columns = await columnRepository.find({ where: { table_note_id: tableNote.id }, order: { order: 'ASC' } });
             const rowCells = await cellRepository.find({ where: { table_note_id: tableNote.id }, relations: ['column'], order: { row_index: 'ASC' } });
+=======
+            const columns = await columnRepository.find({ where: { tableNote: { id: tableNote.id } }, order: { order: 'ASC' } });
+            const rowCells = await cellRepository.find({ where: { tableNote: { id: tableNote.id } }, relations: ['column'], order: { row_index: 'ASC', column: { order: 'ASC' } } });
+>>>>>>> refs/remotes/origin/develop
             // rowCellsをrow_indexごとにグループ化して2次元配列に変換
             const groupedRowCells = [];
             rowCells.forEach(cell => {
@@ -113,6 +118,9 @@ router.get('/', authMiddleware, async (req, res) => {
 // 【UPDATE】テーブルノート更新API
 router.put('/', authMiddleware, async (req, res) => {
     const { id, title, columns, rowCells, label_id, is_locked } = req.body;
+    if (!columns || !rowCells) {
+        return res.status(400).json({ error: "Must set tablenote title, columns, rows" });
+    }
     try {
         await AppDataSource.transaction(async (transactionalEntityManager) => {
             const tableNoteRepository = transactionalEntityManager.getRepository(TableNote);
@@ -247,6 +255,9 @@ router.put('/', authMiddleware, async (req, res) => {
 // 【UPDATE】TableNoteロック状態更新用API
 router.put('/lock', authMiddleware, async (req, res) => {
     const { id, isLocked } = req.body;
+    if (!id || !isLocked) {
+        return res.status(400).json({ error: "Must set tablenote id,isLocked" });
+    }
     try {
         const tableNoteRepository = AppDataSource.getRepository(TableNote);
         const tableNote = await tableNoteRepository.findOneBy({ id: id });
@@ -340,6 +351,9 @@ router.delete('/trash/:id', authMiddleware, async (req, res) => {
 // 【DELETE】Notes削除用API
 router.delete('/:id', authMiddleware, async (req, res) => {
     const { id } = req.params;
+    if (!id) {
+        return res.status(400).json({ error: "Must set tablenote id" });
+    }
     console.log("delete id: ", id);
     try {
         const tableNoteRepository = AppDataSource.getRepository(TableNote);
@@ -360,6 +374,9 @@ router.delete('/:id', authMiddleware, async (req, res) => {
 // 【UPDATE】TrashTableNote復元用API
 router.put('/trash/:id', authMiddleware, async (req, res) => {
     const { id } = req.params;
+    if (!id) {
+        return res.status(400).json({ error: "Must set tablenote id" });
+    }
     try {
         const tableNoteRepository = AppDataSource.getRepository(TableNote);
         const tableNote = await tableNoteRepository.findOneBy({ id: id });

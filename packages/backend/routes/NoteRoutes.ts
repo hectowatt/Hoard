@@ -21,6 +21,9 @@ router.get('/', authMiddleware, async (req, res) => {
 // 【INSERT】Notes登録API
 router.post('/', authMiddleware, async (req, res) => {
   const { title, content, label, isLocked } = req.body;
+  if(!title && !content){
+    return res.status(400).json({ error: "Must set title or content" });
+  }
 
   try {
     const noteRepository = AppDataSource.getRepository(Note);
@@ -45,6 +48,9 @@ router.post('/', authMiddleware, async (req, res) => {
 // 【UPDATE】Notes更新用API
 router.put('/', authMiddleware, async (req, res) => {
   const { id, title, content, label, isLocked } = req.body;
+    if(!id || !title && !content){
+    return res.status(400).json({ error: "Must set title or content and must set id" });
+  }
 
   try {
     const noteRepository = AppDataSource.getRepository(Note);
@@ -71,6 +77,9 @@ router.put('/', authMiddleware, async (req, res) => {
 // 【UPDATE】Notesロック状態更新用API
 router.put('/lock', authMiddleware, async (req, res) => {
   const { id, isLocked } = req.body;
+    if(!id || !isLocked){
+    return res.status(400).json({ error: "Must set id or isLocked" });
+  }
   try {
     const noteRepository = AppDataSource.getRepository(Note);
     const note = await noteRepository.findOneBy({ id: id });
@@ -153,6 +162,10 @@ router.put('/trash', authMiddleware, async (req, res) => {
 router.delete('/trash/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
   console.log("delete id: ", id);
+     if(!id ){
+    return res.status(400).json({ error: "Must set id" });
+  }
+  
   try {
     const noteRepository = AppDataSource.getRepository(Note);
     const note = await noteRepository.findOneBy({ id: id });
@@ -172,6 +185,9 @@ router.delete('/trash/:id', authMiddleware, async (req, res) => {
 router.delete('/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
   console.log("delete id: ", id);
+  if(!id ){
+    return res.status(400).json({ error: "Must set id" });
+  }
   try {
     const noteRepository = AppDataSource.getRepository(Note);
     const note = await noteRepository.findOneBy({ id: id });
@@ -191,7 +207,9 @@ router.delete('/:id', authMiddleware, async (req, res) => {
 // 【UPDATE】Notes復元用API
 router.put('/trash/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
-
+  if(!id ){
+    return res.status(400).json({ error: "Must set id" });
+  }
   try {
     const noteRepository = AppDataSource.getRepository(Note);
     const note = await noteRepository.findOneBy({ id: id });

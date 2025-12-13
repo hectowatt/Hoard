@@ -128,6 +128,13 @@ describe("NoteRoutes", () => {
         expect(response.status).toBe(500);
         expect(response.body.error).toBe("Failed to save note");
     });
+    it("POST /notes without title should return 400 and message", async () => {
+        const response = await request(app)
+            .post("/api/notes")
+            .send({ label: "1", isLocked: false });
+        expect(response.status).toBe(400);
+        expect(response.body.error).toBe("Must set title or content");
+    });
     it("PUT /notes should return 200 and message, updated note", async () => {
         const response = await request(app)
             .put("/api/notes")
@@ -148,6 +155,13 @@ describe("NoteRoutes", () => {
             .send({ id: "999", title: "updated title", content: "updated content", label: "2", isLocked: true });
         expect(response.status).toBe(404);
         expect(response.body.error).toBe("Can't find note");
+    });
+    it("PUT /notes without id should return 400 and message", async () => {
+        const response = await request(app)
+            .put("/api/notes")
+            .send({ title: "updated title", content: "updated content", label: "2", isLocked: true });
+        expect(response.status).toBe(400);
+        expect(response.body.error).toBe("Must set title or content and must set id");
     });
     it("PUT /notes and Error occured should return 500 and message", async () => {
         mockRepo.findOneBy.mockImplementationOnce(() => Promise.reject(new Error("DB findOneBy error")));
@@ -250,6 +264,13 @@ describe("NoteRoutes", () => {
         expect(response.body.message).toBe("Update lock state success!");
         expect(response.body.note.id).toBe("1");
         expect(response.body.note.is_locked).toBe(true);
+    });
+    it("PUT /notes/lock without id should return 200 and message", async () => {
+        const response = await request(app)
+            .put("/api/notes/lock")
+            .send({ isLocked: true });
+        expect(response.status).toBe(400);
+        expect(response.body.error).toBe("Must set id or isLocked");
     });
     it("PUT /notes/lock with NOT exist note should return 404 and message", async () => {
         const response = await request(app)

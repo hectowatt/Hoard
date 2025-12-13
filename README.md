@@ -36,9 +36,9 @@ cp docker-compose_sample.yml docker-compose.yml
 cp .env_sample .env
 ```
 
-If you want to customise connection setting, edit these files;
+If you want to customise connection setting, edit these files.
 
-After building docker container with docker compose, you can launch Hoard;
+After building docker container with docker compose, you can launch Hoard.
 
 ## Languages
 Hoard supports Japanese and English(US).
@@ -46,7 +46,7 @@ Hoard supports Japanese and English(US).
 ## Development
 To develop Hoard, Devcontainer is usefull.
 
-Copy setting file and build container;
+Copy setting file and build container.
 ```
 cp ./.devcontainer/devcontainer_sample.json ./.devcontainer/devcontainer.json
 

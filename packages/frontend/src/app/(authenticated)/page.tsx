@@ -9,6 +9,7 @@ import { useNoteContext } from "@/app/(authenticated)/context/NoteProvider";
 import { useTableNoteContext } from "@/app/(authenticated)/context/TableNoteProvider";
 import TableNote from "@/app/(authenticated)/components/TableNote";
 import { useSearchWordContext } from "@/app/(authenticated)/context/SearchWordProvider";
+import { useSearchLabelContext } from "./context/SearchLabelProvider";
 import { redirect } from "next/navigation";
 
 type Column = {
@@ -29,6 +30,7 @@ export default function Home() {
   const { labels, fetchLabels } = useLabelContext();
   const { tableNotes, setTableNotes, fetchTableNotes } = useTableNoteContext();
   const { searchWord } = useSearchWordContext();
+  const { searchLabel } = useSearchLabelContext();
 
   // label_idに紐づくlabelnameを取得する
   const getLabelNameById = (label_id: string) => {
@@ -37,8 +39,25 @@ export default function Home() {
   };
 
   const trimmedSearchWord = searchWord ? searchWord.trim().toLowerCase() : "";
-  const filterdNotes = searchWord ? notes.filter(note => note.title.toLowerCase().includes(trimmedSearchWord) || note.content.toLowerCase().includes(trimmedSearchWord) || getLabelNameById(note.label_id).toLowerCase().includes(trimmedSearchWord)) : notes;
-  const filterdTableNotes = searchWord ? tableNotes.filter(tableNote => tableNote.title.toLowerCase().includes(trimmedSearchWord) || tableNote.columns.some(column => column.name.toLowerCase().includes(trimmedSearchWord)) || tableNote.rowCells.some(row => row.some(cell => cell.value.toLowerCase().includes(trimmedSearchWord))) || getLabelNameById(tableNote.label_id).toLowerCase().includes(trimmedSearchWord)) : tableNotes;
+  const filterdNotes = (searchWord ?
+    // 検索ワードとラベル絞り込み両方が適用されている場合
+    searchLabel ? notes.filter(note => (note.title.toLowerCase().includes(trimmedSearchWord) || note.content.toLowerCase().includes(trimmedSearchWord)) && getLabelNameById(note.label_id).includes(searchLabel))
+      // 検索ワードが適用されている場合
+      : notes.filter(note => note.title.toLowerCase().includes(trimmedSearchWord) || note.content.toLowerCase().includes(trimmedSearchWord))
+    : searchLabel ?
+      // ラベル絞り込みだけされている場合
+      notes.filter(note => getLabelNameById(note.label_id).includes(searchLabel))
+      // 何も絞り込みがされていない場合
+      : notes);
+  const filterdTableNotes = (searchWord ?
+    // 検索ワードとラベル絞り込み両方が適用されている場合
+    searchLabel ? tableNotes.filter(tableNote => (tableNote.title.toLowerCase().includes(trimmedSearchWord) || tableNote.columns.some(column => column.name.toLowerCase().includes(trimmedSearchWord)) || tableNote.rowCells.some(row => row.some(cell => cell.value.toLowerCase().includes(trimmedSearchWord)))) && getLabelNameById(tableNote.label_id).includes(searchLabel))
+      // 検索ワードが適用されている場合  
+      : tableNotes.filter(tableNote => tableNote.title.toLowerCase().includes(trimmedSearchWord) || tableNote.columns.some(column => column.name.toLowerCase().includes(trimmedSearchWord)) || tableNote.rowCells.some(row => row.some(cell => cell.value.toLowerCase().includes(trimmedSearchWord))))
+    : searchLabel ?
+      tableNotes.filter(tableNote => getLabelNameById(tableNote.label_id).includes(searchLabel))
+      // 何も絞り込みがされていない場合
+      : tableNotes);
 
   useEffect(() => {
     fetchNotes();

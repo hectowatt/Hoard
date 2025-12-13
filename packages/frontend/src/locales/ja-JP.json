@@ -85,9 +85,13 @@
     "message_incorrect_password": "パスワードが違います。再度入力してください。",
     "message_all_delete": "すべて削除しました！",
     "message_all_restore": "すべて復元しました！",
+<<<<<<< HEAD
     "message_must_select_zip_file": "ZIP ファイルを選択してください",
     "message_uploading": "アップロード中...",
     "message_complete_upload": "アップロードに成功しました！",
+=======
+    "message_must_set_title_or_content": "ノートを登録するにはタイトルか内容のいずれかを入力してください",
+>>>>>>> refs/remotes/origin/develop
     "dropdown_labels": "ラベル",
     "dropdown_no_labels": "ラベルなし",
     "dropdown_no_languages": "利用可能言語なし"

@@ -132,8 +132,8 @@ export default function LoginPage() {
             }}>
                 <Image src="/Hoard_logo.png"
                     alt="Logo"
-                    width={552}
-                    height={135}
+                    width={508}
+                    height={128}
                     style={{
                         maxWidth: "100%", height: "auto",
                         marginBottom: "20px",
