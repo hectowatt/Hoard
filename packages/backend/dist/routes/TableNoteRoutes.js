@@ -77,13 +77,8 @@ router.get('/', authMiddleware, async (req, res) => {
             const tableNote = tableNotes[i];
             const columnRepository = AppDataSource.getRepository(TableNoteColumn);
             const cellRepository = AppDataSource.getRepository(TableNoteCell);
-<<<<<<< HEAD
             const columns = await columnRepository.find({ where: { table_note_id: tableNote.id }, order: { order: 'ASC' } });
-            const rowCells = await cellRepository.find({ where: { table_note_id: tableNote.id }, relations: ['column'], order: { row_index: 'ASC' } });
-=======
-            const columns = await columnRepository.find({ where: { tableNote: { id: tableNote.id } }, order: { order: 'ASC' } });
-            const rowCells = await cellRepository.find({ where: { tableNote: { id: tableNote.id } }, relations: ['column'], order: { row_index: 'ASC', column: { order: 'ASC' } } });
->>>>>>> refs/remotes/origin/develop
+            const rowCells = await cellRepository.find({ where: { table_note_id: tableNote.id }, relations: ['column'], order: { row_index: 'ASC', column: { order: 'ASC' } } });
             // rowCellsをrow_indexごとにグループ化して2次元配列に変換
             const groupedRowCells = [];
             rowCells.forEach(cell => {
