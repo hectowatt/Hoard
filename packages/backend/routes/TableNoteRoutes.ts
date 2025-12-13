@@ -41,7 +41,7 @@ router.post('/', authMiddleware, async (req, res) => {
           {
             name: col.name,
             order: col.order ?? 0,
-            tableNote: savedTableNote
+            table_note_id: savedTableNote.id
           }
         );
 
@@ -60,8 +60,8 @@ router.post('/', authMiddleware, async (req, res) => {
           const newCell = cellRepository.create({
             row_index: cell.rowIndex,
             value: cell.value,
-            tableNote: savedTableNote,
-            column: { id: dbColumnId },
+            table_note_id: savedTableNote.id,
+            column_id: dbColumnId,
           });
           await cellRepository.save(newCell);
         }
@@ -93,8 +93,8 @@ router.get('/', authMiddleware, async (req, res) => {
       const tableNote = tableNotes[i];
       const columnRepository = AppDataSource.getRepository(TableNoteColumn);
       const cellRepository = AppDataSource.getRepository(TableNoteCell);
-      const columns = await columnRepository.find({ where: { tableNote: { id: tableNote.id } }, order: { order: 'ASC' } });
-      const rowCells = await cellRepository.find({ where: { tableNote: { id: tableNote.id } }, relations: ['column'], order: { row_index: 'ASC' } });
+      const columns = await columnRepository.find({ where: { table_note_id: tableNote.id }, order: { order: 'ASC' } });
+      const rowCells = await cellRepository.find({ where: { table_note_id: tableNote.id }, relations: ['column'], order: { row_index: 'ASC' } });
 
       // rowCellsをrow_indexごとにグループ化して2次元配列に変換
       const groupedRowCells: { id: string; rowIndex: number; value: string; columnId?: string }[][] = [];
@@ -150,7 +150,7 @@ router.put('/', authMiddleware, async (req, res) => {
 
       // --- カラムの更新 ---
       // 既存カラム取得
-      const dbColumns = await columnRepository.find({ where: { tableNote: { id: tableNote.id } }, order: { order: 'ASC' } });
+      const dbColumns = await columnRepository.find({ where: { table_note_id: tableNote.id }, order: { order: 'ASC' } });
       // 既存カラムIDセット
       const dbColumnIds = dbColumns.map(col => col.id);
       // 新カラムIDセット（新規はidがない場合もあるので注意）
@@ -183,7 +183,7 @@ router.put('/', authMiddleware, async (req, res) => {
           const newCol = columnRepository.create({
             name: col.name,
             order: col.order ?? 0,
-            tableNote: tableNote
+            table_note_id: tableNote.id
           });
           savedColumn = await columnRepository.save(newCol);
         }
@@ -192,7 +192,7 @@ router.put('/', authMiddleware, async (req, res) => {
 
       // --- セルの更新 ---
       // 既存セル取得
-      const dbCells = await cellRepository.find({ where: { tableNote: { id: tableNote.id } } });
+      const dbCells = await cellRepository.find({ where: { table_note_id: tableNote.id } });
       const dbCellIds = dbCells.map(cell => cell.id);
 
       // 新セルを1次元配列化
@@ -218,7 +218,7 @@ router.put('/', authMiddleware, async (req, res) => {
             if (existCell) {
               existCell.row_index = rowIndex;
               existCell.value = cell.value;
-              existCell.tableNote = tableNote;
+              existCell.table_note_id = tableNote.id;
               const columnEntity = await columnRepository.findOneBy({ id: dbColumnId });
               existCell.column = columnEntity;
               await cellRepository.save(existCell);
@@ -228,8 +228,8 @@ router.put('/', authMiddleware, async (req, res) => {
             const newCell = cellRepository.create({
               row_index: rowIndex,
               value: cell.value,
-              tableNote: tableNote,
-              column: { id: dbColumnId }
+              table_note_id: tableNote.id,
+              column_id: dbColumnId.id
             });
             await cellRepository.save(newCell);
           }
@@ -237,8 +237,8 @@ router.put('/', authMiddleware, async (req, res) => {
       }
 
       // レスポンス用データ再取得
-      const updatedColumns = await columnRepository.find({ where: { tableNote: { id: tableNote.id } }, order: { order: 'ASC' } });
-      const updatedRowCells = await cellRepository.find({ where: { tableNote: { id: tableNote.id } }, order: { row_index: 'ASC' } });
+      const updatedColumns = await columnRepository.find({ where: { table_note_id: tableNote.id }, order: { order: 'ASC' } });
+      const updatedRowCells = await cellRepository.find({ where: { table_note_id: tableNote.id }, order: { row_index: 'ASC' } });
       const groupedRowCells: { id: string; rowIndex: number; value: string; columnId?: string }[][] = [];
       updatedRowCells.forEach(cell => {
         const rowIdx = cell.row_index;
@@ -390,7 +390,7 @@ router.delete('/:id', authMiddleware, async (req, res) => {
   }
 });
 
-// 【UPDATE】TableTableNote復元用API
+// 【UPDATE】TrashTableNote復元用API
 router.put('/trash/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
 

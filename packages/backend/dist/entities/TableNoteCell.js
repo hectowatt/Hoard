@@ -7,7 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from "typeorm";
 import TableNoteColumn from "./TableNoteColumn.js";
 import TableNote from "./TableNote.js";
 let TableNoteCell = class TableNoteCell {
@@ -25,11 +25,21 @@ __decorate([
     __metadata("design:type", String)
 ], TableNoteCell.prototype, "value", void 0);
 __decorate([
+    Column({ name: "table_note_id", type: "uuid" }),
+    __metadata("design:type", String)
+], TableNoteCell.prototype, "table_note_id", void 0);
+__decorate([
+    Column({ name: "column_id", type: "uuid" }),
+    __metadata("design:type", String)
+], TableNoteCell.prototype, "column_id", void 0);
+__decorate([
     ManyToOne(() => TableNote, tableNote => tableNote.id, { onDelete: "CASCADE" }),
+    JoinColumn({ name: "table_note_id" }),
     __metadata("design:type", TableNote)
 ], TableNoteCell.prototype, "tableNote", void 0);
 __decorate([
     ManyToOne(() => TableNoteColumn, column => column.id, { onDelete: "CASCADE" }),
+    JoinColumn({ name: "column_id" }),
     __metadata("design:type", TableNoteColumn)
 ], TableNoteCell.prototype, "column", void 0);
 TableNoteCell = __decorate([

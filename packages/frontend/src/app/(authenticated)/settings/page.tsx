@@ -9,6 +9,9 @@ import { useTranslation } from "react-i18next";
 import LanguageOutlinedIcon from '@mui/icons-material/LanguageOutlined';
 import i18n from "@/app/lib/i18n";
 import { useSnackbar } from "../context/SnackbarProvider";
+import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
+import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined';
+import { styled } from '@mui/material/styles';
 
 // 設定ページのコンテンツ
 export default function Home() {
@@ -26,6 +29,17 @@ export default function Home() {
     en: "English",
   };
   const { showSnackbar } = useSnackbar();
+  const VisuallyHiddenInput = styled('input')({
+    clip: 'rect(0 0 0 0)',
+    clipPath: 'inset(50%)',
+    height: 1,
+    overflow: 'hidden',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    whiteSpace: 'nowrap',
+    width: 1,
+  });
 
   const fetchPasswordStatus = async () => {
     const responseSelect = await fetch("/api/password", {
@@ -213,6 +227,53 @@ export default function Home() {
     localStorage.setItem("i18nextLng", lang);
   };
 
+  // データエクスポート処理
+  const handleDownload = async () => {
+    const res = await fetch("/api/export");
+    if (!res.ok) {
+      showSnackbar(t("message_error_occured"));
+      return;
+    }
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "export.zip";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // データアップロード処理
+  const handleUpload = async (selectedFile: File) => {
+    if (!selectedFile) {
+      showSnackbar(t("message_must_select_zip_file"), "warning");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    showSnackbar(t("message_uploading"), "info");
+
+    try {
+      const res = await fetch("/api/import", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        throw new Error("Import failed");
+      }
+
+      showSnackbar(t("message_complete_upload"), "success");
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+      showSnackbar(t("message_error_occured"), "error");
+    }
+  };
+
   return (
 
     <Container>
@@ -245,7 +306,7 @@ export default function Home() {
       </FormControl>
 
       {/* ユーザ設定 */}
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 4 }}>
         <Person2OutlinedIcon />
         <h3>{t("label_user_settings")}</h3>
       </Box>
@@ -385,10 +446,42 @@ export default function Home() {
           </form>
         )
       }
+      {/* データダウンロード */}
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 4 }}>
+        <FileDownloadOutlinedIcon></FileDownloadOutlinedIcon>
+        <h3>{t("label_download")}</h3>
+      </Box>
+      <p>{t("label_download_desc")}</p>
+      <Button onClick={handleDownload} variant="contained" data-testid="button-download">{t("button_download")}</Button>
 
-      {/* TODO: テーマ選択のUIをここに追加 */}
+      {/* データアップロード */}
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mt: 4 }}>
+        <FileUploadOutlinedIcon></FileUploadOutlinedIcon>
+        <h3>{t("label_upload")}</h3>
+      </Box>
+      <div>
+        <p>{t("label_upload_desc")}</p>
+        <Button
+          component="label"
+          variant="contained"
+          tabIndex={-1}
+          sx={{ mt: 1 }}
+          data-testid="button-upload"
+        >
+          {t("button_upload")}
+          <VisuallyHiddenInput
+            type="file"
+            accept=".zip"
+            onChange={(e) => {
+              const selected = e.target.files?.[0];
+              if (selected) {
+                handleUpload(selected);
+              }
+            }}
+          />
+        </Button>
 
-
+      </div>
     </Container >
 
   );

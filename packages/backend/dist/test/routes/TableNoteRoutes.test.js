@@ -24,16 +24,16 @@ const mockTableNotes = [
 ];
 // テーブルノートのカラムのモック
 const mockTableNoteColumns = [
-    { id: "1", name: "test column1", order: 1, tableNote: mockTableNotes[0] },
-    { id: "2", name: "test column2", order: 2, tableNote: mockTableNotes[0] },
-    { id: "3", name: "test column3", order: 1, tableNote: mockTableNotes[1] },
+    { id: "1", name: "test column1", order: 1, table_note_id: mockTableNotes[0].id, tableNote: mockTableNotes[0] },
+    { id: "2", name: "test column2", order: 2, table_note_id: mockTableNotes[0].id, tableNote: mockTableNotes[0] },
+    { id: "3", name: "test column3", order: 1, table_note_id: mockTableNotes[1].id, tableNote: mockTableNotes[1] },
 ];
 // テーブルノートのセルのモック
 const mockTableNoteCells = [
-    { id: "1", row_index: 0, value: "test cell1", tableNote: mockTableNotes[0], column: mockTableNoteColumns[0] },
-    { id: "2", row_index: 0, value: "test cell2", tableNote: mockTableNotes[0], column: mockTableNoteColumns[1] },
-    { id: "3", row_index: 0, value: "test cell3", tableNote: mockTableNotes[1], column: mockTableNoteColumns[2] },
-    { id: "4", row_index: 1, value: "test cell4", tableNote: mockTableNotes[1], column: mockTableNoteColumns[2] },
+    { id: "1", row_index: 0, value: "test cell1", table_note_id: mockTableNotes[0].id, column_id: mockTableNoteColumns[0].id, tableNote: mockTableNotes[0], column: mockTableNoteColumns[0] },
+    { id: "2", row_index: 0, value: "test cell2", table_note_id: mockTableNotes[0].id, column_id: mockTableNoteColumns[1].id, tableNote: mockTableNotes[0], column: mockTableNoteColumns[1] },
+    { id: "3", row_index: 0, value: "test cell3", table_note_id: mockTableNotes[1].id, column_id: mockTableNoteColumns[2].id, tableNote: mockTableNotes[1], column: mockTableNoteColumns[2] },
+    { id: "4", row_index: 1, value: "test cell4", table_note_id: mockTableNotes[1].id, column_id: mockTableNoteColumns[2].id, tableNote: mockTableNotes[1], column: mockTableNoteColumns[2] },
 ];
 // 削除済みノートのモック
 const mockDeletedTableNotes = [
@@ -41,13 +41,13 @@ const mockDeletedTableNotes = [
 ];
 // 削除済みテーブルノートのカラムのモック
 const mockDeletedTableNoteColumns = [
-    { id: "1", name: "test column1", order: 1, tableNote: mockTableNotes[0] },
-    { id: "2", name: "test column2", order: 2, tableNote: mockTableNotes[0] },
+    { id: "1", name: "test column1", order: 1, table_note_id: mockTableNotes[0].id, tableNote: mockTableNotes[0] },
+    { id: "2", name: "test column2", order: 2, table_note_id: mockTableNotes[0].id, tableNote: mockTableNotes[0] },
 ];
 // 削除済みテーブルノートのセルのモック
 const mockDeletedTableNoteCells = [
-    { id: "1", row_index: 0, value: "test cell1", tableNote: mockTableNotes[0], column: mockTableNoteColumns[0] },
-    { id: "2", row_index: 0, value: "test cell2", tableNote: mockTableNotes[0], column: mockTableNoteColumns[1] },
+    { id: "1", row_index: 0, value: "test cell1", table_note_id: mockTableNotes[0].id, column_id: mockTableNoteColumns[0].id, tableNote: mockTableNotes[0], column: mockTableNoteColumns[0] },
+    { id: "2", row_index: 0, value: "test cell2", table_note_id: mockTableNotes[0].id, column_id: mockTableNoteColumns[1].id, tableNote: mockTableNotes[0], column: mockTableNoteColumns[1] },
 ];
 // AuthMiddlewareをモック
 jest.unstable_mockModule('../../dist/middleware/AuthMiddleware', () => ({
@@ -90,10 +90,10 @@ const mockRepoTableNote = {
 // TableNoteColumnのリポジトリをモック
 const mockRepoTableNoteColumn = {
     find: jest.fn((options) => {
-        if (options?.where?.tableNote?.id === "1") {
+        if (options?.where?.table_note_id === "1") {
             return Promise.resolve([mockTableNoteColumns[0], mockTableNoteColumns[1]]);
         }
-        if (options?.where?.tableNote?.id === "2") {
+        if (options?.where?.table_note_id === "2") {
             return Promise.resolve([
                 mockTableNoteColumns[2]
             ]);
@@ -129,9 +129,15 @@ const mockRepoTableNoteColumn = {
 // TableNoteCellのリポジトリをモック
 const mockRepoTableNoteCell = {
     find: jest.fn((options) => {
-        if (options?.where?.tableNote?.id) {
-            return Promise.resolve(mockTableNoteCells.filter(cell => cell.tableNote.id === options.where.tableNote.id));
+        const noteId = options?.where?.table_note_id;
+        if (noteId) {
+            const filteredCells = mockTableNoteCells.filter(cell => cell.table_note_id === noteId);
+            return Promise.resolve(filteredCells.map(cell => ({
+                ...cell,
+                column: mockTableNoteColumns.find(col => col.id === cell.column_id)
+            })));
         }
+        // 検索条件がない場合（本来GET /tablenotesでは通らないはず）
         return Promise.resolve(mockTableNoteCells);
     }),
     findOneBy: jest.fn(({ id }) => {
