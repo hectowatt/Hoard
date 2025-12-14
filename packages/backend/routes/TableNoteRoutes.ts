@@ -5,6 +5,7 @@ import TableNoteColumn from '../entities/TableNoteColumn.js';
 import TableNote from '../entities/TableNote.js';
 import { authMiddleware } from '../middleware/AuthMiddleware.js';
 import { EntityManager } from 'typeorm';
+import { table } from 'console';
 
 const router = Router();
 
@@ -19,9 +20,23 @@ router.post('/', authMiddleware, async (req, res) => {
   }
 
   try {
-    var savedTableNote: TableNote = null;
+
+    let tableNoteAfterRegist = {
+      id: "",
+      title: "",
+      label_id: "",
+      is_locked: false,
+      createdate: "",
+      updatedate: "",
+      columns: null,
+      rowCells: null
+    };
+
+    let columnsAfterRegist = null;
+    let rowCellsAfterRegist = null;
 
     await AppDataSource.transaction(async (transactionalEntityManager: EntityManager) => {
+      var savedTableNote: TableNote = null;
       // table_noteテーブルにデータを登録
       const tableNoteRepository = transactionalEntityManager.getRepository(TableNote);
       const newTableNote = tableNoteRepository.create({
@@ -49,6 +64,8 @@ router.post('/', authMiddleware, async (req, res) => {
         columnIdMap[col.id] = savedColumn.id; // カラム名とIDのマッピングを作成
       }
 
+      columnsAfterRegist = await columnRepository.find({ where: { table_note_id: savedTableNote.id }, order: { order: 'ASC' } });
+
       // rowCellの登録
       const cellRepository = transactionalEntityManager.getRepository(TableNoteCell);
       for (let rowIdx = 0; rowIdx < rowCells.length; rowIdx++) {
@@ -66,10 +83,38 @@ router.post('/', authMiddleware, async (req, res) => {
           await cellRepository.save(newCell);
         }
       }
+      rowCellsAfterRegist = await cellRepository.find({ where: { table_note_id: savedTableNote.id }, order: { row_index: 'ASC', column: { order: "ASC" } } });
+      console.log("登録後に取得したcells:", rowCellsAfterRegist);
+      // rowCellsをrow_indexごとにグループ化して2次元配列に変換
+      const groupedRowCells: { id: string; rowIndex: number; value: string; columnId?: string; table_note_id: string }[][] = [];
+      rowCellsAfterRegist.forEach(cell => {
+        const rowIdx = cell.row_index;
+        if (!groupedRowCells[rowIdx]) groupedRowCells[rowIdx] = [];
+        groupedRowCells[rowIdx].push({
+          id: cell.id,
+          rowIndex: cell.row_index,
+          value: cell.value,
+          columnId: cell.column ? cell.column.id : undefined,
+          table_note_id: cell.table_note_id
+        });
+      })
 
       console.log('TableNote inserted with ID: ', savedTableNote.id);
+      console.log("登録後に取得したcolumns:", columnsAfterRegist);
+      console.log("並べ替えたcells:", groupedRowCells);
+      // レスポンス用データ整形
+      tableNoteAfterRegist = {
+        id: savedTableNote.id,
+        title: savedTableNote.title,
+        label_id: savedTableNote.label_id,
+        is_locked: savedTableNote.is_locked,
+        createdate: savedTableNote.createdate.toISOString(),
+        updatedate: savedTableNote.updatedate.toISOString(),
+        columns: columnsAfterRegist,
+        rowCells: groupedRowCells
+      };
     });
-    res.status(201).json({ message: "Save TableNote success!", tableNote: savedTableNote });
+    res.status(201).json({ message: "Save TableNote success!", tableNote: tableNoteAfterRegist });
   } catch (error) {
     console.error("Error saving TableNote:", error);
     res.status(500).json({ error: "Failed to save TableNote" });
@@ -86,7 +131,7 @@ router.get('/', authMiddleware, async (req, res) => {
     }
 
     // 返却するテーブルノートの配列
-    let tableNoteArray: { id: string; title: string; label_id: string; is_locked: boolean; createdate: string; updatedate: string; columns: { id: string, name: string, order: number }[]; rowCells: { id: string, rowIndex: number, value: string, columnId?: string }[][] }[] = [];
+    let tableNoteArray: { id: string; title: string; label_id: string; is_locked: boolean; createdate: string; updatedate: string; columns: { id: string, name: string, order: number, table_note_id: string }[]; rowCells: { id: string, rowIndex: number, value: string, columnId?: string, table_note_id: string }[][] }[] = [];
 
     // 各テーブルノートのカラムとセルを取得
     for (var i = 0; i < tableNotes.length; i++) {
@@ -97,7 +142,7 @@ router.get('/', authMiddleware, async (req, res) => {
       const rowCells = await cellRepository.find({ where: { table_note_id: tableNote.id }, relations: ['column'], order: { row_index: 'ASC', column: { order: 'ASC' } } });
 
       // rowCellsをrow_indexごとにグループ化して2次元配列に変換
-      const groupedRowCells: { id: string; rowIndex: number; value: string; columnId?: string }[][] = [];
+      const groupedRowCells: { id: string; rowIndex: number; value: string; columnId?: string; table_note_id: string }[][] = [];
       rowCells.forEach(cell => {
         const rowIdx = cell.row_index;
         if (!groupedRowCells[rowIdx]) groupedRowCells[rowIdx] = [];
@@ -105,7 +150,8 @@ router.get('/', authMiddleware, async (req, res) => {
           id: cell.id,
           rowIndex: cell.row_index,
           value: cell.value,
-          columnId: cell.column ? cell.column.id : undefined
+          columnId: cell.column ? cell.column.id : undefined,
+          table_note_id: cell.table_note_id
         });
       });
       tableNoteArray.push({
@@ -115,7 +161,7 @@ router.get('/', authMiddleware, async (req, res) => {
         is_locked: tableNote.is_locked,
         createdate: tableNote.createdate.toISOString(),
         updatedate: tableNote.updatedate.toISOString(),
-        columns: columns.map(col => ({ id: col.id, name: col.name, order: col.order })),
+        columns: columns.map(col => ({ id: col.id, name: col.name, order: col.order, table_note_id: col.table_note_id })),
         rowCells: groupedRowCells
       });
     }
@@ -222,17 +268,20 @@ router.put('/', authMiddleware, async (req, res) => {
               existCell.row_index = rowIndex;
               existCell.value = cell.value;
               existCell.table_note_id = tableNote.id;
+              existCell.column_id = dbColumnId;
               const columnEntity = await columnRepository.findOneBy({ id: dbColumnId });
               existCell.column = columnEntity;
               await cellRepository.save(existCell);
             }
           } else {
             // 新規セルは追加
+            const columnEntity = await columnRepository.findOneBy({ id: dbColumnId });
             const newCell = cellRepository.create({
               row_index: rowIndex,
               value: cell.value,
               table_note_id: tableNote.id,
-              column_id: dbColumnId.id
+              column_id: dbColumnId.id,
+              column: columnEntity
             });
             await cellRepository.save(newCell);
           }
@@ -242,7 +291,7 @@ router.put('/', authMiddleware, async (req, res) => {
       // レスポンス用データ再取得
       const updatedColumns = await columnRepository.find({ where: { table_note_id: tableNote.id }, order: { order: 'ASC' } });
       const updatedRowCells = await cellRepository.find({ where: { table_note_id: tableNote.id }, order: { row_index: 'ASC' } });
-      const groupedRowCells: { id: string; rowIndex: number; value: string; columnId?: string }[][] = [];
+      const groupedRowCells: { id: string; rowIndex: number; value: string; columnId?: string; table_note_id: string }[][] = [];
       updatedRowCells.forEach(cell => {
         const rowIdx = cell.row_index;
         if (!groupedRowCells[rowIdx]) groupedRowCells[rowIdx] = [];
@@ -250,7 +299,8 @@ router.put('/', authMiddleware, async (req, res) => {
           id: cell.id,
           rowIndex: cell.row_index,
           value: cell.value,
-          columnId: cell.column ? cell.column.id : undefined
+          columnId: cell.column ? cell.column.id : undefined,
+          table_note_id: cell.table_note_id
         });
       });
 
@@ -262,7 +312,7 @@ router.put('/', authMiddleware, async (req, res) => {
           is_locked: tableNote.is_locked,
           createdate: tableNote.createdate.toISOString(),
           updatedate: tableNote.updatedate.toISOString(),
-          columns: updatedColumns.map(col => ({ id: col.id, name: col.name, order: col.order })),
+          columns: updatedColumns.map(col => ({ id: col.id, name: col.name, order: col.order, table_note_id: col.table_note_id })),
           rowCells: groupedRowCells
         }
       });

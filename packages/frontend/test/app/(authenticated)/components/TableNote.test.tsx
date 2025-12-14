@@ -14,6 +14,7 @@ type Column = {
     id: number;
     name: string;
     order?: number;
+    table_note_id?: string;
 }
 
 type RowCell = {
@@ -21,6 +22,7 @@ type RowCell = {
     rowIndex: number;
     value: string;
     columnId?: number;
+    table_note_id?: string;
 }
 
 const mockColumns: Column[] = [{ id: 1, name: "テストカラム1", order: 1 }];

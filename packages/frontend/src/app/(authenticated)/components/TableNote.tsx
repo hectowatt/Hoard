@@ -27,6 +27,7 @@ interface Column {
     id: number;
     name: string;
     order?: number;
+    table_note_id?: string;
 }
 
 interface RowCell {
@@ -34,6 +35,7 @@ interface RowCell {
     rowIndex: number;
     value: string;
     columnId?: number;
+    table_note_id?: string;
 }
 
 interface tableNoteProps {
@@ -151,7 +153,8 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
             id: Date.now() + idx,
             rowIndex: editRowCells.length,
             value: "",
-            columnId: col.id
+            columnId: col.id,
+            table_note_id: col.table_note_id
         }
     ))]);
 
@@ -368,15 +371,16 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
 
             const result = await response.json();
             console.log("Table note saved successfully!", result);
-            setOpen(false);
-            setEditColumns([{ id: 1, name: "カラム1", order: 1 }]);
-            setEditRowCells([[{ id: 1, rowIndex: 0, value: "", columnId: 1 }]]);
             // テーブルノート登録時のコールバック関数を呼び出す
             if (typeof onSave === "function") {
                 onSave(result.tableNote.id, result.tableNote.title, editLabel || "", isLocked, result.tableNote.updatedate, editColumns, editRowCells);
             }
+            setOpen(false);
+            setEditColumns(result.tableNote.columns || []);
+            setEditRowCells(Array.isArray(result.tableNote.rowCells) ? result.tableNote.rowCells : editRowCells);
         } catch (error) {
-            console.error("Error saving table note:", error);
+            showSnackbar(t("message_error_occured"), "error");
+            return;
         }
     }
 
@@ -409,7 +413,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
             setOpen(false);
 
         } catch (error) {
-            console.error("Error deleting note", error);
+            showSnackbar(t("message_error_occured"), "error");
             return;
         }
     };
@@ -491,7 +495,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {editRowCells.map((row, rowIdx) => (
+                                    {editRowCells.map((row: RowCell[], rowIdx) => (
                                         <TableRow key={rowIdx}>
                                             {row.map((cell, colIdx) => (
                                                 <TableCell key={colIdx} sx={{ minWidth: 20, padding: '4px 6px' }} size="small">
@@ -549,7 +553,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {editRowCells.map((row, rowIdx) => (
+                                    {editRowCells.map((row: RowCell[], rowIdx) => (
                                         <TableRow key={rowIdx}>
                                             {row.map((cell, colIdx) => (
                                                 <TableCell key={colIdx} sx={{ minWidth: 20, padding: '4px 6px' }} size="small">

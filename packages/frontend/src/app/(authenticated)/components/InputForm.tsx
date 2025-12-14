@@ -41,6 +41,7 @@ type Column = {
     id: number;
     name: string;
     order?: number;
+    table_note_id?: string;
 }
 
 type RowCell = {
@@ -48,6 +49,7 @@ type RowCell = {
     rowIndex: number;
     value: string;
     columnId?: number;
+    table_note_id?: string;
 }
 
 // トップページ上部の入力フォームコンポーネント
@@ -237,6 +239,11 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
 
             const result = await response.json();
             console.log("Table note saved successfully!", result);
+            console.log("result.tableNote.id:", result.tableNote.id);
+            // テーブルノート登録時のコールバック関数を呼び出す
+            if (typeof onInsertTableNote === "function") {
+                onInsertTableNote(result.tableNote.id, result.tableNote.title, editLabelId || "", isLocked, result.tableNote.columns, result.tableNote.rowCells);
+            }
             setTableNoteOpen(false);
 
             setEditColumns([{ id: 1, name: "カラム1", order: 0 }]);
@@ -244,12 +251,8 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
             setEditRowCells([[{ id: 1, rowIndex: 0, value: "", columnId: 1 }]]);
             setTitle("");
             setExpand(false);
-            // テーブルノート登録時のコールバック関数を呼び出す
-            if (typeof onInsertTableNote === "function") {
-                onInsertTableNote(result.tableNote.id, result.tableNote.title, editLabelId || "", isLocked, editColumns, editRowCells);
-            }
         } catch (error) {
-            showSnackbar(t("message_error_occured"));
+            showSnackbar(t("message_error_occured"), "error");
         }
     }
 
@@ -295,7 +298,7 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
             ...editRowCells,
             editColumns.map((col, idx) => ({
                 id: Date.now() + idx,
-                rowIndex: editRowCells.length + 1,
+                rowIndex: editRowCells.length,
                 value: "",
                 columnId: col.id,
             }))

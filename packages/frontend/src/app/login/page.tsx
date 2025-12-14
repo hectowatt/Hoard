@@ -134,6 +134,7 @@ export default function LoginPage() {
                     alt="Logo"
                     width={508}
                     height={128}
+                    priority
                     style={{
                         maxWidth: "100%", height: "auto",
                         marginBottom: "20px",
