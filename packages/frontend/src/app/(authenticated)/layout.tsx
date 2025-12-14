@@ -381,22 +381,21 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 							{labels.map((label) => (
 								<ListItem key={label.id} disablePadding>
 									<ListItemButton onClick={() => setSearchLabel(label.labelname)} sx={{ pl: logoHorizontalPadding }} data-testid={`labellistitem-${label.id}`}>
-										<ListItemIcon sx={{ minWidth: 0, justifyContent: "center", pl: logoHorizontalPadding }}>
+										<ListItemIcon sx={{ minWidth: 0, justifyContent: "center", px: logoHorizontalPadding }}>
 											<LabelImportantOutlineRoundedIcon data-testid={`addedlabelicon-${label.id}`} />
 										</ListItemIcon>
-										{isDrawerOpen && (
-											<ListItemText
-												primary={label.labelname}
-												sx={{
-													opacity: isDrawerOpen ? 1 : 0,
-													whiteSpace: "nowrap",
-													transition: (theme) =>
-														theme.transitions.create("opacity", {
-															duration: theme.transitions.duration.enteringScreen,
-														}),
-												}}
-											/>
-										)}
+										{isDrawerOpen && <ListItemText
+											primary={label.labelname}
+											sx={{
+												opacity: isDrawerOpen ? 1 : 0,
+												whiteSpace: "nowrap",
+												transition: (theme) =>
+													theme.transitions.create("opacity", {
+														duration: theme.transitions.duration.enteringScreen,
+													}),
+											}}
+										/>
+										}
 									</ListItemButton>
 								</ListItem>
 							))}

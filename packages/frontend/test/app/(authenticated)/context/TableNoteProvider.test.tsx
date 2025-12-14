@@ -10,6 +10,7 @@ type Column = {
     id: number;
     name: string;
     order?: number;
+    table_note_id?: string;
 }
 
 type RowCell = {
@@ -17,6 +18,7 @@ type RowCell = {
     rowIndex: number;
     value: string;
     columnId?: number;
+    table_note_id?: string;
 }
 
 type TableNote = {
