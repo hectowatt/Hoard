@@ -61,6 +61,11 @@ export default function Home() {
       // 何も絞り込みがされていない場合
       : tableNotes);
 
+  const pinnedNotes = filterdNotes.filter(note => note.is_pinned);
+  const unpinnedNotes = filterdNotes.filter(note => !note.is_pinned);
+  const pinnedTableNotes = filterdTableNotes.filter(tableNote => tableNote.is_pinned);
+  const unpinnedTableNotes = filterdTableNotes.filter(tableNote => !tableNote.is_pinned);
+
   useEffect(() => {
     fetchNotes();
   }, []);
@@ -71,7 +76,7 @@ export default function Home() {
 
 
   // ノート初期登録時のコールバック関数
-  const handleInsert = (newId: string, newTitle: string, newContent: string, LabelId: string, is_locked: boolean) => {
+  const handleInsert = (newId: string, newTitle: string, newContent: string, LabelId: string, is_locked: boolean, is_pinned: boolean) => {
     if (setNotes !== undefined) {
       setNotes(prevNote => {
         const newNotes = [
@@ -83,7 +88,8 @@ export default function Home() {
             label_id: LabelId,
             createdate: new Date().toISOString(),
             updatedate: new Date().toISOString(),
-            is_locked: is_locked
+            is_locked: is_locked,
+            is_pinned: is_pinned
           },
         ];
         return newNotes.sort((a, b) => new Date(b.updatedate).getTime() - new Date(a.updatedate).getTime());
@@ -94,7 +100,7 @@ export default function Home() {
   }
 
   // テーブルノート初期登録時のコールバック関数
-  const handleInsertTableNote = (newId: string, newTitle: string, newLabel: string, is_locked: boolean, newColumn: Column[], newRowCells: RowCell[][]) => {
+  const handleInsertTableNote = (newId: string, newTitle: string, newLabel: string, is_locked: boolean, is_pinned: boolean, newColumn: Column[], newRowCells: RowCell[][]) => {
     if (setTableNotes !== undefined) {
       setTableNotes(prevTableNotes => {
         const newTableNotes = [
@@ -106,6 +112,7 @@ export default function Home() {
             createdate: new Date().toISOString(),
             updatedate: new Date().toISOString(),
             is_locked: is_locked,
+            is_pinned: is_pinned,
             columns: newColumn,
             rowCells: newRowCells
           },
@@ -187,21 +194,40 @@ export default function Home() {
     }
   };
 
+  // ノートピン留め時のコールバック関数
+  const handlePinNote = (id: string) => {
+    fetchNotes();
+  };
+
+  // テーブルノートピン留め時のコールバック関数
+  const handlePinTableNote = (id: string) => {
+    fetchTableNotes();
+  }
+
   return (
     <Container>
       <InputForm onInsert={handleInsert} onInsertTableNote={handleInsertTableNote} />
-      {/* ノートとテーブルノート一覧表示 */}
+      {/* ノートとテーブルノートをピン留めされたものを先頭に一覧表示 */}
       <Grid container spacing={2}>
-        {filterdNotes.map((note, index) => (
+
+        {pinnedNotes.map((note, index) => (
           <Grid key={note.id}>
-            {/* Noteコンポーネントを生成 */}
-            <Note {...note} onSave={handleSave} onDelete={handleDelete} data-testid="note" />
+            <Note {...note} onSave={handleSave} onDelete={handleDelete} onPin={handlePinNote} data-testid="note" />
           </Grid>
         ))}
-        {filterdTableNotes.map((tableNote, index) => (
+        {pinnedTableNotes.map((tableNote, index) => (
           <Grid key={tableNote.id}>
-            {/* TableNoteコンポーネントを生成 */}
-            <TableNote {...tableNote} onSave={handleSaveTableNote} onDelete={handleDeleteTableNote} data-testid="tablenote" />
+            <TableNote {...tableNote} onSave={handleSaveTableNote} onDelete={handleDeleteTableNote} onPin={handlePinTableNote} data-testid="tablenote" />
+          </Grid>
+        ))}
+        {unpinnedNotes.map((note, index) => (
+          <Grid key={note.id}>
+            <Note {...note} onSave={handleSave} onDelete={handleDelete} onPin={handlePinNote} data-testid="note" />
+          </Grid>
+        ))}
+        {unpinnedTableNotes.map((tableNote, index) => (
+          <Grid key={tableNote.id}>
+            <TableNote {...tableNote} onSave={handleSaveTableNote} onDelete={handleDeleteTableNote} onPin={handlePinTableNote} data-testid="tablenote" />
           </Grid>
         ))}
 

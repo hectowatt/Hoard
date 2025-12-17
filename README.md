@@ -29,14 +29,17 @@
 
 ## Installation
 
-After cloning source, you have to copy `docker-compose_sample.yml` and `.env_sample`.
+After cloning source, you have to copy `docker-compose_sample.yml`, `default.conf_sample` and `.env_sample`.
 ```
 cp docker-compose_sample.yml docker-compose.yml
 
+cp nginx/conf.d/default.conf_sample nginx/conf.d/default.conf
+
 cp .env_sample .env
 ```
+Next, enter your server's domain name in COOKIE_DOMAIN in .env.
 
-If you want to customise connection setting, edit these files.
+And if you want to customise connection setting, edit these files.
 
 After building docker container with docker compose, you can launch Hoard.
 
@@ -48,7 +51,13 @@ To develop Hoard, Devcontainer is usefull.
 
 Copy setting file and build container.
 ```
+cp docker-compose_sample_dev.yml docker-compose.yml
+
+cp nginx/conf.d/default.conf_sample_dev nginx/conf.d/default.conf
+
 cp ./.devcontainer/devcontainer_sample.json ./.devcontainer/devcontainer.json
+
+cp .env_sample .env
 
 ```
 

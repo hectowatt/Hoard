@@ -97,6 +97,9 @@ export default function ThemeRegistry({ children }: { children: React.ReactNode 
                     },
                 }
                 : {}),
+            action: {
+                disabledOpacity: 0.25
+            }
         },
         typography: {
             fontSize: 14,

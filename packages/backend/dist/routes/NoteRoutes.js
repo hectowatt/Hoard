@@ -18,7 +18,7 @@ router.get('/', authMiddleware, async (req, res) => {
 });
 // 【INSERT】Notes登録API
 router.post('/', authMiddleware, async (req, res) => {
-    const { title, content, label, isLocked } = req.body;
+    const { title, content, label, isLocked, isPinned } = req.body;
     if (!title && !content) {
         return res.status(400).json({ error: "Must set title or content" });
     }
@@ -30,7 +30,8 @@ router.post('/', authMiddleware, async (req, res) => {
             label_id: label || null, // ラベルがない場合はnullを設定
             createdate: new Date(),
             updatedate: new Date(),
-            is_locked: isLocked // ロック状態を設定
+            is_locked: isLocked, // ロック状態を設定
+            is_pinned: isPinned
         });
         const savedNote = await noteRepository.save(newNote);
         console.log('Note inserted with ID: ', savedNote.id);
@@ -43,7 +44,7 @@ router.post('/', authMiddleware, async (req, res) => {
 });
 // 【UPDATE】Notes更新用API
 router.put('/', authMiddleware, async (req, res) => {
-    const { id, title, content, label, isLocked } = req.body;
+    const { id, title, content, label, isLocked, isPinned } = req.body;
     if (!id || !title && !content) {
         return res.status(400).json({ error: "Must set title or content and must set id" });
     }
@@ -58,6 +59,7 @@ router.put('/', authMiddleware, async (req, res) => {
         note.label_id = label;
         note.updatedate = new Date();
         note.is_locked = isLocked;
+        note.is_pinned = isPinned;
         const updatedNote = await noteRepository.save(note);
         console.log('updated: ', updatedNote.updatedate);
         res.status(200).json({ message: "update note success!", note: updatedNote });
@@ -87,6 +89,33 @@ router.put('/lock', authMiddleware, async (req, res) => {
     catch (error) {
         console.error("Error updating lock state", error);
         res.status(500).json({ error: "Failed to update lock state" });
+    }
+});
+// 【UPDATE】Noteピン用API
+router.put('/pin', authMiddleware, async (req, res) => {
+    const { id, isPinned } = req.body;
+    if (!id || typeof isPinned !== 'boolean') {
+        return res.status(400).json({ error: "Must set id and pin status" });
+    }
+    try {
+        const noteRepository = AppDataSource.getRepository(Note);
+        const result = await noteRepository
+            .createQueryBuilder()
+            .update(Note)
+            .set({
+            is_pinned: isPinned,
+            updatedate: () => '"updatedate"'
+        })
+            .where("id = :id", { id })
+            .execute();
+        if (result.affected === 0) {
+            return res.status(404).json({ error: "Can't find Note" });
+        }
+        res.status(200).json({ message: "Pin note success!" });
+    }
+    catch (error) {
+        console.error("Error pin note", error);
+        res.status(500).json({ error: "Failed to pin notes" });
     }
 });
 /************ TrashNote ************/

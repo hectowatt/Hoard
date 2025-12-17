@@ -38,6 +38,7 @@ import { LocaleProvider } from "@/app/context/LocaleProvider";
 describe("Note", () => {
     const mockOnSave = jest.fn();
     const mockOnDelete = jest.fn();
+    const mockOnPin = jest.fn();
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -53,7 +54,7 @@ describe("Note", () => {
                 <SnackbarProvider>
                     <NoteProvider>
                         <LabelProvider>
-                            <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
+                            <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} is_pinned={false} onSave={mockOnSave} onDelete={mockOnDelete} onPin={mockOnPin} />
                         </LabelProvider>
                     </NoteProvider>
                 </SnackbarProvider>
@@ -66,13 +67,13 @@ describe("Note", () => {
         expect(screen.getByText(/2025\/07\/06/)).toBeVisible();
     })
 
-    it("クリックした時、編集、削除、ロックアイコンボタンが表示される", async () => {
+    it("クリックした時、編集、削除、ロックアイコンボタン、ピンボタンが表示される", async () => {
         render(
             <LocaleProvider>
                 <SnackbarProvider>
                     <NoteProvider>
                         <LabelProvider>
-                            <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
+                            <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} is_pinned={false} onSave={mockOnSave} onDelete={mockOnDelete} onPin={mockOnPin} />
                         </LabelProvider>
                     </NoteProvider>
                 </SnackbarProvider>
@@ -86,6 +87,7 @@ describe("Note", () => {
         expect(screen.getByTestId("button_edit")).toBeVisible();
         expect(screen.getByTestId("button_delete")).toBeVisible();
         expect(screen.getByTestId("unlock")).toBeVisible();
+        expect(screen.getByTestId("button_pin")).toBeVisible();
     })
 
     it("編集モード時、タイトルを編集できる", async () => {
@@ -94,7 +96,7 @@ describe("Note", () => {
                 <SnackbarProvider>
                     <NoteProvider>
                         <LabelProvider>
-                            <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
+                            <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} is_pinned={false} onSave={mockOnSave} onDelete={mockOnDelete} onPin={mockOnPin} />
                         </LabelProvider>
                     </NoteProvider>
                 </SnackbarProvider>
@@ -125,7 +127,7 @@ describe("Note", () => {
                 <SnackbarProvider>
                     <NoteProvider>
                         <LabelProvider>
-                            <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
+                            <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} is_pinned={false} onSave={mockOnSave} onDelete={mockOnDelete} onPin={mockOnPin} />
                         </LabelProvider>
                     </NoteProvider>
                 </SnackbarProvider>
@@ -156,7 +158,7 @@ describe("Note", () => {
                 <SnackbarProvider>
                     <NoteProvider>
                         <LabelProvider>
-                            <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
+                            <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} is_pinned={false} onSave={mockOnSave} onDelete={mockOnDelete} onPin={mockOnPin} />
                         </LabelProvider>
                     </NoteProvider>
                 </SnackbarProvider>
@@ -190,7 +192,7 @@ describe("Note", () => {
                     <SnackbarProvider>
                         <NoteProvider>
                             <LabelProvider>
-                                <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
+                                <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} is_pinned={false} onSave={mockOnSave} onDelete={mockOnDelete} onPin={mockOnPin} />
                             </LabelProvider>
                         </NoteProvider>
                     </SnackbarProvider>
@@ -225,7 +227,7 @@ describe("Note", () => {
                 <SnackbarProvider>
                     <NoteProvider>
                         <LabelProvider>
-                            <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} onSave={mockOnSave} onDelete={mockOnDelete} />
+                            <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} is_pinned={false} onSave={mockOnSave} onDelete={mockOnDelete} onPin={mockOnPin} />
                         </LabelProvider>
                     </NoteProvider>
                 </SnackbarProvider>
@@ -264,7 +266,7 @@ describe("Note", () => {
                 <SnackbarProvider>
                     <NoteProvider>
                         <LabelProvider>
-                            <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={true} onSave={mockOnSave} onDelete={mockOnDelete} />
+                            <Note id={"testid111"} title={"テストノートタイトル"} content={"テストノートcontent"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={true} is_pinned={false} onSave={mockOnSave} onDelete={mockOnDelete} onPin={mockOnPin} />
                         </LabelProvider>
                     </NoteProvider>
                 </SnackbarProvider>

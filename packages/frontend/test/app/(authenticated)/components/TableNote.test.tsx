@@ -58,6 +58,7 @@ import { LocaleProvider } from "@/app/context/LocaleProvider";
 describe("TableNote", () => {
     const mockOnSave = jest.fn();
     const mockOnDelete = jest.fn();
+    const mockOnPin = jest.fn();
 
     beforeEach(() => {
         jest.clearAllMocks();
@@ -73,7 +74,7 @@ describe("TableNote", () => {
                 <SnackbarProvider>
                     <NoteProvider>
                         <LabelProvider>
-                            <TableNote id={"testid111"} title={"テストノートタイトル"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} />
+                            <TableNote id={"testid111"} title={"テストノートタイトル"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} is_pinned={false} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} onPin={mockOnPin} />
                         </LabelProvider>
                     </NoteProvider>
                 </SnackbarProvider>
@@ -91,7 +92,7 @@ describe("TableNote", () => {
                 <SnackbarProvider>
                     <NoteProvider>
                         <LabelProvider>
-                            <TableNote id={"testid111"} title={"テストノートタイトル"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} />
+                            <TableNote id={"testid111"} title={"テストノートタイトル"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} is_pinned={false} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} onPin={mockOnPin} />
                         </LabelProvider>
                     </NoteProvider>
                 </SnackbarProvider>
@@ -113,7 +114,7 @@ describe("TableNote", () => {
                 <SnackbarProvider>
                     <NoteProvider>
                         <LabelProvider>
-                            <TableNote id={"testid111"} title={"テストノートタイトル"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} />
+                            <TableNote id={"testid111"} title={"テストノートタイトル"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} is_pinned={false} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} onPin={mockOnPin} />
                         </LabelProvider>
                     </NoteProvider>
                 </SnackbarProvider>
@@ -144,7 +145,7 @@ describe("TableNote", () => {
                 <SnackbarProvider>
                     <NoteProvider>
                         <LabelProvider>
-                            <TableNote id={"testid111"} title={"テストノートタイトル"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} />
+                            <TableNote id={"testid111"} title={"テストノートタイトル"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} is_pinned={false} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} onPin={mockOnPin} />
                         </LabelProvider>
                     </NoteProvider>
                 </SnackbarProvider>
@@ -175,7 +176,7 @@ describe("TableNote", () => {
                 <SnackbarProvider>
                     <NoteProvider>
                         <LabelProvider>
-                            <TableNote id={"testid111"} title={"テストノートタイトル"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} />
+                            <TableNote id={"testid111"} title={"テストノートタイトル"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} is_pinned={false} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} onPin={mockOnPin} />
                         </LabelProvider>
                     </NoteProvider>
                 </SnackbarProvider>
@@ -206,7 +207,7 @@ describe("TableNote", () => {
                 <SnackbarProvider>
                     <NoteProvider>
                         <LabelProvider>
-                            <TableNote id={"testid111"} title={"テストノートタイトル"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} />
+                            <TableNote id={"testid111"} title={"テストノートタイトル"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} is_pinned={false} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} onPin={mockOnPin} />
                         </LabelProvider>
                     </NoteProvider>
                 </SnackbarProvider>
@@ -237,7 +238,7 @@ describe("TableNote", () => {
                 <SnackbarProvider>
                     <NoteProvider>
                         <LabelProvider>
-                            <TableNote id={"testid111"} title={"テストノートタイトル"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} />
+                            <TableNote id={"testid111"} title={"テストノートタイトル"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} is_pinned={false} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} onPin={mockOnPin} />
                         </LabelProvider>
                     </NoteProvider>
                 </SnackbarProvider>
@@ -271,7 +272,7 @@ describe("TableNote", () => {
                     <SnackbarProvider>
                         <NoteProvider>
                             <LabelProvider>
-                                <TableNote id={"testid111"} title={"テストノートタイトル"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} />
+                                <TableNote id={"testid111"} title={"テストノートタイトル"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} is_pinned={false} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} onPin={mockOnPin} />
                             </LabelProvider>
                         </NoteProvider>
                     </SnackbarProvider>
@@ -306,7 +307,7 @@ describe("TableNote", () => {
                 <SnackbarProvider>
                     <NoteProvider>
                         <LabelProvider>
-                            <TableNote id={"testid111"} title={"テストノートタイトル"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} />
+                            <TableNote id={"testid111"} title={"テストノートタイトル"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={false} is_pinned={false} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} onPin={mockOnPin} />
                         </LabelProvider>
                     </NoteProvider>
                 </SnackbarProvider>
@@ -345,7 +346,7 @@ describe("TableNote", () => {
                 <SnackbarProvider>
                     <NoteProvider>
                         <LabelProvider>
-                            <TableNote id={"testid111"} title={"テストノートタイトル"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={true} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} />
+                            <TableNote id={"testid111"} title={"テストノートタイトル"} label_id={""} createdate="2025-07-05 05:33:05.864" updatedate="2025-07-06 05:33:05.864" is_locked={true} is_pinned={false} columns={mockColumns} rowCells={mockRowCells} onSave={mockOnSave} onDelete={mockOnDelete} onPin={mockOnPin} />
                         </LabelProvider>
                     </NoteProvider>
                 </SnackbarProvider>

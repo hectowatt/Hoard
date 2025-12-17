@@ -20,12 +20,12 @@ const mockLabels = [
 ];
 // ノートのモック
 const mockNotes = [
-    { id: "1", title: "test title1", content: "test content1", label_id: "1", label: mockLabels[0], is_deleted: false, deletedate: null, is_locked: false, createdate: new Date(), updatedate: new Date() },
-    { id: "2", title: "test title2", content: "test content2", label_id: "2", label: mockLabels[1], is_deleted: false, deletedate: null, is_locked: true, createdate: new Date(), updatedate: new Date() }
+    { id: "1", title: "test title1", content: "test content1", label_id: "1", label: mockLabels[0], is_deleted: false, is_pinned: false, deletedate: null, is_locked: false, createdate: new Date(), updatedate: new Date() },
+    { id: "2", title: "test title2", content: "test content2", label_id: "2", label: mockLabels[1], is_deleted: false, is_pinned: false, deletedate: null, is_locked: true, createdate: new Date(), updatedate: new Date() }
 ];
 // 削除済みノートのモック
 const mockDeletedNotes = [
-    { id: "3", title: "test title3", content: "test content3", label_id: "1", label: mockLabels[0], is_deleted: true, deletedate: new Date(), is_locked: false, createdate: new Date(), updatedate: new Date() }
+    { id: "3", title: "test title3", content: "test content3", label_id: "1", label: mockLabels[0], is_deleted: true, is_pinned: false, deletedate: new Date(), is_locked: false, createdate: new Date(), updatedate: new Date() }
 ];
 // AuthMiddlewareをモック
 jest.unstable_mockModule('../../dist/middleware/AuthMiddleware', () => ({
@@ -55,6 +55,7 @@ const mockRepo = {
             content: note.content,
             label_id: note.label_id,
             is_locked: note.is_locked,
+            is_pinned: note.is_pinned,
             createdate: new Date(),
             updatedate: new Date(),
             is_deleted: false,
@@ -64,6 +65,7 @@ const mockRepo = {
     remove: jest.fn((note) => Promise.resolve(note)),
     createQueryBuilder: jest.fn(() => ({
         delete: mockDelete,
+        update: jest.fn(() => ({ set: jest.fn(() => ({ where: jest.fn(() => ({ execute: mockExecute })) })) })),
     }))
 };
 jest.unstable_mockModule("../../dist/DataSource.js", () => ({
@@ -88,6 +90,7 @@ describe("NoteRoutes", () => {
         expect(response.body[0].is_deleted).toBe(false);
         expect(response.body[0].deletedate).toBe(null);
         expect(response.body[0].is_locked).toBe(false);
+        expect(response.body[0].is_pinned).toBe(false);
         expect(response.body[0].label.id).toBe("1");
         expect(response.body[1].id).toBe("2");
         expect(response.body[1].title).toBe("test title2");
@@ -96,6 +99,7 @@ describe("NoteRoutes", () => {
         expect(response.body[1].is_deleted).toBe(false);
         expect(response.body[1].deletedate).toBe(null);
         expect(response.body[1].is_locked).toBe(true);
+        expect(response.body[0].is_pinned).toBe(false);
         expect(response.body[1].label.id).toBe("2");
     });
     it("GET /notes and Error occured should return 500 and error message", async () => {
@@ -107,7 +111,7 @@ describe("NoteRoutes", () => {
     it("POST /notes should return 201 and message, registered note", async () => {
         const res = await request(app)
             .post("/api/notes")
-            .send({ title: "test title3", content: "test content3", label: "1", isLocked: false });
+            .send({ title: "test title3", content: "test content3", label: "1", isLocked: false, isPinned: false });
         expect(res.status).toBe(201);
         expect(res.body.message).toBe("save note success!");
         expect(res.body.note).toHaveProperty("id");
@@ -115,6 +119,7 @@ describe("NoteRoutes", () => {
         expect(res.body.note.content).toBe("test content3");
         expect(res.body.note.label_id).toBe("1");
         expect(res.body.note.is_locked).toBe(false);
+        expect(res.body.note.is_pinned).toBe(false);
         expect(res.body.note.is_deleted).toBe(false);
         expect(res.body.note.deletedate).toBe(null);
         expect(res.body.note).toHaveProperty("createdate");
@@ -124,7 +129,7 @@ describe("NoteRoutes", () => {
         mockRepo.save.mockImplementationOnce(() => Promise.reject(new Error("DB save error")));
         const response = await request(app)
             .post("/api/notes")
-            .send({ title: "test title3", content: "test content3", label: "1", isLocked: false });
+            .send({ title: "test title3", content: "test content3", label: "1", isLocked: false, isPinned: false });
         expect(response.status).toBe(500);
         expect(response.body.error).toBe("Failed to save note");
     });
@@ -138,7 +143,7 @@ describe("NoteRoutes", () => {
     it("PUT /notes should return 200 and message, updated note", async () => {
         const response = await request(app)
             .put("/api/notes")
-            .send({ id: "1", title: "updated title", content: "updated content", label: "2", isLocked: true });
+            .send({ id: "1", title: "updated title", content: "updated content", label: "2", isLocked: true, isPinned: false });
         expect(response.status).toBe(200);
         expect(response.body.message).toBe("update note success!");
         expect(response.body.note.id).toBe("1");
@@ -146,20 +151,21 @@ describe("NoteRoutes", () => {
         expect(response.body.note.content).toBe("updated content");
         expect(response.body.note.label_id).toBe("2");
         expect(response.body.note.is_locked).toBe(true);
+        expect(response.body.note.is_pinned).toBe(false);
         expect(response.body.note).toHaveProperty("createdate");
         expect(response.body.note).toHaveProperty("updatedate");
     });
     it("PUT /notes with invalid id should return 404 and message", async () => {
         const response = await request(app)
             .put("/api/notes")
-            .send({ id: "999", title: "updated title", content: "updated content", label: "2", isLocked: true });
+            .send({ id: "999", title: "updated title", content: "updated content", label: "2", isLocked: true, isPinned: false });
         expect(response.status).toBe(404);
         expect(response.body.error).toBe("Can't find note");
     });
     it("PUT /notes without id should return 400 and message", async () => {
         const response = await request(app)
             .put("/api/notes")
-            .send({ title: "updated title", content: "updated content", label: "2", isLocked: true });
+            .send({ title: "updated title", content: "updated content", label: "2", isLocked: true, isPinned: false });
         expect(response.status).toBe(400);
         expect(response.body.error).toBe("Must set title or content and must set id");
     });
@@ -167,7 +173,7 @@ describe("NoteRoutes", () => {
         mockRepo.findOneBy.mockImplementationOnce(() => Promise.reject(new Error("DB findOneBy error")));
         const response = await request(app)
             .put("/api/notes")
-            .send({ id: "1", title: "updated title", content: "updated content", label: "2", isLocked: true });
+            .send({ id: "1", title: "updated title", content: "updated content", label: "2", isLocked: true, isPinned: false });
         expect(response.status).toBe(500);
         expect(response.body.error).toBe("failed to update notes");
     });
@@ -190,6 +196,36 @@ describe("NoteRoutes", () => {
         expect(response.status).toBe(500);
         expect(response.body.error).toBe("Failed to move note to trash");
     });
+    it("PUT /notes/pin should return 200 and message", async () => {
+        const response = await request(app)
+            .put("/api/notes/pin")
+            .send({ id: "1", isPinned: false });
+        expect(response.status).toBe(200);
+        expect(response.body.message).toBe("Pin note success!");
+    });
+    it("PUT /notes/pin with not exists note should return 404 and message", async () => {
+        mockExecute.mockResolvedValueOnce({ affected: 0 });
+        const response = await request(app)
+            .put("/api/notes/pin")
+            .send({ id: "999-999", isPinned: false });
+        expect(response.status).toBe(404);
+        expect(response.body.error).toBe("Can't find Note");
+    });
+    it("PUT /notes/pin with no id should return 400 and message", async () => {
+        const response = await request(app)
+            .put("/api/notes/pin")
+            .send({ isPinned: false });
+        expect(response.status).toBe(400);
+        expect(response.body.error).toBe("Must set id and pin status");
+    });
+    it("PUT /notes/pin and error occured should return 500 and message", async () => {
+        mockExecute.mockRejectedValueOnce(new Error("DB update error"));
+        const response = await request(app)
+            .put("/api/notes/pin")
+            .send({ id: "1", isPinned: false });
+        expect(response.status).toBe(500);
+        expect(response.body.error).toBe("Failed to pin notes");
+    });
     /************ TrashNote ************/
     it("GET /notes/trash should return deleted notes", async () => {
         mockRepo.find.mockImplementationOnce(() => Promise.resolve(mockDeletedNotes));
@@ -201,6 +237,7 @@ describe("NoteRoutes", () => {
         expect(response.body[0].content).toBe("test content3");
         expect(response.body[0].label_id).toBe("1");
         expect(response.body[0].is_locked).toBe(false);
+        expect(response.body[0].is_pinned).toBe(false);
         expect(response.body[0].is_deleted).toBe(true);
         expect(response.body[0]).toHaveProperty("deletedate");
         expect(response.body[0]).toHaveProperty("createdate");
