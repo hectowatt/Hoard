@@ -33,8 +33,8 @@ const mockLabels: Label[] = [
 
 // テーブルノートのモック
 const mockTableNotes: TableNote[] = [
-    { id: "1", title: "test title1", label_id: "1", label: mockLabels[0], is_deleted: false, deletedate: null, is_locked: false, createdate: new Date(), updatedate: new Date() },
-    { id: "2", title: "test title2", label_id: "2", label: mockLabels[1], is_deleted: false, deletedate: null, is_locked: true, createdate: new Date(), updatedate: new Date() }
+    { id: "1", title: "test title1", label_id: "1", label: mockLabels[0], is_deleted: false, deletedate: null, is_locked: false, is_pinned: false, createdate: new Date(), updatedate: new Date() },
+    { id: "2", title: "test title2", label_id: "2", label: mockLabels[1], is_deleted: false, deletedate: null, is_locked: true, is_pinned: false, createdate: new Date(), updatedate: new Date() }
 ];
 
 // テーブルノートのカラムのモック
@@ -56,7 +56,7 @@ const mockTableNoteCells: TableNoteCell[] = [
 
 // 削除済みノートのモック
 const mockDeletedTableNotes = [
-    { id: "3", title: "test title3", label_id: "1", label: mockLabels[0], is_deleted: true, deletedate: new Date(), is_locked: false, createdate: new Date(), updatedate: new Date() }
+    { id: "3", title: "test title3", label_id: "1", label: mockLabels[0], is_deleted: true, deletedate: new Date(), is_locked: false, is_pinned: false, createdate: new Date(), updatedate: new Date() }
 ];
 
 // 削除済みテーブルノートのカラムのモック
@@ -89,7 +89,7 @@ const mockRepoTableNote = {
         }
         return Promise.resolve(null);
     }),
-    create: jest.fn((data: { title: string; label_id: null; createdate: Date; updatedate: Date; is_locked: boolean }) => {
+    create: jest.fn((data: { title: string; label_id: null; createdate: Date; updatedate: Date; is_locked: boolean; is_pinned: boolean }) => {
         return { id: 3, ...data };
     }),
     save: jest.fn((tableNote: TableNote) => {
@@ -98,6 +98,7 @@ const mockRepoTableNote = {
             title: tableNote.title,
             label_id: tableNote.label_id,
             is_locked: tableNote.is_locked,
+            is_pinned: tableNote.is_pinned,
             createdate: new Date(),
             updatedate: new Date(),
             is_deleted: false,
@@ -107,6 +108,7 @@ const mockRepoTableNote = {
     remove: jest.fn((tableNote: TableNote) => Promise.resolve(tableNote)),
     createQueryBuilder: jest.fn(() => ({
         delete: mockDelete,
+        update: jest.fn(() => ({ set: jest.fn(() => ({ where: jest.fn(() => ({ execute: mockExecute })) })) })),
     }))
 };
 
@@ -247,7 +249,7 @@ describe("TableNoteRoutes", () => {
     it("POST /tablenotes should return 201 and message", async () => {
         const response = await request(app)
             .post("/api/tablenotes")
-            .send({ title: "test title", columns: mockTableNoteColumns, rowCells: mockTableNoteCells, label_id: mockLabels[0].id, is_locked: false });
+            .send({ title: "test title", columns: mockTableNoteColumns, rowCells: mockTableNoteCells, label_id: mockLabels[0].id, is_locked: false, is_pinned: false });
 
         expect(response.status).toBe(201);
         expect(response.body.message).toBe("Save TableNote success!");
@@ -256,6 +258,7 @@ describe("TableNoteRoutes", () => {
         expect(response.body.tableNote.title).toBe("test title");
         expect(response.body.tableNote.label_id).toBe(mockLabels[0].id);
         expect(response.body.tableNote.is_locked).toBe(false);
+        expect(response.body.tableNote.is_pinned).toBe(false);
         expect(response.body.tableNote).toHaveProperty("createdate");
         expect(response.body.tableNote).toHaveProperty("updatedate");
     });
@@ -264,7 +267,7 @@ describe("TableNoteRoutes", () => {
         mockRepoTableNote.save.mockRejectedValueOnce(() => Promise.reject(new Error("DB find error")));
         const response = await request(app)
             .post("/api/tablenotes")
-            .send({ title: "test title", columns: mockTableNoteColumns, rowCells: mockTableNoteCells, label_id: mockLabels[0].id, is_locked: false });
+            .send({ title: "test title", columns: mockTableNoteColumns, rowCells: mockTableNoteCells, label_id: mockLabels[0].id, is_locked: false, is_pinned: false });
 
         expect(response.status).toBe(500);
         expect(response.body.error).toBe("Failed to save TableNote");
@@ -273,7 +276,7 @@ describe("TableNoteRoutes", () => {
     it("POST /tablenotes with NO columns should return 400 and message", async () => {
         const response = await request(app)
             .post("/api/tablenotes")
-            .send({ title: "", columns: null, rowCells: mockTableNoteCells, label_id: mockLabels[0].id, is_locked: false });
+            .send({ title: "", columns: null, rowCells: mockTableNoteCells, label_id: mockLabels[0].id, is_locked: false, is_pinned: false });
 
         expect(response.status).toBe(400);
         expect(response.body.error).toBe("Must set tablenote columns, rows");
@@ -288,6 +291,7 @@ describe("TableNoteRoutes", () => {
         expect(response.body[0].title).toBe("test title1");
         expect(response.body[0].label_id).toBe("1");
         expect(response.body[0].is_locked).toBe(false);
+        expect(response.body[0].is_pinned).toBe(false);
         expect(response.body[0]).toHaveProperty("createdate");
         expect(response.body[0]).toHaveProperty("updatedate");
         expect(response.body[0].columns[0].id).toBe("1");
@@ -309,6 +313,7 @@ describe("TableNoteRoutes", () => {
         expect(response.body[1].title).toBe("test title2");
         expect(response.body[1].label_id).toBe("2");
         expect(response.body[1].is_locked).toBe(true);
+        expect(response.body[1].is_pinned).toBe(false);
         expect(response.body[1]).toHaveProperty("createdate");
         expect(response.body[1]).toHaveProperty("updatedate");
         expect(response.body[1].columns[0].id).toBe("3");
@@ -343,12 +348,13 @@ describe("TableNoteRoutes", () => {
     it("PUT /tablenotes should return 200 and message", async () => {
         const response = await request(app)
             .put("/api/tablenotes")
-            .send({ id: "1", title: "updated title", columns: [mockTableNoteColumns[0]], rowCells: [[]], label: mockLabels[0], is_locked: false });
+            .send({ id: "1", title: "updated title", columns: [mockTableNoteColumns[0]], rowCells: [[]], label: mockLabels[0], is_locked: false, is_pinned: false });
 
         expect(response.status).toBe(200);
         expect(response.body.tableNote.id).toBe("1");
         expect(response.body.tableNote.title).toBe("updated title");
         expect(response.body.tableNote.is_locked).toBe(false);
+        expect(response.body.tableNote.is_pinned).toBe(false);
         expect(response.body.tableNote).toHaveProperty("createdate");
         expect(response.body.tableNote).toHaveProperty("updatedate");
         expect(response.body.tableNote.columns[0].id).toBe("1");
@@ -361,7 +367,7 @@ describe("TableNoteRoutes", () => {
         mockRepoTableNote.findOneBy.mockImplementationOnce(() => Promise.resolve(null));
         const response = await request(app)
             .put("/api/tablenotes")
-            .send({ id: "1", title: "updated title", columns: [mockTableNoteColumns[0]], rowCells: [[]], label: mockLabels[0], is_locked: false });
+            .send({ id: "1", title: "updated title", columns: [mockTableNoteColumns[0]], rowCells: [[]], label: mockLabels[0], is_locked: false, is_pinned: false });
 
         expect(response.status).toBe(404);
         expect(response.body.error).toBe("tablenote not found");
@@ -371,7 +377,7 @@ describe("TableNoteRoutes", () => {
         mockRepoTableNote.findOneBy.mockRejectedValueOnce(() => Promise.reject(new Error("DB find error!")));
         const response = await request(app)
             .put("/api/tablenotes")
-            .send({ id: "1", title: "updated title", columns: [mockTableNoteColumns[0]], rowCells: [[]], label: mockLabels[0], is_locked: false });
+            .send({ id: "1", title: "updated title", columns: [mockTableNoteColumns[0]], rowCells: [[]], label: mockLabels[0], is_locked: false, is_pinned: false });
 
         expect(response.status).toBe(500);
         expect(response.body.error).toBe("Failed to update TableNote");
@@ -403,6 +409,45 @@ describe("TableNoteRoutes", () => {
         expect(response.body.error).toBe("Failed moved to trash");
     });
 
+
+      it("PUT /tablenotes/pin should return 200 and message", async () => {
+        const response = await request(app)
+          .put("/api/tablenotes/pin")
+          .send({ id: "1", isPinned: false });
+    
+        expect(response.status).toBe(200);
+        expect(response.body.message).toBe("Pin TableNote success!");
+      });
+    
+      it("PUT /tablenotes/pin with not exists note should return 404 and message", async () => {
+         mockExecute.mockResolvedValueOnce({ affected: 0 }); 
+         const response = await request(app)
+          .put("/api/tablenotes/pin")
+          .send({ id: "999-999", isPinned: false });
+    
+        expect(response.status).toBe(404);
+        expect(response.body.error).toBe("Can't find TableNote");
+      });
+    
+        it("PUT /tablenotes/pin with no id should return 400 and message", async () => {
+         const response = await request(app)
+          .put("/api/tablenotes/pin")
+          .send({ isPinned: false });
+    
+        expect(response.status).toBe(400);
+        expect(response.body.error).toBe("Must set id and pin status");
+      });
+    
+       it("PUT /tablenotes/pin and error occured should return 500 and message", async () => {
+        mockExecute.mockRejectedValueOnce(new Error("DB update error"));
+         const response = await request(app)
+          .put("/api/tablenotes/pin")
+          .send({ id: "1", isPinned: false });
+    
+        expect(response.status).toBe(500);
+        expect(response.body.error).toBe("Failed to pin TableNote");
+      });
+
     /************ TrashNote ************/
 
     it("GET /tablenotes/trash should return 200 and trash tablenotes", async () => {
@@ -417,6 +462,7 @@ describe("TableNoteRoutes", () => {
         expect(response.body[0].title).toBe("test title3");
         expect(response.body[0].label_id).toBe("1");
         expect(response.body[0].is_locked).toBe(false);
+        expect(response.body[0].is_pinned).toBe(false);
         expect(response.body[0]).toHaveProperty("createdate");
         expect(response.body[0]).toHaveProperty("updatedate");
     });

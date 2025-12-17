@@ -178,6 +178,29 @@ describe("InputForm", () => {
         expect(buttonUnlock).toBeInTheDocument();
     });
 
+    it("openがtrueのとき、ピンボタンが表示される", async () => {
+        render(
+            <LocaleProvider>
+                <SnackbarProvider>
+                    <NoteProvider>
+                        <LabelProvider>
+                            <InputForm onInsert={mockOnInsert} onInsertTableNote={mockOnInsertTableNote} />
+                        </LabelProvider>
+                    </NoteProvider>
+                </SnackbarProvider>
+            </LocaleProvider>
+        );
+
+        const buttonpin = screen.getByTestId("button_pin");
+
+        await act(async () => {
+            fireEvent.click(buttonpin);
+        });
+
+        const buttonUnlock = await screen.getByTestId("unlock");
+        expect(buttonUnlock).toBeInTheDocument();
+    });
+
     it("openがtrueのとき、テーブルノートアイコンが表示される", async () => {
         render(
             <LocaleProvider>

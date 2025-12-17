@@ -31,10 +31,11 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useTranslation } from "react-i18next";
 import { useSnackbar } from "@/app/(authenticated)/context/SnackbarProvider";
 import { useRouter } from "next/navigation";
+import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
 
 interface InputFormProps {
-    onInsert: (newId: string, newTitle: string, newContent: string, newLabel: string, isLocked: boolean) => void;
-    onInsertTableNote: (newId: string, newTitle: string, newLabel: string, isLocked: boolean, newColumns: Column[], newRowCells: RowCell[][]) => void;
+    onInsert: (newId: string, newTitle: string, newContent: string, newLabel: string, isLocked: boolean, isPinned: boolean) => void;
+    onInsertTableNote: (newId: string, newTitle: string, newLabel: string, isLocked: boolean, isPinned: boolean, newColumns: Column[], newRowCells: RowCell[][]) => void;
 }
 
 type Column = {
@@ -62,6 +63,7 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
     const [isFocused, setIsFocused] = useState(false);
     const [editLabelId, setEditLabelId] = React.useState<string | null>(null);
     const [isLocked, setIsLocked] = React.useState(false);
+    const [isPinned, setIsPinned] = React.useState(false);
     const [tableNoteOpen, setTableNoteOpen] = useState(false);
     const { t } = useTranslation();
     const { showSnackbar } = useSnackbar();
@@ -153,8 +155,9 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                 body: JSON.stringify({
                     title: title,
                     content: content,
-                    label: editLabelId, // nullの場合はnullが送信される
-                    isLocked: isLocked, // ロック状態を送信
+                    label: editLabelId,
+                    isLocked: isLocked,
+                    isPinned: isPinned
                 }),
                 credentials: "include"
             })
@@ -173,13 +176,15 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
 
             setTitle("");
             setContent("");
+            setIsLocked(false);
+            setIsPinned(false);
             setExpand(false);
 
             const insertedNoteId = result.note.id;
 
             // ノート登録時のコールバック関数を呼び出す
             if (typeof onInsert === "function") {
-                onInsert(insertedNoteId, title, content, editLabelId || "", isLocked);
+                onInsert(insertedNoteId, title, content, editLabelId || "", isLocked, isPinned);
             }
         } catch (error) {
             showSnackbar(t("message_error_occured"));
@@ -224,6 +229,7 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                     rowCells: editRowCells,
                     label: editLabelId,
                     is_locked: isLocked,
+                    is_pinned: isPinned
                 }),
                 credentials: "include"
             })
@@ -242,14 +248,16 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
             console.log("result.tableNote.id:", result.tableNote.id);
             // テーブルノート登録時のコールバック関数を呼び出す
             if (typeof onInsertTableNote === "function") {
-                onInsertTableNote(result.tableNote.id, result.tableNote.title, editLabelId || "", isLocked, result.tableNote.columns, result.tableNote.rowCells);
+                onInsertTableNote(result.tableNote.id, result.tableNote.title, editLabelId || "", isLocked, isPinned, result.tableNote.columns, result.tableNote.rowCells);
             }
             setTableNoteOpen(false);
 
-            setEditColumns([{ id: 1, name: "カラム1", order: 0 }]);
+            setEditColumns([{ id: 1, name: "", order: 0 }]);
 
             setEditRowCells([[{ id: 1, rowIndex: 0, value: "", columnId: 1 }]]);
             setTitle("");
+            setIsLocked(false);
+            setIsPinned(false);
             setExpand(false);
         } catch (error) {
             showSnackbar(t("message_error_occured"), "error");
@@ -318,6 +326,10 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
         );
         setEditRowCells(newRowCellsWithReorderdIndex);
     };
+
+    const handlePinned = () => {
+        setIsPinned(!isPinned);
+    }
 
     return (
         <Box sx={{ maxWidth: 800, mx: 'auto', mt: 4, p: 2 }}
@@ -400,6 +412,12 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                         <IconButton
                             onClick={() => handleLock()}>
                             {isLocked ? <LockOutlinedIcon data-testid="lock" /> : <NoEncryptionGmailerrorredOutlinedIcon data-testid="unlock" />}
+                        </IconButton>
+                        <IconButton
+                            onClick={handlePinned}
+                            sx={{ ml: 1, color: isPinned ? "text.primary" : "action.disabled" }}
+                            data-testid="button_pin">
+                            <PushPinOutlinedIcon />
                         </IconButton>
                         <IconButton
                             onClick={() => setTableNoteOpen(true)}
@@ -513,6 +531,12 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                         onClick={() => handleLock()}
                         sx={{ ml: 1 }}>
                         {isLocked ? <LockOutlinedIcon /> : <NoEncryptionGmailerrorredOutlinedIcon />}
+                    </IconButton>
+                    <IconButton
+                        onClick={handlePinned}
+                        sx={{ ml: 1, color: isPinned ? "text.primary" : "action.disabled" }}
+                        data-testid="button_pin">
+                        <PushPinOutlinedIcon />
                     </IconButton>
                 </Box>
             </Dialog >

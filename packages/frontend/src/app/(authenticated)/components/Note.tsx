@@ -1,13 +1,14 @@
 "use client"
 
 import React, { useEffect } from "react";
-import { Box, Paper, Typography, Dialog, DialogTitle, DialogContent, TextField, Button, FormControl, Select, MenuItem, InputLabel, IconButton } from "@mui/material";
+import { Box, Paper, Typography, Dialog, DialogTitle, DialogContent, TextField, Button, FormControl, Select, MenuItem, InputLabel, IconButton, Icon } from "@mui/material";
 import { useLabelContext } from "@/app/(authenticated)/context/LabelProvider";
 import NoEncryptionGmailerrorredOutlinedIcon from '@mui/icons-material/NoEncryptionGmailerrorredOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useTranslation } from "react-i18next";
 import { useSnackbar } from "@/app/(authenticated)/context/SnackbarProvider";
 import { useRouter } from "next/navigation";
+import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
 
 interface NoteProps {
     id: string;
@@ -17,8 +18,10 @@ interface NoteProps {
     createdate: string;
     updatedate: string;
     is_locked: boolean;
+    is_pinned: boolean;
     onSave: (id: string, newTitle: string, newContent: string, newLabel: string, newUpdateDate: string) => void;
     onDelete: (id: string) => void;
+    onPin: (id: string) => void;
 }
 
 // 日付をフォーマットする
@@ -42,8 +45,10 @@ export default function Note({
     createdate,
     updatedate,
     is_locked,
+    is_pinned,
     onSave,
-    onDelete
+    onDelete,
+    onPin
 }: NoteProps) {
 
     const [open, setOpen] = React.useState(false);
@@ -57,6 +62,7 @@ export default function Note({
     const [inputPassword, setInputPassword] = React.useState("");
     const [passwordDialogOpen, setPasswordDialogOpen] = React.useState(false);
     const [passwordId, setPasswordId] = React.useState<string | null>(null);
+    const [isPinned, setIsPinned] = React.useState(false);
     const { t } = useTranslation();
     const { showSnackbar } = useSnackbar();
     const router = useRouter();
@@ -64,9 +70,10 @@ export default function Note({
     // 画面描画時にノートロック状態とラベルを設定
     useEffect(() => {
         setIsLocked(is_locked);
+        setIsPinned(is_pinned);
         setEditTitle(title);
         setEditLabel(label_id || null);
-    }, [title, label_id]);
+    }, [title, label_id, is_pinned]);
 
 
     const handleOpen = () => {
@@ -135,6 +142,7 @@ export default function Note({
                     content: editContent,
                     label: editLabel,
                     isLocked: isLocked,
+                    isPinned: isPinned
                 }),
                 credentials: "include"
             })
@@ -321,9 +329,40 @@ export default function Note({
         }
     }
 
+    // ピン留めボタン押下処理
+    const handlePin = async () => {
+        try {
+            const response = await fetch("/api/notes/pin", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    id: id,
+                    isPinned: !isPinned,
+                }),
+                credentials: "include"
+            });
+            if (!response.ok) {
+                if (response.status === 401) {
+                    console.error("Error pin note");
+                    showSnackbar(t("message_error_occured_redirect_login"), "warning");
+                    router.push("/login");
+                }
+                throw new Error("Failed to pin note");
+            }
+            setIsPinned(!isPinned);
+            if (typeof onPin === "function") {
+                onPin(id);
+            }
+        } catch (error) {
+            showSnackbar(t("message_error_occured"), "error");
+        }
+    };
+
     return (
         <>
-            <Paper elevation={3} sx={{ p: 2, maxWidth: 300, maxHeight: 250, wordWrap: "break-word", cursor: "pointer" }} onClick={handleOpen}>
+            <Paper elevation={3} variant="elevation" sx={{ p: 2, maxWidth: 300, maxHeight: 250, wordWrap: "break-word", cursor: "pointer", border: "2px solid", borderColor: isPinned ? "primary.main" : "transparent" }} onClick={handleOpen}>
                 <Typography variant="h6" sx={title && title.trim() !== "" ? { mb: 1 } : { mb: 1, fontStyle: "italic", color: "#b0b0b0", fontWeight: "normal" }}>
                     {title && title.trim() !== "" ? title : t("label_no_title")}
                 </Typography>
@@ -428,6 +467,12 @@ export default function Note({
                                     sx={{ ml: 1, color: isLocked ? "primary.main" : "text.secondary" }}>
                                     {isLocked ? <LockOutlinedIcon data-testid="lock" /> : <NoEncryptionGmailerrorredOutlinedIcon data-testid="unlock" />}
                                 </IconButton>
+                                <IconButton
+                                    onClick={handlePin}
+                                    sx={{ ml: 1, color: isPinned ? "text.primary" : "action.disabled" }}
+                                    data-testid="button_pin">
+                                    <PushPinOutlinedIcon />
+                                </IconButton>
 
                             </>
                         ) : (
@@ -438,6 +483,12 @@ export default function Note({
                                     onClick={handleLock}
                                     sx={{ ml: 1, color: isLocked ? "primary.main" : "text.secondary" }}>
                                     {isLocked ? <LockOutlinedIcon data-testid="lock" /> : <NoEncryptionGmailerrorredOutlinedIcon data-testid="unlock" />}
+                                </IconButton>
+                                <IconButton
+                                    onClick={handlePin}
+                                    sx={{ ml: 1, color: isPinned ? "text.primary" : "action.disabled" }}
+                                    data-testid="button_pin">
+                                    <PushPinOutlinedIcon />
                                 </IconButton>
                             </>
                         )}

@@ -22,6 +22,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useTranslation } from "react-i18next";
 import { useSnackbar } from "../context/SnackbarProvider";
 import { useRouter } from "next/navigation";
+import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
 
 interface Column {
     id: number;
@@ -43,12 +44,14 @@ interface tableNoteProps {
     title: string;
     label_id: string;
     is_locked: boolean;
+    is_pinned: boolean;
     createdate: string;
     updatedate: string;
     columns: Column[];
     rowCells: RowCell[][];
     onSave: (id: string, newTitle: string, newLabel: string, is_locked: boolean, newUpdateDate: string, newColumn: Column[], newRowCells: RowCell[][]) => void;
     onDelete: (id: string) => void;
+    onPin: (id: string) => void;
 }
 
 // 日付をフォーマットする
@@ -63,7 +66,7 @@ const formatDate = (exString: string) => {
     return `${year}/${month}/${day}`;
 }
 
-export default function TableNote({ id, title, label_id, is_locked, createdate, updatedate, columns, rowCells, onSave, onDelete }: tableNoteProps) {
+export default function TableNote({ id, title, label_id, is_locked, is_pinned, createdate, updatedate, columns, rowCells, onSave, onDelete, onPin }: tableNoteProps) {
     const [open, setOpen] = React.useState(false);
     const [editTitle, setEditTitle] = React.useState(title);
     const [isEditing, setIsEditing] = React.useState(false);
@@ -75,6 +78,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
     const [passwordId, setPasswordId] = React.useState<string | null>(null);
     const [editColumns, setEditColumns] = useState<Column[]>(columns);
     const [editRowCells, setEditRowCells] = useState<RowCell[][]>(rowCells);
+    const [isPinned, setIsPinned] = React.useState(false);
     const { t } = useTranslation();
     const { showSnackbar } = useSnackbar();
     const router = useRouter();
@@ -84,7 +88,8 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
     useEffect(() => {
         setEditTitle(title);
         setEditLabel(label_id || null);
-    }, [title, label_id]);
+        setIsPinned(is_pinned);
+    }, [title, label_id, is_pinned]);
 
     // propsを変更用のstateに格納
     useEffect(() => {
@@ -169,6 +174,11 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
     // 画面描画時にノートロック状態を設定
     useEffect(() => {
         setIsLocked(is_locked);
+    }, [is_locked]);
+
+    // 画面描画時にノートピン状態を設定
+    useEffect(() => {
+        setIsPinned(is_pinned);
     }, [is_locked]);
 
     useEffect(() => {
@@ -356,6 +366,7 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                     rowCells: editRowCells,
                     label_id: editLabel,
                     is_locked: isLocked,
+                    is_pinned: isPinned,
                 }),
                 credentials: "include"
             })
@@ -418,9 +429,40 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
         }
     };
 
+    // ピン留めボタン押下処理
+    const handlePin = async () => {
+        try {
+            const response = await fetch("/api/tablenotes/pin", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    id: id,
+                    isPinned: !isPinned,
+                }),
+                credentials: "include"
+            });
+            if (!response.ok) {
+                if (response.status === 401) {
+                    console.error("Error pin tablenote");
+                    showSnackbar(t("message_error_occured_redirect_login"), "warning");
+                    router.push("/login");
+                }
+                throw new Error("Failed to pin tablenote");
+            }
+            setIsPinned(!isPinned);
+            if (typeof onPin === "function") {
+                onPin(id);
+            }
+        } catch (error) {
+            showSnackbar(t("message_error_occured"), "error");
+        }
+    };
+
     return (
         <>
-            <Paper elevation={3} sx={{ p: 2, maxWidth: 300, maxHeight: 200, wordWrap: "break-word", cursor: "pointer" }} onClick={handleOpen}>
+            <Paper elevation={3} sx={{ p: 2, maxWidth: 300, maxHeight: 200, wordWrap: "break-word", cursor: "pointer", border: "2px solid", borderColor: isPinned ? "primary.main" : "transparent" }} onClick={handleOpen}>
                 <Typography variant="h6" sx={title && title.trim() !== "" ? { mb: 1 } : { mb: 1, fontStyle: "italic", color: "#b0b0b0", fontWeight: "normal" }}>
                     {title && title.trim() !== "" ? title : t("label_no_title")}
                 </Typography>
@@ -626,7 +668,12 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                                     sx={{ ml: 1, color: isLocked ? "primary.main" : "text.secondary" }}>
                                     {isLocked ? <LockOutlinedIcon data-testid="lock" /> : <NoEncryptionGmailerrorredOutlinedIcon data-testid="unlock" />}
                                 </IconButton>
-
+                                <IconButton
+                                    onClick={handlePin}
+                                    sx={{ ml: 1, color: isPinned ? "text.primary" : "action.disabled" }}
+                                    data-testid="button_pin">
+                                    <PushPinOutlinedIcon />
+                                </IconButton>
                             </>
                         ) : (
                             // パスワードロックされている場合
@@ -636,6 +683,12 @@ export default function TableNote({ id, title, label_id, is_locked, createdate, 
                                     onClick={handleLock}
                                     sx={{ ml: 1, color: isLocked ? "primary.main" : "text.secondary" }}>
                                     {isLocked ? <LockOutlinedIcon data-testid="lock" /> : <NoEncryptionGmailerrorredOutlinedIcon data-testid="unlock" />}
+                                </IconButton>
+                                <IconButton
+                                    onClick={handlePin}
+                                    sx={{ ml: 1, color: isPinned ? "text.primary" : "action.disabled" }}
+                                    data-testid="button_pin">
+                                    <PushPinOutlinedIcon />
                                 </IconButton>
                             </>
                         )}

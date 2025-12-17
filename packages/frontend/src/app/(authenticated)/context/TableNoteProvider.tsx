@@ -10,6 +10,7 @@ type tableNote = {
     createdate: string;
     updatedate: string;
     is_locked: boolean;
+    is_pinned: boolean;
     columns: Column[];
     rowCells: RowCell[][];
 };

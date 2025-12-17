@@ -5,6 +5,9 @@ services:
     container_name: hoard_dev
     env_file:
       - .env
+    ports:
+      - "3500:3500"
+      - "4000:4000"
     volumes:
       - ./:/app
     networks:
@@ -29,7 +32,7 @@ services:
     volumes:
       - ./packages/frontend:/app/packages/frontend
       - /app/packages/frontend/node_modules
-    command: /bin/sh -c "npm run build && npm run dev"
+    command: sleep infinity
 
   backend:
     build:
@@ -53,7 +56,7 @@ services:
     volumes:
       - ./packages/backend:/app/packages/backend
       - /app/packages/backend/node_modules
-    command: /bin/sh -c "npm run build && npm run dev"
+    command: sleep infinity
 
   db:
     image: postgres:15

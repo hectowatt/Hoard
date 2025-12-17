@@ -41,6 +41,10 @@ __decorate([
     __metadata("design:type", Boolean)
 ], TableNote.prototype, "is_locked", void 0);
 __decorate([
+    Column({ name: "is_pinned", type: "boolean", default: false }),
+    __metadata("design:type", Boolean)
+], TableNote.prototype, "is_pinned", void 0);
+__decorate([
     CreateDateColumn({ name: "createdate", type: "timestamp" }),
     __metadata("design:type", Date)
 ], TableNote.prototype, "createdate", void 0);

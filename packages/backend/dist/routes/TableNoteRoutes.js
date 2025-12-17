@@ -7,7 +7,7 @@ import { authMiddleware } from '../middleware/AuthMiddleware.js';
 const router = Router();
 // 【INSERT】テーブルノート登録API
 router.post('/', authMiddleware, async (req, res) => {
-    const { title, columns, rowCells, label_id, is_locked } = req.body;
+    const { title, columns, rowCells, label_id, is_locked, is_pinned } = req.body;
     if (!columns || !rowCells) {
         return res.status(400).json({ error: "Must set tablenote columns, rows" });
     }
@@ -17,6 +17,7 @@ router.post('/', authMiddleware, async (req, res) => {
             title: "",
             label_id: "",
             is_locked: false,
+            is_pinned: false,
             createdate: "",
             updatedate: "",
             columns: null,
@@ -32,6 +33,7 @@ router.post('/', authMiddleware, async (req, res) => {
                 title: title,
                 label_id: label_id || null, // ラベルがない場合はnullを設定
                 is_locked: is_locked || false, // ロック状態を設定
+                is_pinned: is_pinned,
                 createdate: new Date(),
                 updatedate: new Date()
             });
@@ -67,7 +69,6 @@ router.post('/', authMiddleware, async (req, res) => {
                 }
             }
             rowCellsAfterRegist = await cellRepository.find({ where: { table_note_id: savedTableNote.id }, order: { row_index: 'ASC', column: { order: "ASC" } } });
-            console.log("登録後に取得したcells:", rowCellsAfterRegist);
             // rowCellsをrow_indexごとにグループ化して2次元配列に変換
             const groupedRowCells = [];
             rowCellsAfterRegist.forEach(cell => {
@@ -82,15 +83,13 @@ router.post('/', authMiddleware, async (req, res) => {
                     table_note_id: cell.table_note_id
                 });
             });
-            console.log('TableNote inserted with ID: ', savedTableNote.id);
-            console.log("登録後に取得したcolumns:", columnsAfterRegist);
-            console.log("並べ替えたcells:", groupedRowCells);
             // レスポンス用データ整形
             tableNoteAfterRegist = {
                 id: savedTableNote.id,
                 title: savedTableNote.title,
                 label_id: savedTableNote.label_id,
                 is_locked: savedTableNote.is_locked,
+                is_pinned: savedTableNote.is_pinned,
                 createdate: savedTableNote.createdate.toISOString(),
                 updatedate: savedTableNote.updatedate.toISOString(),
                 columns: columnsAfterRegist,
@@ -140,6 +139,7 @@ router.get('/', authMiddleware, async (req, res) => {
                 title: tableNote.title,
                 label_id: tableNote.label_id,
                 is_locked: tableNote.is_locked,
+                is_pinned: tableNote.is_pinned,
                 createdate: tableNote.createdate.toISOString(),
                 updatedate: tableNote.updatedate.toISOString(),
                 columns: columns.map(col => ({ id: col.id, name: col.name, order: col.order, table_note_id: col.table_note_id })),
@@ -155,7 +155,7 @@ router.get('/', authMiddleware, async (req, res) => {
 });
 // 【UPDATE】テーブルノート更新API
 router.put('/', authMiddleware, async (req, res) => {
-    const { id, title, columns, rowCells, label_id, is_locked } = req.body;
+    const { id, title, columns, rowCells, label_id, is_locked, is_pinned } = req.body;
     if (!columns || !rowCells) {
         return res.status(400).json({ error: "Must set tablenote title, columns, rows" });
     }
@@ -172,6 +172,7 @@ router.put('/', authMiddleware, async (req, res) => {
             tableNote.title = title;
             tableNote.label_id = label_id || null;
             tableNote.is_locked = is_locked || false;
+            tableNote.is_pinned = is_pinned || false;
             tableNote.updatedate = new Date();
             await tableNoteRepository.save(tableNote);
             // --- カラムの更新 ---
@@ -281,6 +282,7 @@ router.put('/', authMiddleware, async (req, res) => {
                     id: tableNote.id,
                     title: tableNote.title,
                     is_locked: tableNote.is_locked,
+                    is_pinned: tableNote.is_pinned,
                     createdate: tableNote.createdate.toISOString(),
                     updatedate: tableNote.updatedate.toISOString(),
                     columns: updatedColumns.map(col => ({ id: col.id, name: col.name, order: col.order, table_note_id: col.table_note_id })),
@@ -314,6 +316,33 @@ router.put('/lock', authMiddleware, async (req, res) => {
     catch (error) {
         console.error("Error updating lock state", error);
         res.status(500).json({ error: "Failed to update lock state" });
+    }
+});
+// 【UPDATE】TableNoteピン用API
+router.put('/pin', authMiddleware, async (req, res) => {
+    const { id, isPinned } = req.body;
+    if (!id || typeof isPinned !== 'boolean') {
+        return res.status(400).json({ error: "Must set id and pin status" });
+    }
+    try {
+        const tableNoteRepository = AppDataSource.getRepository(TableNote);
+        const result = await tableNoteRepository
+            .createQueryBuilder()
+            .update(TableNote)
+            .set({
+            is_pinned: isPinned,
+            updatedate: () => '"updatedate"'
+        })
+            .where("id = :id", { id })
+            .execute();
+        if (result.affected === 0) {
+            return res.status(404).json({ error: "Can't find TableNote" });
+        }
+        res.status(200).json({ message: "Pin TableNote success!" });
+    }
+    catch (error) {
+        console.error("Error pin TableNote", error);
+        res.status(500).json({ error: "Failed to pin TableNote" });
     }
 });
 /************ TrashNote ************/
