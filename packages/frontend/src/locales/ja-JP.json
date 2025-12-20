@@ -46,6 +46,7 @@
     "label_upload": "データアップロード",
     "label_download_desc": "保存したデータをダウンロードできます。",
     "label_upload_desc": "ダウンロードしたデータをデータベースに登録できます。",
+    "label_filtered": "絞り込んでいます...",
     "placeholder_search": "検索",
     "placeholder_title": "タイトル",
     "placeholder_input_note": "ノートを入力...",

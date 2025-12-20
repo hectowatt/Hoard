@@ -3,7 +3,7 @@
 import InputForm from "./components/InputForm";
 import Note from "@/app/(authenticated)/components/Note";
 import React, { use, useEffect, useState } from "react";
-import { Container, Grid } from "@mui/material";
+import { Box, Container, Grid, Typography } from "@mui/material";
 import { useLabelContext } from "@/app/(authenticated)/context/LabelProvider";
 import { useNoteContext } from "@/app/(authenticated)/context/NoteProvider";
 import { useTableNoteContext } from "@/app/(authenticated)/context/TableNoteProvider";
@@ -11,6 +11,8 @@ import TableNote from "@/app/(authenticated)/components/TableNote";
 import { useSearchWordContext } from "@/app/(authenticated)/context/SearchWordProvider";
 import { useSearchLabelContext } from "./context/SearchLabelProvider";
 import { redirect } from "next/navigation";
+import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
+import { useTranslation } from "react-i18next";
 
 type Column = {
   id: number;
@@ -33,6 +35,7 @@ export default function Home() {
   const { tableNotes, setTableNotes, fetchTableNotes } = useTableNoteContext();
   const { searchWord } = useSearchWordContext();
   const { searchLabel } = useSearchLabelContext();
+  const { t } = useTranslation();
 
   // label_idに紐づくlabelnameを取得する
   const getLabelNameById = (label_id: string) => {
@@ -206,6 +209,14 @@ export default function Home() {
 
   return (
     <Container>
+      {(searchWord || searchLabel) && (
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <FilterAltOutlinedIcon />
+          <Typography variant="body2">
+            {t("label_filtered")}
+          </Typography>
+        </Box>
+      )}
       <InputForm onInsert={handleInsert} onInsertTableNote={handleInsertTableNote} />
       {/* ノートとテーブルノートをピン留めされたものを先頭に一覧表示 */}
       <Grid container spacing={2}>
