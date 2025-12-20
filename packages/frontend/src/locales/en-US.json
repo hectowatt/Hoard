@@ -46,6 +46,7 @@
     "label_upload": "Data Upload",
     "label_download_desc": "You can download saved data.",
     "label_upload_desc": "Downloaded data can be registered in the database.",
+    "label_filtered": "Filtering...",
     "placeholder_search": "Search",
     "placeholder_title": "Title",
     "placeholder_input_note": "Create note...",

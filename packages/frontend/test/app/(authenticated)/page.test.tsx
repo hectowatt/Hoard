@@ -1,85 +1,132 @@
 import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, cleanup } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { NoteProvider } from "@/app/(authenticated)/context/NoteProvider";
-import { LabelProvider } from "@/app/(authenticated)/context/LabelProvider";
 import Home from "@/app/(authenticated)/page";
-import { SearchLabelProvider } from "@/app/(authenticated)/context/SearchLabelProvider";
+import { useNoteContext } from "@/app/(authenticated)/context/NoteProvider";
+import { useLabelContext } from "@/app/(authenticated)/context/LabelProvider";
+import { useTableNoteContext } from "@/app/(authenticated)/context/TableNoteProvider";
+import { useSearchWordContext } from "@/app/(authenticated)/context/SearchWordProvider";
+import { useSearchLabelContext } from "@/app/(authenticated)/context/SearchLabelProvider";
 
-// ラベルコンテキストのモック
-const mockLabels = [
-    { id: "label1", labelname: "仕事" },
-    { id: "label2", labelname: "プライベート" },
-];
+// フックのモック化
+jest.mock("@/app/(authenticated)/context/NoteProvider");
+jest.mock("@/app/(authenticated)/context/LabelProvider");
+jest.mock("@/app/(authenticated)/context/TableNoteProvider");
+jest.mock("@/app/(authenticated)/context/SearchWordProvider");
+jest.mock("@/app/(authenticated)/context/SearchLabelProvider");
 
-jest.mock("@/app/(authenticated)/components/InputForm", () => () => <div data-testid="inputform">InputForm</div>);
-jest.mock("@/app/(authenticated)/components/Note", () => (props: any) => <div data-testid="note">Note: {props.title}</div>);
-jest.mock("@/app/(authenticated)/components/TableNote", () => (props: any) => <div data-testid="tablenote">TableNote: {props.title}</div>);
+// i18nextのモック
+jest.mock("react-i18next", () => ({
+    useTranslation: () => ({
+        t: (key: string) => key,
+    }),
+}));
 
-jest.mock("@/app/(authenticated)/context/LabelProvider", () => {
-    return {
-        ...jest.requireActual("@/app/(authenticated)/context/LabelProvider"),
-        useLabelContext: () => ({
-            labels: mockLabels,
-        }),
-        LabelProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+// 子コンポーネントの簡易モック
+jest.mock("@/app/(authenticated)/components/InputForm", () => {
+    return function MockInputForm() {
+        return <div data-testid="input-form">InputForm</div>;
+    };
+});
+jest.mock("@/app/(authenticated)/components/Note", () => {
+    return function MockNote({ title }: { title: string }) {
+        return <div data-testid="note">{title}</div>;
+    };
+});
+jest.mock("@/app/(authenticated)/components/TableNote", () => {
+    return function MockTableNote({ title }: { title: string }) {
+        return <div data-testid="tablenote">{title}</div>;
     };
 });
 
-jest.mock("@/app/(authenticated)/context/SearchWordProvider", () => ({
-    useSearchWordContext: () => ({
-        searchWord: "",
-    }),
-}));
+describe("Home Component", () => {
+    const mockFetchNotes = jest.fn();
+    const mockFetchTableNotes = jest.fn();
+    const mockFetchLabels = jest.fn();
 
-jest.mock("@/app/(authenticated)/context/NoteProvider", () => ({
-    useNoteContext: () => ({
-        notes: [
-            { id: "1", title: "Note1", content: "Test note", label_id: "", createdate: "", updatedate: "", is_locked: false },
-        ],
-        setNotes: jest.fn(),
-        fetchNotes: jest.fn(),
-    }),
-}));
+    const mockNotes = [
+        { id: "1", title: "Note 1", content: "Content 1", label_id: "l1", is_pinned: false, updatedate: "2023-01-01" },
+        { id: "2", title: "Pinned Note", content: "Content 2", label_id: "l1", is_pinned: true, updatedate: "2023-01-02" },
+    ];
 
-jest.mock("@/app/(authenticated)/context/TableNoteProvider", () => ({
-    useTableNoteContext: () => ({
-        tableNotes: [
+    const mockTableNotes = [
+        { id: "t1", title: "Table 1", label_id: "l1", is_pinned: false, updatedate: "2023-01-01", columns: [], rowCells: [] },
+    ];
+
+    const mockLabels = [{ id: "l1", labelname: "Work" }];
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+
+        // デフォルトのContext戻り値を設定
+        (useNoteContext as jest.Mock).mockReturnValue({
+            notes: mockNotes,
+            fetchNotes: mockFetchNotes,
+            setNotes: jest.fn(),
+        });
+        (useLabelContext as jest.Mock).mockReturnValue({
+            labels: mockLabels,
+            fetchLabels: mockFetchLabels,
+        });
+        (useTableNoteContext as jest.Mock).mockReturnValue({
+            tableNotes: mockTableNotes,
+            fetchTableNotes: mockFetchTableNotes,
+            setTableNotes: jest.fn(),
+        });
+        (useSearchWordContext as jest.Mock).mockReturnValue({ searchWord: "" });
+        (useSearchLabelContext as jest.Mock).mockReturnValue({ searchLabel: "" });
+    });
+
+    afterEach(cleanup);
+
+    it("初期表示時にノートとテーブルノートを取得する関数が実行されること", () => {
+        render(<Home />);
+        expect(mockFetchNotes).toHaveBeenCalledTimes(1);
+        expect(mockFetchTableNotes).toHaveBeenCalledTimes(1);
+    });
+
+    it("ピン留めされたノートがリストの最初に表示されること", () => {
+        render(<Home />);
+        const notes = screen.getAllByTestId("note");
+
+        expect(notes[0]).toHaveTextContent("Pinned Note");
+        expect(notes[1]).toHaveTextContent("Note 1");
+    });
+
+    it("検索ワードを入力した際、該当するノートのみが表示されること", () => {
+        (useSearchWordContext as jest.Mock).mockReturnValue({ searchWord: "Pinned" });
+        render(<Home />);
+
+        expect(screen.getByText("Pinned Note")).toBeInTheDocument();
+        expect(screen.queryByText("Note 1")).not.toBeInTheDocument();
+    });
+
+    it("ラベルフィルターが有効な場合、フィルタリング中のメッセージが表示されること", () => {
+        (useSearchLabelContext as jest.Mock).mockReturnValue({ searchLabel: "Work" });
+        render(<Home />);
+
+        expect(screen.getByText("label_filtered")).toBeInTheDocument();
+    });
+
+    it("テーブル内のセル値に検索ワードがヒットした場合、そのテーブルノートが表示されること", () => {
+        const customTableNotes = [
             {
-                id: "1",
-                title: "TableNote1",
-                label_id: "",
-                createdate: "",
-                updatedate: "",
-                is_locked: false,
+                id: "t2",
+                title: "Searchable Table",
+                label_id: "l1",
+                is_pinned: false,
+                updatedate: "2023-01-01",
                 columns: [],
-                rowCells: [],
-            },
-        ],
-        setTableNotes: jest.fn(),
-        fetchTableNotes: jest.fn(),
-    }),
-}));
+                rowCells: [[{ value: "FindMe" }]]
+            }
+        ];
+        (useTableNoteContext as jest.Mock).mockReturnValue({
+            tableNotes: customTableNotes,
+            fetchTableNotes: jest.fn(),
+        });
+        (useSearchWordContext as jest.Mock).mockReturnValue({ searchWord: "findme" });
 
-// fetch モック
-global.fetch = jest.fn(() =>
-    Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve(["Work", "Personal"]),
-    })
-) as jest.Mock;
-
-describe("Top Page", () => {
-    it("NoteとTableNoteが表示される", async () => {
-        render(
-            <SearchLabelProvider>
-                <Home />
-            </SearchLabelProvider>
-        );
-
-        expect(screen.getByTestId("note")).toBeInTheDocument();
-        expect(screen.getByTestId("inputform")).toBeInTheDocument();
-        expect(screen.getByTestId("tablenote")).toBeInTheDocument();
-
-    })
-})
+        render(<Home />);
+        expect(screen.getByText("Searchable Table")).toBeInTheDocument();
+    });
+});
