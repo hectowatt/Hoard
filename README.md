@@ -65,3 +65,6 @@ cp .env_sample .env
 Hoard supports PWA.
 
 If you use Hoard in Mobile, PWA is usefull for you.
+
+## Documentation
+For more information, [please check here](https://hectowatt.github.io/w477/2025/12/introhoard/).
