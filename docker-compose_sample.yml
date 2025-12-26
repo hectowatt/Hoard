@@ -1,47 +1,22 @@
 services:
-  frontend:
+  app:
     build:
       context: .
-    container_name: hoard_frontend
-    working_dir: /app/packages/frontend
-    restart: always
-    ports:
-      - "3500:3500"
+    container_name: hoard_app
+    working_dir: /app
     env_file:
       - .env
-    networks:
-      hoard_network:
-        ipv4_address: 192.168.1.100
-    depends_on:
-      - backend
-    volumes:
-      - ./packages/frontend:/app/packages/frontend
-      - /app/packages/frontend/node_modules
-    command: /bin/sh -c "npm run build && npm run start"
-
-  backend:
-    build:
-      context: .
-    container_name: hoard_backend
-    working_dir: /app/packages/backend
-    restart: always
-    ports:
-      - "4000:4000"
     environment:
       - DATABASE_URL=postgres://hoard_user:hoard_password@db:5432/hoard_db
       - REDIS_URL=redis://redis:6379
-    env_file:
-      - .env
-    networks:
-      hoard_network:
-        ipv4_address: 192.168.1.104
+    volumes:
+      - /app/node_modules
+    command: /bin/sh -c "npm run build && npm run start"
     depends_on:
       - db
       - redis
-    volumes:
-      - ./packages/backend:/app/packages/backend
-      - /app/packages/backend/node_modules
-    command: /bin/sh -c "npm run build && npm run start"
+    networks:
+      - hoard_network
 
   db:
     image: postgres:15
@@ -57,7 +32,7 @@ services:
       - pgdata:/var/lib/postgresql/data
     networks:
       hoard_network:
-        ipv4_address: 192.168.1.101
+
   redis:
     image: redis:7
     container_name: hoard_redis
@@ -66,23 +41,20 @@ services:
       - "6380:6379"
     networks:
       hoard_network:
-        ipv4_address: 192.168.1.103
 
   nginx:
     image: nginx:latest
     container_name: hoard_nginx
     restart: always
     ports:
-      - "8080:80"
+      - "8120:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./nginx/conf.d:/etc/nginx/conf.d
     depends_on:
-      - frontend
-      - backend
+      - app
     networks:
       hoard_network:
-        ipv4_address: 192.168.1.102
 
 networks:
   hoard_network:

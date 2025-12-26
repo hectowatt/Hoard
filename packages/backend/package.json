@@ -1,5 +1,5 @@
 {
-  "name": "backend",
+  "name": "hoard_backend",
   "type": "module",
   "version": "1.0.0",
   "main": "server.ts",

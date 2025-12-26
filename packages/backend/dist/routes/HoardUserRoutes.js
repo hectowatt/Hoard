@@ -64,7 +64,13 @@ router.put('/', authMiddleware, async (req, res) => {
         }
         // JWT を検証・デコード
         const decoded = jwt.verify(prevToken, SECRET);
-        const user_id = decoded.id;
+        if (typeof decoded === 'string' || !('id' in decoded)) {
+            return res.status(401).json({ error: "Invalid token" });
+        }
+        const user_id = typeof decoded !== 'string' && 'id' in decoded ? decoded.id : null;
+        if (!user_id) {
+            return res.status(401).json({ error: "Invalid token" });
+        }
         const oldJti = decoded.jti;
         // user_id でユーザーを検索
         const userRepository = AppDataSource.getRepository(HoardUser);
@@ -128,7 +134,7 @@ router.post('/compare', authMiddleware, async (req, res) => {
         }
         // JWT を検証・デコード
         const decoded = jwt.verify(token, SECRET);
-        const user_id = decoded.id;
+        const user_id = typeof decoded !== 'string' && 'id' in decoded ? decoded.id : null;
         const passwordString = req.body.passwordString;
         if (!passwordString) {
             return res.status(400).json({ error: "Must set password string" });

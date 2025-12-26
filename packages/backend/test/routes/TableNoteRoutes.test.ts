@@ -327,15 +327,6 @@ describe("TableNoteRoutes", () => {
         expect(response.body[1].rowCells[1][0].value).toBe("test cell4");
     });
 
-    it("GET /tablenotes and can't find tablenote should return 200 and message", async () => {
-        mockRepoTableNote.find.mockImplementationOnce(() => Promise.resolve(null));
-        const response = await request(app)
-            .get("/api/tablenotes");
-
-        expect(response.status).toBe(404);
-        expect(response.body.error).toBe("TableNote not found");
-    });
-
     it("GET /tablenotes and error ocuured should return 200 and message", async () => {
         mockRepoTableNote.find.mockRejectedValueOnce(() => Promise.reject(new Error("DB find error!")));
         const response = await request(app)

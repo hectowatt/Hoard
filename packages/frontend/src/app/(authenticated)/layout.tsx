@@ -20,8 +20,6 @@ import {
 	ListItemIcon,
 	ListItemText,
 	Divider,
-	Table,
-	useMediaQuery,
 } from "@mui/material";
 import TextSnippetOutlinedIcon from "@mui/icons-material/TextSnippetOutlined";
 import LabelImportantOutlineRoundedIcon from "@mui/icons-material/LabelImportantOutlineRounded";
@@ -70,8 +68,6 @@ export default function AuthenticatedLayout({
 	const router = useRouter();
 	const theme = useTheme();
 
-	// useMediaQueryを使って画面サイズを判定
-	const themeForMediaQuery = useTheme();
 	//クライアントサイドでのみテーマを決定する
 	React.useEffect(() => {
 		const THEME_KEY = process.env.THEME_KEY ? process.env.THEME_KEY : "hoard_theme_mode";
@@ -132,10 +128,22 @@ function InnerLayout({ children }: { children: React.ReactNode }) {
 	const { mode, setMode } = useThemeMode();
 	const router = useRouter();
 	const theme = useTheme();
-	// useMediaQueryを使って画面サイズを判定
-	const themeForMediaQuery = useTheme();
 	// md (900px) より小さい画面で isSmallScreen が true になる
-	const isSmallScreen = useMediaQuery(themeForMediaQuery.breakpoints.down("md"));
+	const [isSmallScreen, setIsSmallScreen] = React.useState(false);
+	React.useEffect(() => {
+		const handleResize = () => {
+			setIsSmallScreen(window.innerWidth < theme.breakpoints.values.md);
+		};
+		// 初回判定
+		handleResize();
+		// リサイズイベントリスナーを追加
+		window.addEventListener("resize", handleResize);
+
+		// クリーンアップ
+		return () => {
+			window.removeEventListener("resize", handleResize);
+		};
+	}, [theme]);
 	const [isDrawerOpen, setIsDrawerOpen] = React.useState(!isSmallScreen);
 	const { searchWord, setSearchWord } = useSearchWordContext();
 	const { searchLabel, setSearchLabel } = useSearchLabelContext();

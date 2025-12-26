@@ -4,8 +4,8 @@
     ],
     "ext": "ts",
     "ignore": [
-        "./node_modules",
-        "./migrations"
+        "node_modules",
+        "migrations"
     ],
-    "exec": "node --loader ts-node/esm ./server.ts"
+    "exec": "tsx ./server.ts"
 }

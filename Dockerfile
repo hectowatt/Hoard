@@ -4,13 +4,16 @@ FROM node:22.14.0
 # 作業ディレクトリを設定
 WORKDIR /app
 
-# backendの依存関係をインストール
+# 依存関係ファイルをコピー
+COPY package*.json ./
 COPY ./packages/backend/package*.json ./packages/backend/
-RUN cd ./packages/backend && npm install
-
-# frontendの依存関係をインストール
 COPY ./packages/frontend/package*.json ./packages/frontend/
-RUN cd ./packages/frontend && npm install
+
+# 依存関係のインストール
+RUN npm install
 
 # ソースコードをコピー
-COPY ./packages ./packages
+COPY . .
+
+# ポート開放
+EXPOSE 3500 4000

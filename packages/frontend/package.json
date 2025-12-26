@@ -1,5 +1,5 @@
 {
-  "name": "hoard",
+  "name": "hoard_frontend",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -15,9 +15,9 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@fontsource/roboto": "^5.2.9",
-    "@mui/icons-material": "^7.0.2",
-    "@mui/material": "^7.0.2",
-    "@mui/material-nextjs": "^7.0.2",
+    "@mui/icons-material": "^7.3.6",
+    "@mui/material": "^7.3.6",
+    "@mui/material-nextjs": "^7.3.6",
     "dotenv": "^17.2.3",
     "i18next": "^25.7.1",
     "i18next-browser-languagedetector": "^8.2.0",

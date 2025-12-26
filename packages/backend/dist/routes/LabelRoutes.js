@@ -38,11 +38,12 @@ router.get('/', authMiddleware, async (req, res) => {
         const labelRepository = AppDataSource.getRepository(Label);
         // labelを全件取得する
         const labels = await labelRepository.find();
-        res.status(200).json(labels);
+        return res.status(200).json(labels);
     }
     catch (error) {
         console.error("Error fetching labels:", error);
         res.status(500).json({ error: 'Failed to fetch labels' });
+        return;
     }
 });
 // 【DELETE】ラベル削除API

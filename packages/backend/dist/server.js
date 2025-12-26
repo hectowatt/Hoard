@@ -25,11 +25,13 @@ const port = 4000;
 app.use(express.json());
 app.use(cors({
     origin: [
-        'http://192.168.1.100:3500',
+        'http://localhost:8120',
+        'http://127.0.0.1:8120',
+        'http://localhost:3500'
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-    Credentials: true
+    credentials: true
 }));
 app.use(cookieParser());
 // PostgreSQL接続設定
@@ -45,7 +47,7 @@ export async function startServer() {
     await AppDataSource.initialize();
     console.log("Data Source has been initialized!");
     const hoardserver = await new Promise((resolve) => {
-        const server = app.listen(port, () => {
+        const server = app.listen(port, '0.0.0.0', () => {
             console.log(`Server running on http://localhost:${port}`);
             resolve(server);
         });
@@ -104,5 +106,8 @@ if (process.env.NODE_ENV !== 'test') {
     });
 }
 ;
-export const redis = new Redis({ host: '192.168.1.103', port: 6379 });
+export const redis = new Redis({
+    host: process.env.REDIS_HOST || 'redis',
+    port: 6379
+});
 //# sourceMappingURL=server.js.map

@@ -125,50 +125,52 @@ router.get('/', authMiddleware, async (req, res) => {
   try {
     const tableNoteRepository = AppDataSource.getRepository(TableNote);
     const tableNotes = await tableNoteRepository.find({ where: { is_deleted: false }, order: { updatedate: 'DESC' } });
-    if (!tableNotes) {
-      return res.status(404).json({ error: "TableNote not found" });
-    }
 
-    // 返却するテーブルノートの配列
-    let tableNoteArray: { id: string; title: string; label_id: string; is_locked: boolean; is_pinned: boolean; createdate: string; updatedate: string; columns: { id: string, name: string, order: number, table_note_id: string }[]; rowCells: { id: string, rowIndex: number, value: string, columnId?: string, table_note_id: string }[][] }[] = [];
+    if (tableNotes) {
+      // 返却するテーブルノートの配列
+      let tableNoteArray: { id: string; title: string; label_id: string; is_locked: boolean; is_pinned: boolean; createdate: string; updatedate: string; columns: { id: string, name: string, order: number, table_note_id: string }[]; rowCells: { id: string, rowIndex: number, value: string, columnId?: string, table_note_id: string }[][] }[] = [];
 
-    // 各テーブルノートのカラムとセルを取得
-    for (var i = 0; i < tableNotes.length; i++) {
-      const tableNote = tableNotes[i];
-      const columnRepository = AppDataSource.getRepository(TableNoteColumn);
-      const cellRepository = AppDataSource.getRepository(TableNoteCell);
-      const columns = await columnRepository.find({ where: { table_note_id: tableNote.id }, order: { order: 'ASC' } });
-      const rowCells = await cellRepository.find({ where: { table_note_id: tableNote.id }, relations: ['column'], order: { row_index: 'ASC', column: { order: 'ASC' } } });
+      // 各テーブルノートのカラムとセルを取得
+      for (var i = 0; i < tableNotes.length; i++) {
+        const tableNote = tableNotes[i];
+        const columnRepository = AppDataSource.getRepository(TableNoteColumn);
+        const cellRepository = AppDataSource.getRepository(TableNoteCell);
+        const columns = await columnRepository.find({ where: { table_note_id: tableNote.id }, order: { order: 'ASC' } });
+        const rowCells = await cellRepository.find({ where: { table_note_id: tableNote.id }, relations: ['column'], order: { row_index: 'ASC', column: { order: 'ASC' } } });
 
-      // rowCellsをrow_indexごとにグループ化して2次元配列に変換
-      const groupedRowCells: { id: string; rowIndex: number; value: string; columnId?: string; table_note_id: string }[][] = [];
-      rowCells.forEach(cell => {
-        const rowIdx = cell.row_index;
-        if (!groupedRowCells[rowIdx]) groupedRowCells[rowIdx] = [];
-        groupedRowCells[rowIdx].push({
-          id: cell.id,
-          rowIndex: cell.row_index,
-          value: cell.value,
-          columnId: cell.column ? cell.column.id : undefined,
-          table_note_id: cell.table_note_id
+        // rowCellsをrow_indexごとにグループ化して2次元配列に変換
+        const groupedRowCells: { id: string; rowIndex: number; value: string; columnId?: string; table_note_id: string }[][] = [];
+        rowCells.forEach(cell => {
+          const rowIdx = cell.row_index;
+          if (!groupedRowCells[rowIdx]) groupedRowCells[rowIdx] = [];
+          groupedRowCells[rowIdx].push({
+            id: cell.id,
+            rowIndex: cell.row_index,
+            value: cell.value,
+            columnId: cell.column ? cell.column.id : undefined,
+            table_note_id: cell.table_note_id
+          });
         });
-      });
-      tableNoteArray.push({
-        id: tableNote.id,
-        title: tableNote.title,
-        label_id: tableNote.label_id,
-        is_locked: tableNote.is_locked,
-        is_pinned: tableNote.is_pinned,
-        createdate: tableNote.createdate.toISOString(),
-        updatedate: tableNote.updatedate.toISOString(),
-        columns: columns.map(col => ({ id: col.id, name: col.name, order: col.order, table_note_id: col.table_note_id })),
-        rowCells: groupedRowCells
-      });
+        tableNoteArray.push({
+          id: tableNote.id,
+          title: tableNote.title,
+          label_id: tableNote.label_id,
+          is_locked: tableNote.is_locked,
+          is_pinned: tableNote.is_pinned,
+          createdate: tableNote.createdate.toISOString(),
+          updatedate: tableNote.updatedate.toISOString(),
+          columns: columns.map(col => ({ id: col.id, name: col.name, order: col.order, table_note_id: col.table_note_id })),
+          rowCells: groupedRowCells
+        });
+      }
+      return res.status(200).json(tableNoteArray);
+    } else {
+      return res.status(200).json([]);
     }
-    res.status(200).json(tableNoteArray);
   } catch (error) {
     console.error("Error fetching TableNote:", error);
     res.status(500).json({ error: 'Failed to fetch TableNote' });
+    return;
   }
 });
 
@@ -357,19 +359,19 @@ router.put('/pin', authMiddleware, async (req, res) => {
   try {
     const tableNoteRepository = AppDataSource.getRepository(TableNote);
     const result = await tableNoteRepository
-    .createQueryBuilder()
-    .update(TableNote)
-    .set({
-      is_pinned: isPinned,
-      updatedate: () => '"updatedate"'
-    })
-    .where("id = :id", { id })
-    .execute();
+      .createQueryBuilder()
+      .update(TableNote)
+      .set({
+        is_pinned: isPinned,
+        updatedate: () => '"updatedate"'
+      })
+      .where("id = :id", { id })
+      .execute();
 
     if (result.affected === 0) {
       return res.status(404).json({ error: "Can't find TableNote" });
     }
-    res.status(200).json({ message: "Pin TableNote success!"});
+    res.status(200).json({ message: "Pin TableNote success!" });
   } catch (error) {
     console.error("Error pin TableNote", error);
     res.status(500).json({ error: "Failed to pin TableNote" });

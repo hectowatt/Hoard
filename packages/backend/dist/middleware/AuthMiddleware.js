@@ -7,9 +7,16 @@ export const authMiddleware = async (req, res, next) => {
         return res.status(401).json({ message: 'Unauthorized' });
     try {
         const decoded = jwt.verify(token, SECRET);
-        const status = await redis.get(`token:${decoded.jti}`);
-        if (status !== 'valid') {
-            return res.status(401).json({ message: 'Token invalid or expired' });
+        if (typeof decoded !== 'string' && 'jti' in decoded) {
+            const status = await redis.get(`token:${decoded.jti}`);
+            if (status !== 'valid') {
+                return res.status(401).json({ message: 'Token invalid or expired' });
+            }
+            req.user = decoded;
+            return next();
+        }
+        else {
+            return res.status(401).json({ message: 'Invalid token payload' });
         }
         req.user = decoded;
         next();

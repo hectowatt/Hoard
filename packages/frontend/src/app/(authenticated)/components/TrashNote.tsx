@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Box, Paper, Typography, Dialog, DialogTitle, DialogContent, TextField, Button, FormControl, Select, MenuItem, InputLabel } from "../../../../node_modules/@mui/material";
+import { Box, Paper, Typography, Dialog, DialogTitle, DialogContent, TextField, Button, FormControl, Select, MenuItem, InputLabel } from "@mui/material";
 import { useLabelContext } from "@/app/(authenticated)/context/LabelProvider";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";

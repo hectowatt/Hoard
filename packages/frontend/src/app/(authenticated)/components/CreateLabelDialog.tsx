@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useState } from "react";
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, List, ListItem, ListItemText, IconButton, DialogContentText } from "../../../../node_modules/@mui/material";
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, List, ListItem, ListItemText, IconButton, DialogContentText } from "@mui/material"
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useLabelContext } from "@/app/(authenticated)/context/LabelProvider";
 import { useNoteContext } from "@/app/(authenticated)/context/NoteProvider";
@@ -74,7 +74,7 @@ export default function CreateLabelDialog({ open, onClose }: LabelDialogProps) {
             await fetchLabels(); // ラベルを再取得して更新
 
         } catch (error) {
-            console.error("Error saving note:", error);
+            console.error("Error saving label:", error);
         }
     }
 

@@ -9,11 +9,12 @@ router.get('/', authMiddleware, async (req, res) => {
         const noteRepository = AppDataSource.getRepository(Note);
         // Notesを全件取得する
         const notes = await noteRepository.find({ where: { is_deleted: false }, order: { updatedate: 'DESC' } });
-        res.status(200).json(notes);
+        return res.status(200).json(notes);
     }
     catch (error) {
         console.error("Error fetching notes:", error);
         res.status(500).json({ error: 'Failed to fetch notes' });
+        return;
     }
 });
 // 【INSERT】Notes登録API

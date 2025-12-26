@@ -19,7 +19,6 @@ import {
     TableCell,
     TableRow,
     TableHead,
-    useMediaQuery, // Import useMediaQuery
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles'; // Import useTheme
 import { useLabelContext } from "@/app/(authenticated)/context/LabelProvider";
@@ -97,8 +96,24 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
     }
 
     const theme = useTheme();
-    const isXs = useMediaQuery(theme.breakpoints.down('sm'));
+     const [isSmallScreen, setIsSmallScreen] = React.useState(false);
 
+  React.useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth < theme.breakpoints.values.sm);
+    };
+
+    // 初回判定
+    handleResize();
+
+    // リサイズイベントリスナーを追加
+    window.addEventListener("resize", handleResize);
+
+    // クリーンアップ
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [theme]);
     // ロックボタン押下処理
     const handleLock = async () => {
         if (!isLocked) {
@@ -385,8 +400,8 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                         gap: 1,
                         mt: 1
                     }}>
-                        <Button onClick={saveButtonClick} variant="contained" sx={{ fontSize: isXs ? '0.7rem' : '0.875rem' }} data-testid="button_save">{t("button_save")}</Button>
-                        <Button onClick={handleCollapse} variant="contained" sx={{ fontSize: isXs ? '0.7rem' : '0.875rem' }} data-testid="button_cancel">{t("button_cancel")}</Button>
+                        <Button onClick={saveButtonClick} variant="contained" sx={{ fontSize: isSmallScreen ? '0.7rem' : '0.875rem' }} data-testid="button_save">{t("button_save")}</Button>
+                        <Button onClick={handleCollapse} variant="contained" sx={{ fontSize: isSmallScreen ? '0.7rem' : '0.875rem' }} data-testid="button_cancel">{t("button_cancel")}</Button>
                         <FormControl size="small" sx={{ minWidth: 120 }}>
                             <InputLabel id="select-label">{t("dropdown_labels")}</InputLabel>
                             <Select
@@ -500,10 +515,10 @@ export default function InputForm({ onInsert, onInsertTableNote }: InputFormProp
                     <Button onClick={handleAddRow} sx={{ m: 2 }}><AddIcon /></Button>
                 </TableContainer>
                 <Box sx={{ textAlign: 'center', p: 2 }}>
-                    <Button onClick={handleSaveTableNote} variant="contained" sx={{ mr: 2, mb: 1, fontSize: isXs ? '0.7rem' : '0.875rem' }}>
+                    <Button onClick={handleSaveTableNote} variant="contained" sx={{ mr: 2, mb: 1, fontSize: isSmallScreen ? '0.7rem' : '0.875rem' }}>
                         {t("button_save")}
                     </Button>
-                    <Button onClick={() => setTableNoteOpen(false)} variant="contained" sx={{ mb: 1, fontSize: isXs ? '0.7rem' : '0.875rem' }}>
+                    <Button onClick={() => setTableNoteOpen(false)} variant="contained" sx={{ mb: 1, fontSize: isSmallScreen ? '0.7rem' : '0.875rem' }}>
                         {t("button_cancel")}
                     </Button>
                     <FormControl size="small" sx={{ minWidth: 120, ml: 2 }}>

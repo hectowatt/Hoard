@@ -13,7 +13,9 @@ router.post('/', async (req, res) => {
     if (token) {
         try {
             const decoded = jwt.verify(token, SECRET);
-            await redis.del(`token:${decoded.jti}`);
+            if (typeof decoded === 'object' && decoded !== null && 'jti' in decoded) {
+                await redis.del(`token:${decoded.jti}`);
+            }
         } catch (e) {
             console.error(e);
         }
