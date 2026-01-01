@@ -53,7 +53,7 @@ Copy setting file and build container.
 ```
 cp docker-compose_sample_dev.yml docker-compose.yml
 
-cp nginx/conf.d/default.conf_sample_dev nginx/conf.d/default.conf
+cp nginx/conf.d/default.conf_sample nginx/conf.d/default.conf
 
 cp ./.devcontainer/devcontainer_sample.json ./.devcontainer/devcontainer.json
 

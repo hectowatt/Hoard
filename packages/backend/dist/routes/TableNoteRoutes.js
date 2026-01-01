@@ -302,7 +302,7 @@ router.put('/', authMiddleware, async (req, res) => {
 // 【UPDATE】TableNoteロック状態更新用API
 router.put('/lock', authMiddleware, async (req, res) => {
     const { id, isLocked } = req.body;
-    if (!id || !isLocked) {
+    if (!id || isLocked === null || isLocked === undefined) {
         return res.status(400).json({ error: "Must set tablenote id,isLocked" });
     }
     try {
