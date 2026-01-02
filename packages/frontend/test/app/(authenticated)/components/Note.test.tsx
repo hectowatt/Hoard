@@ -117,7 +117,7 @@ describe("Note", () => {
         expect(screen.getByTestId("button_edit")).toBeVisible();
         expect(screen.getByTestId("button_delete")).toBeVisible();
         expect(screen.getByTestId("unlock")).toBeVisible();
-        expect(screen.getByTestId("button_pin")).toBeVisible();
+        expect(screen.getByTestId("icon_pin")).toBeVisible();
     })
 
     it("編集モード時、タイトルを編集できる", async () => {
